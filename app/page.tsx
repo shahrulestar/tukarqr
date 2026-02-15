@@ -670,7 +670,7 @@ export default function Home() {
         setDrawerAction(null);
         return;
       }
-      try {
+      const blobPromise = (async () => {
         const dataUrl = await renderSvgToPng(svg, {
           merchantName,
           includeText: true,
@@ -683,18 +683,22 @@ export default function Home() {
         for (let i = 0; i < bstr.length; i++) {
           u8arr[i] = bstr.charCodeAt(i);
         }
-        const blob = new Blob([u8arr], { type: mime });
-        await navigator.clipboard.write([
-          new ClipboardItem({ [mime]: blob }),
-        ]);
-        toast.success("Berjaya", {
-          description: "Imej QR berjaya disalin ke papan keratan",
-        });
-      } catch {
-        toast.error("Ralat", {
-          description: "Gagal menyalin imej. Cuba muat turun imej.",
-        });
-      }
+        return new Blob([u8arr], { type: mime });
+      })();
+      navigator.clipboard
+        .write([new ClipboardItem({ "image/png": blobPromise })])
+        .then(() =>
+          toast.success("Berjaya", {
+            description: "Imej QR berjaya disalin ke papan keratan",
+          })
+        )
+        .catch(() =>
+          toast.error("Ralat", {
+            description: "Gagal menyalin imej. Cuba muat turun imej.",
+          })
+        )
+        .finally(() => setDrawerAction(null));
+      return;
     }
 
     setDrawerAction(null);
