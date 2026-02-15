@@ -8,6 +8,7 @@ import {
   RefreshCw,
   QrCode,
   ImageIcon,
+  Scan,
   X,
 } from "lucide-react";
 
@@ -271,11 +272,9 @@ function getPrimaryColor(): string {
   return value || "#000000";
 }
 
-function renderSvgToPng(
-  svgElement: SVGSVGElement,
-  merchantName?: string | null,
-  scale = 4
-): Promise<string> {
+const PNG_OUTPUT_SIZE = 1000;
+
+function renderSvgToPng(svgElement: SVGSVGElement): Promise<string> {
   return new Promise((resolve, reject) => {
     const svgData = new XMLSerializer().serializeToString(svgElement);
     const svgBlob = new Blob([svgData], {
@@ -284,25 +283,21 @@ function renderSvgToPng(
     const url = URL.createObjectURL(svgBlob);
     const img = new Image();
     img.onload = () => {
-      const qrSize = img.width * scale;
-      const padding = 24 * scale;
-      const nameHeight = merchantName ? 32 * scale : 0;
+      const padding = 100;
+      const qrSize = PNG_OUTPUT_SIZE - padding * 2;
       const canvas = document.createElement("canvas");
-      canvas.width = qrSize + padding * 2;
-      canvas.height = qrSize + padding * 2 + nameHeight;
+      canvas.width = PNG_OUTPUT_SIZE;
+      canvas.height = PNG_OUTPUT_SIZE;
       const ctx = canvas.getContext("2d")!;
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, padding, padding, qrSize, qrSize);
-
-      if (merchantName) {
-        ctx.fillStyle = "#000000";
-        ctx.font = `600 ${18 * scale}px system-ui, sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        const displayName = merchantName.length > 30 ? merchantName.slice(0, 27) + "..." : merchantName;
-        ctx.fillText(displayName, canvas.width / 2, qrSize + padding + nameHeight / 2);
-      }
+      ctx.drawImage(
+        img,
+        padding,
+        padding,
+        qrSize,
+        qrSize
+      );
 
       const dataUrl = canvas.toDataURL("image/png");
       URL.revokeObjectURL(url);
@@ -318,10 +313,9 @@ function renderSvgToPng(
 
 function downloadQrAsPng(
   svgElement: SVGSVGElement,
-  filename: string,
-  merchantName?: string | null
+  filename: string
 ) {
-  renderSvgToPng(svgElement, merchantName).then((dataUrl) => {
+  renderSvgToPng(svgElement).then((dataUrl) => {
     const a = document.createElement("a");
     a.href = dataUrl;
     a.download = filename;
@@ -359,9 +353,8 @@ export default function Home() {
       return;
     }
     const svg = qrSvgRef.current;
-    const name = merchantName ?? null;
     const timer = requestAnimationFrame(() => {
-      renderSvgToPng(svg, name, 2)
+      renderSvgToPng(svg)
         .then(setPngPreviewUrl)
         .catch(() => setPngPreviewUrl(null));
     });
@@ -369,7 +362,7 @@ export default function Home() {
       cancelAnimationFrame(timer);
       setPngPreviewUrl(null);
     };
-  }, [qrPayload, merchantName]);
+  }, [qrPayload]);
 
   async function handleImageFile(
     file: File,
@@ -381,12 +374,12 @@ export default function Home() {
       /^image\//.test(file.type) ||
       /\.(jpg|jpeg|png|gif|webp|bmp|heic|heif|tiff|tif|svg|ico|avif)(\?.*)?$/i.test(file.name);
     if (!isImage) {
-      toast.error("Sila pilih fail imej");
+      toast.error("Ralat", { description: "Sila pilih fail imej" });
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("Imej terlalu besar. Maksimum 10MB.");
+      toast.error("Ralat", { description: "Imej terlalu besar. Maksimum 10MB." });
       return;
     }
 
@@ -422,19 +415,21 @@ export default function Home() {
         const validation = isDuitNowQr(payload);
         if (validation.valid) {
           setQrPayload(payload);
-          toast.success("QR DuitNow berjaya dekod! QR pembayaran sudah sedia.");
+          toast.success("Berjaya", {
+            description: "QR DuitNow berjaya dekod! QR pembayaran sudah sedia.",
+          });
         } else {
-          toast.error(validation.reason);
+          toast.error("Ralat", { description: validation.reason });
         }
       } else {
-        toast.error("Cuba lagi atau muat naik imej");
+        toast.error("Ralat", { description: "Cuba lagi atau muat naik imej" });
       }
 
       setIsDecoding(false);
     };
 
     img.onerror = () => {
-      toast.error("Gagal memuatkan imej");
+      toast.error("Ralat", { description: "Gagal memuatkan imej" });
       setIsDecoding(false);
     };
 
@@ -464,8 +459,10 @@ export default function Home() {
   function handleDownload() {
     const svg = qrSvgRef.current;
     if (!svg || !qrPayload) return;
-    downloadQrAsPng(svg, formatShortFilename(merchantName), merchantName);
-    toast.success("QR DuitNow berjaya dimuat turun! Imbas dengan aplikasi bank anda.");
+    downloadQrAsPng(svg, formatShortFilename(merchantName));
+    toast.success("Berjaya", {
+      description: "QR DuitNow berjaya dimuat turun! Imbas dengan aplikasi bank anda.",
+    });
   }
 
   function handleReset() {
@@ -483,11 +480,11 @@ export default function Home() {
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2">
             <QrCode className="size-8 text-primary" />
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-[22px] md:text-[26px] font-semibold leading-[1.25] tracking-[-0.015em] text-foreground">
               QRKita
             </h1>
           </div>
-          <p className="text-sm text-muted-foreground font-normal">
+          <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
             Tukar QR DuitNow yang kabur jadi QR code yang jelas dan bersih
           </p>
         </div>
@@ -495,10 +492,10 @@ export default function Home() {
         {/* Input Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">
+            <CardTitle className="text-[16px] md:text-[18px]">
               Imbas QR DuitNow
             </CardTitle>
-            <CardDescription className="font-normal">
+            <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
               Muat naik foto atau guna kamera untuk merakam QR DuitNow untuk pembayaran
             </CardDescription>
           </CardHeader>
@@ -511,10 +508,10 @@ export default function Home() {
               }}
             >
               <TabsList className="w-full">
-                <TabsTrigger value="upload" className="flex-1 font-medium">
+                <TabsTrigger value="upload" className="flex-1">
                   Muat naik
                 </TabsTrigger>
-                <TabsTrigger value="camera" className="flex-1 font-medium">
+                <TabsTrigger value="camera" className="flex-1">
                   Kamera
                 </TabsTrigger>
               </TabsList>
@@ -550,10 +547,10 @@ export default function Home() {
                         <ImageIcon className="size-6 text-primary" />
                       </div>
                       <div className="text-center">
-                        <p className="text-sm font-medium text-foreground">
+                        <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground">
                           Letakkan imej QR DuitNow di sini
                         </p>
-                        <p className="text-xs text-muted-foreground font-normal mt-1">
+                        <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground mt-1">
                           atau klik untuk melayari
                         </p>
                       </div>
@@ -577,12 +574,12 @@ export default function Home() {
                     className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50"
                   >
                     <div className="rounded-full bg-primary/10 p-3">
-                      <ImageIcon className="size-6 text-primary" />
+                      <Scan className="size-6 text-primary" />
                     </div>
-                    <p className="text-sm font-medium text-foreground text-center">
+                    <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
                       Klik untuk buka kamera dan ambil gambar QR DuitNow
                     </p>
-                    <p className="text-xs text-muted-foreground font-normal">
+                    <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
                       Gambar akan digunakan untuk dekod QR
                     </p>
                   </div>
@@ -606,7 +603,7 @@ export default function Home() {
           <Card>
             <CardContent className="flex items-center justify-center gap-3 py-8">
               <RefreshCw className="size-5 animate-spin text-primary" />
-              <span className="text-sm font-medium text-muted-foreground">
+              <span className="text-[14px] md:text-[16px] font-medium text-muted-foreground">
                 Mendekod kod QR...
               </span>
             </CardContent>
@@ -617,10 +614,10 @@ export default function Home() {
         {qrPayload && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">
+              <CardTitle className="text-[19px] md:text-[22px]">
                 QR DuitNow Pembayaran Sedia
               </CardTitle>
-              <CardDescription className="font-normal">
+              <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
                 Imbas dengan aplikasi bank anda untuk bayar. Kandungan sama seperti asal.
               </CardDescription>
             </CardHeader>
@@ -650,22 +647,26 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-                <span className="text-xs font-normal text-muted-foreground">
-                  Serasi dengan DuitNow, FPX, dan semua aplikasi bank Malaysia
+                {merchantName && (
+                  <p className="text-[15px] md:text-[16px] font-semibold text-foreground text-center">
+                    {merchantName}
+                  </p>
+                )}
+                <span className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
+                  Serasi dengan DuitNow dan semua aplikasi bank Malaysia
                 </span>
               </div>
 
               <div className="flex gap-2">
                 <Button
                   onClick={handleDownload}
-                  className="flex-1 font-medium"
+                  className="flex-1"
                 >
                   Muat Turun
                 </Button>
                 <Button
                   onClick={handleReset}
                   variant="outline"
-                  className="font-medium"
                 >
                   Set Semula
                 </Button>
@@ -678,9 +679,14 @@ export default function Home() {
         <canvas ref={canvasRef} className="hidden" />
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground font-normal">
-          QRKita &mdash; Penjana semula QR pembayaran DuitNow
-        </p>
+        <div className="text-center space-y-1">
+          <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
+            QRKita &mdash; Penjana semula QR pembayaran DuitNow
+          </p>
+          <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
+            Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
+          </p>
+        </div>
       </div>
     </main>
   );
