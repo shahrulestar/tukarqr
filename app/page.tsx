@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import jsQR from "jsqr";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import {
-  Download,
   RefreshCw,
   QrCode,
   ImageIcon,
@@ -228,7 +227,7 @@ function isDuitNowQr(payload: string): { valid: boolean; reason?: string } {
   if (!merchantAccount) {
     return {
       valid: false,
-      reason: "Invalid DuitNow QR format. The QR code may be corrupted or not a payment QR.",
+      reason: "Format QR DuitNow tidak sah. Kod QR mungkin rosak atau bukan QR pembayaran.",
     };
   }
   const aid = getMerchantAccountAid(merchantAccount);
@@ -253,6 +252,17 @@ function parseEmvCoMerchantName(payload: string): string | null {
   return value?.trim() || null;
 }
 
+function formatShortFilename(merchantName: string | null): string {
+  const now = new Date();
+  const date = now.toISOString().slice(2, 10).replace(/-/g, "");
+  const time = now.toTimeString().slice(0, 5).replace(":", "");
+  const base =
+    merchantName
+      ? merchantName.replace(/[^a-zA-Z0-9\s]/g, "").slice(0, 20).trim() || "qr"
+      : "qr";
+  return `${base}_${date}_${time}.png`;
+}
+
 function getPrimaryColor(): string {
   if (typeof window === "undefined") return "#000000";
   const value = getComputedStyle(document.documentElement)
@@ -261,55 +271,64 @@ function getPrimaryColor(): string {
   return value || "#000000";
 }
 
+function renderSvgToPng(
+  svgElement: SVGSVGElement,
+  merchantName?: string | null,
+  scale = 4
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgBlob = new Blob([svgData], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const qrSize = img.width * scale;
+      const padding = 24 * scale;
+      const nameHeight = merchantName ? 32 * scale : 0;
+      const canvas = document.createElement("canvas");
+      canvas.width = qrSize + padding * 2;
+      canvas.height = qrSize + padding * 2 + nameHeight;
+      const ctx = canvas.getContext("2d")!;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, padding, padding, qrSize, qrSize);
+
+      if (merchantName) {
+        ctx.fillStyle = "#000000";
+        ctx.font = `600 ${18 * scale}px system-ui, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const displayName = merchantName.length > 30 ? merchantName.slice(0, 27) + "..." : merchantName;
+        ctx.fillText(displayName, canvas.width / 2, qrSize + padding + nameHeight / 2);
+      }
+
+      const dataUrl = canvas.toDataURL("image/png");
+      URL.revokeObjectURL(url);
+      resolve(dataUrl);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to render PNG"));
+    };
+    img.src = url;
+  });
+}
+
 function downloadQrAsPng(
   svgElement: SVGSVGElement,
   filename: string,
   merchantName?: string | null
 ) {
-  const svgData = new XMLSerializer().serializeToString(svgElement);
-  const svgBlob = new Blob([svgData], {
-    type: "image/svg+xml;charset=utf-8",
+  renderSvgToPng(svgElement, merchantName).then((dataUrl) => {
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   });
-  const url = URL.createObjectURL(svgBlob);
-
-  const img = new Image();
-  img.onload = () => {
-    const scale = 4;
-    const qrSize = img.width * scale;
-    const padding = 24 * scale;
-    const nameHeight = merchantName ? 32 * scale : 0;
-    const canvas = document.createElement("canvas");
-    canvas.width = qrSize + padding * 2;
-    canvas.height = qrSize + padding * 2 + nameHeight;
-    const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, padding, padding, qrSize, qrSize);
-
-    if (merchantName) {
-      ctx.fillStyle = "#000000";
-      ctx.font = `600 ${18 * scale}px system-ui, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      const displayName = merchantName.length > 30 ? merchantName.slice(0, 27) + "..." : merchantName;
-      ctx.fillText(displayName, canvas.width / 2, qrSize + padding + nameHeight / 2);
-    }
-
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const pngUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = pngUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(pngUrl);
-    }, "image/png");
-
-    URL.revokeObjectURL(url);
-  };
-  img.src = url;
 }
 
 export default function Home() {
@@ -317,12 +336,8 @@ export default function Home() {
   const [qrPayload, setQrPayload] = useState<string | null>(null);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [isDecoding, setIsDecoding] = useState(false);
-  const [isCameraActive, setIsCameraActive] = useState(false);
   const [qrFgColor, setQrFgColor] = useState("#000000");
-
-  useEffect(() => {
-    setQrFgColor(getPrimaryColor());
-  }, []);
+  const [pngPreviewUrl, setPngPreviewUrl] = useState<string | null>(null);
 
   const merchantName = useMemo(
     () => (qrPayload ? parseEmvCoMerchantName(qrPayload) : null),
@@ -330,38 +345,38 @@ export default function Home() {
   );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
   const qrSvgRef = useRef<SVGSVGElement>(null);
-  const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const stopCamera = useCallback(() => {
-    if (scanIntervalRef.current) {
-      clearInterval(scanIntervalRef.current);
-      scanIntervalRef.current = null;
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    setIsCameraActive(false);
+  useEffect(() => {
+    setQrFgColor(getPrimaryColor());
   }, []);
 
   useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, [stopCamera]);
-
-  // Stop camera when switching away from camera tab
-  useEffect(() => {
-    if (activeTab !== "camera") {
-      stopCamera();
+    if (!qrPayload || !qrSvgRef.current) {
+      setPngPreviewUrl(null);
+      return;
     }
-  }, [activeTab, stopCamera]);
+    const svg = qrSvgRef.current;
+    const name = merchantName ?? null;
+    const timer = requestAnimationFrame(() => {
+      renderSvgToPng(svg, name, 2)
+        .then(setPngPreviewUrl)
+        .catch(() => setPngPreviewUrl(null));
+    });
+    return () => {
+      cancelAnimationFrame(timer);
+      setPngPreviewUrl(null);
+    };
+  }, [qrPayload, merchantName]);
 
-  async function handleImageFile(file: File) {
+  async function handleImageFile(
+    file: File,
+    options?: { fromCamera?: boolean }
+  ) {
+    const fromCamera = options?.fromCamera ?? false;
+
     const isImage =
       /^image\//.test(file.type) ||
       /\.(jpg|jpeg|png|gif|webp|bmp|heic|heif|tiff|tif|svg|ico|avif)(\?.*)?$/i.test(file.name);
@@ -393,7 +408,15 @@ export default function Home() {
 
       ctx.drawImage(img, 0, 0);
 
-      const payload = await preprocessAndDecode(canvas, { full: true });
+      let payload: string | null = null;
+      if (fromCamera) {
+        payload = await preprocessAndDecode(canvas, { full: false });
+        if (!payload) {
+          payload = await preprocessAndDecode(canvas, { full: true });
+        }
+      } else {
+        payload = await preprocessAndDecode(canvas, { full: true });
+      }
 
       if (payload) {
         const validation = isDuitNowQr(payload);
@@ -404,7 +427,7 @@ export default function Home() {
           toast.error(validation.reason);
         }
       } else {
-        toast.error("Tidak dapat dekod kod QR. Cuba imej yang lebih jelas.");
+        toast.error("Cuba lagi atau muat naik imej");
       }
 
       setIsDecoding(false);
@@ -423,6 +446,11 @@ export default function Home() {
     if (file) handleImageFile(file);
   }
 
+  function handleCameraChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) handleImageFile(file, { fromCamera: true });
+  }
+
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
@@ -433,82 +461,24 @@ export default function Home() {
     e.preventDefault();
   }
 
-  async function startCamera() {
-    try {
-      stopCamera();
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
-      });
-
-      streamRef.current = stream;
-      setIsCameraActive(true);
-
-      const video = videoRef.current;
-      if (video) {
-        video.srcObject = stream;
-        await new Promise<void>((resolve, reject) => {
-          video.onloadedmetadata = () => resolve();
-          video.onerror = () => reject(new Error("Video load failed"));
-        });
-        await video.play();
-
-        // Start scanning after video has frames
-        scanIntervalRef.current = setInterval(() => {
-          scanCameraFrame();
-        }, 500);
-      }
-    } catch {
-      stopCamera();
-      toast.error("Tidak dapat akses kamera. Semak kebenaran.");
-    }
-  }
-
-  async function scanCameraFrame() {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas || video.readyState !== video.HAVE_ENOUGH_DATA)
-      return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.drawImage(video, 0, 0);
-
-    const payload = await preprocessAndDecode(canvas, { full: false });
-    if (payload) {
-      const validation = isDuitNowQr(payload);
-      if (validation.valid) {
-        setQrPayload(payload);
-        setOriginalImage(null);
-        stopCamera();
-        toast.success("QR DuitNow berjaya dirakam! QR pembayaran sudah sedia.");
-      } else {
-        toast.error(validation.reason);
-      }
-    }
-  }
-
   function handleDownload() {
     const svg = qrSvgRef.current;
     if (!svg || !qrPayload) return;
-    downloadQrAsPng(svg, "duitnow-qr-payment.png", merchantName);
+    downloadQrAsPng(svg, formatShortFilename(merchantName), merchantName);
     toast.success("QR DuitNow berjaya dimuat turun! Imbas dengan aplikasi bank anda.");
   }
 
   function handleReset() {
-    stopCamera();
     setQrPayload(null);
     setOriginalImage(null);
     setIsDecoding(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   }
 
   return (
     <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
-      <div className="mx-auto max-w-md space-y-6">
+      <div className="mx-auto max-w-[800px] w-full space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2">
@@ -535,7 +505,10 @@ export default function Home() {
           <CardContent>
             <Tabs
               value={activeTab}
-              onValueChange={(val) => setActiveTab(val)}
+              onValueChange={(val) => {
+                setActiveTab(val);
+                handleReset();
+              }}
             >
               <TabsList className="w-full">
                 <TabsTrigger value="upload" className="flex-1 font-medium">
@@ -566,7 +539,7 @@ export default function Home() {
                           handleReset();
                         }}
                         aria-label="Buang imej"
-                        className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-white shadow-sm hover:bg-destructive/90"
+                        className="absolute -right-2 -top-2 rounded-full bg-primary p-1 text-primary-foreground shadow-sm hover:bg-primary/90"
                       >
                         <X className="size-3" />
                       </button>
@@ -581,7 +554,7 @@ export default function Home() {
                           Letakkan imej QR DuitNow di sini
                         </p>
                         <p className="text-xs text-muted-foreground font-normal mt-1">
-                          atau klik untuk melayari (semua format imej)
+                          atau klik untuk melayari
                         </p>
                       </div>
                     </>
@@ -599,37 +572,29 @@ export default function Home() {
 
               <TabsContent value="camera" className="mt-4">
                 <div className="space-y-3">
-                  <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted">
-                    {isCameraActive ? (
-                      <video
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="absolute inset-0 h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
-                        <div className="size-10 rounded-full border-2 border-dashed border-muted-foreground/40" />
-                        <p className="text-sm font-normal">
-                          Pratonton kamera akan muncul di sini
-                        </p>
-                      </div>
-                    )}
-                    {isCameraActive && (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="size-48 rounded-2xl border-2 border-primary/60" />
-                      </div>
-                    )}
-                  </div>
-
-                  <Button
-                    onClick={isCameraActive ? stopCamera : startCamera}
-                    variant="default"
-                    className="w-full font-medium"
+                  <div
+                    onClick={() => cameraInputRef.current?.click()}
+                    className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50"
                   >
-                    {isCameraActive ? "Berhenti Kamera" : "Mulakan Kamera"}
-                  </Button>
+                    <div className="rounded-full bg-primary/10 p-3">
+                      <ImageIcon className="size-6 text-primary" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground text-center">
+                      Klik untuk buka kamera dan ambil gambar QR DuitNow
+                    </p>
+                    <p className="text-xs text-muted-foreground font-normal">
+                      Gambar akan digunakan untuk dekod QR
+                    </p>
+                  </div>
+                  <input
+                    ref={cameraInputRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    aria-label="Ambil gambar QR"
+                    className="hidden"
+                    onChange={handleCameraChange}
+                  />
                 </div>
               </TabsContent>
             </Tabs>
@@ -662,22 +627,29 @@ export default function Home() {
             <CardContent className="space-y-4">
               <div className="flex flex-col items-center gap-2">
                 <div className="rounded-lg bg-white p-6">
-                  <QRCodeSVG
-                    ref={qrSvgRef}
-                    value={qrPayload}
-                    size={200}
-                    level="M"
-                    marginSize={2}
-                    fgColor={qrFgColor}
-                    bgColor="#ffffff"
-                    title="QR DuitNow - Imbas untuk bayar"
-                  />
+                  <div className="relative inline-block">
+                    <QRCodeSVG
+                      ref={qrSvgRef}
+                      value={qrPayload}
+                      size={200}
+                      level="M"
+                      marginSize={2}
+                      fgColor={qrFgColor}
+                      bgColor="#ffffff"
+                      title="QR DuitNow - Imbas untuk bayar"
+                      className={pngPreviewUrl ? "sr-only" : undefined}
+                      aria-hidden={!!pngPreviewUrl}
+                    />
+                    {pngPreviewUrl && (
+                      <img
+                        src={pngPreviewUrl}
+                        alt="QR DuitNow - Imbas untuk bayar"
+                        className="w-[200px] h-auto object-contain"
+                        draggable={false}
+                      />
+                    )}
+                  </div>
                 </div>
-                {merchantName && (
-                  <p className="text-sm font-medium text-foreground text-center">
-                    {merchantName}
-                  </p>
-                )}
                 <span className="text-xs font-normal text-muted-foreground">
                   Serasi dengan DuitNow, FPX, dan semua aplikasi bank Malaysia
                 </span>
@@ -688,15 +660,13 @@ export default function Home() {
                   onClick={handleDownload}
                   className="flex-1 font-medium"
                 >
-                  <Download className="size-4" />
-                  Muat Turun PNG
+                  Muat Turun
                 </Button>
                 <Button
                   onClick={handleReset}
                   variant="outline"
                   className="font-medium"
                 >
-                  <RefreshCw className="size-4" />
                   Set Semula
                 </Button>
               </div>
