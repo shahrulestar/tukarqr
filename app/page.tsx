@@ -722,9 +722,6 @@ export default function Home() {
           <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
             Tukar QR DuitNow yang kabur jadi QR code yang jelas dan bersih
           </p>
-          <p className="text-[12px] leading-[1.5] text-muted-foreground/80">
-            Sahkan nama penerima dan jumlah sebelum bayar bila imbasan QR
-          </p>
         </div>
 
         {/* Input Card */}
