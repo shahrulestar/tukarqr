@@ -21,6 +21,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 function decodeQrFromCanvas(canvas: HTMLCanvasElement): string | null {
   const ctx = canvas.getContext("2d");
@@ -253,6 +268,21 @@ function parseEmvCoMerchantName(payload: string): string | null {
   return value?.trim() || null;
 }
 
+/** Tag 54 = Transaction amount. Format: "10.00" or "458" + amount for MYR. */
+function parseEmvCoAmount(payload: string): string | null {
+  const tlv = parseEmvCoTlv(payload);
+  const value = tlv.get("54")?.trim();
+  if (!value) return null;
+  // If starts with 3-digit currency code (e.g. 458 for MYR), use the rest
+  const amountStr =
+    /^\d{3}[\d.]+$/.test(value) && value.length > 4
+      ? value.slice(3)
+      : value;
+  const num = parseFloat(amountStr);
+  if (isNaN(num) || num < 0) return null;
+  return `RM ${num.toFixed(2)}`;
+}
+
 function formatShortFilename(merchantName: string | null): string {
   const now = new Date();
   const date = now.toISOString().slice(2, 10).replace(/-/g, "");
@@ -272,15 +302,28 @@ function getPrimaryColor(): string {
   return value || "#000000";
 }
 
-const PNG_OUTPUT_SIZE = 1000;
-const PNG_TEXT_AREA_HEIGHT = 120;
+const INNER_PADDING_TOP_BOTTOM = 16;
+const INNER_PADDING_LEFT_RIGHT = 24;
+const MALAYSIA_QR_BORDER_WIDTH = 12;
+const MALAYSIA_QR_BAR_HEIGHT = 100;
+const MALAYSIA_QR_RADIUS = 16;
+const HOLDER_NAME_FONT = "600 44px system-ui, -apple-system, sans-serif";
+
+const WATERMARK_TEXT = "Tukar QR";
 
 function renderSvgToPng(
   svgElement: SVGSVGElement,
-  options?: { merchantName?: string | null; includeText?: boolean }
+  options?: {
+    merchantName?: string | null;
+    includeText?: boolean;
+    ratio?: "1:1" | "3:4";
+    watermark?: boolean;
+  }
 ): Promise<string> {
   const merchantName = options?.merchantName ?? null;
   const includeText = options?.includeText ?? false;
+  const ratio = options?.ratio ?? "1:1";
+  const watermark = options?.watermark ?? true;
 
   return new Promise((resolve, reject) => {
     const svgData = new XMLSerializer().serializeToString(svgElement);
@@ -290,31 +333,115 @@ function renderSvgToPng(
     const url = URL.createObjectURL(svgBlob);
     const img = new Image();
     img.onload = () => {
-      const padding = 100;
-      const qrSize = PNG_OUTPUT_SIZE - padding * 2;
-      const canvasHeight = includeText && merchantName ? PNG_OUTPUT_SIZE + PNG_TEXT_AREA_HEIGHT : PNG_OUTPUT_SIZE;
-      const canvas = document.createElement("canvas");
-      canvas.width = PNG_OUTPUT_SIZE;
-      canvas.height = canvasHeight;
-      const ctx = canvas.getContext("2d")!;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(
-        img,
-        padding,
-        padding,
-        qrSize,
-        qrSize
+      const borderWidth = MALAYSIA_QR_BORDER_WIDTH;
+      const barHeight = MALAYSIA_QR_BAR_HEIGHT;
+      const radius = MALAYSIA_QR_RADIUS;
+      const holderNameArea = includeText && merchantName ? 80 : 0;
+
+      const totalWidth = ratio === "1:1" ? 1000 : 900;
+      const totalHeight =
+        ratio === "1:1" ? 1000 : Math.round(totalWidth * (4 / 3));
+      const contentLeft = INNER_PADDING_LEFT_RIGHT;
+      const contentTop = INNER_PADDING_TOP_BOTTOM;
+      const contentWidth = totalWidth - INNER_PADDING_LEFT_RIGHT * 2;
+      const contentHeight = totalHeight - INNER_PADDING_TOP_BOTTOM * 2;
+      const frameSize = Math.min(contentWidth, contentHeight);
+      const frameX = contentLeft + (contentWidth - frameSize) / 2;
+      const frameY = contentTop + (contentHeight - frameSize) / 2;
+
+      const innerWidth = frameSize - borderWidth * 2;
+      const whiteHeight = frameSize - borderWidth - barHeight;
+
+      const qrSize = Math.min(
+        innerWidth - INNER_PADDING_TOP_BOTTOM * 2,
+        whiteHeight - INNER_PADDING_TOP_BOTTOM * 2 - holderNameArea
       );
+      const qrX = frameX + borderWidth + (innerWidth - qrSize) / 2;
+      const qrY = frameY + borderWidth + INNER_PADDING_TOP_BOTTOM;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = totalWidth;
+      canvas.height = totalHeight;
+      const ctx = canvas.getContext("2d")!;
+
+      const drawRoundedRect = (
+        x: number,
+        y: number,
+        w: number,
+        h: number,
+        r: number
+      ) => {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+      };
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+      const borderColor = getPrimaryColor();
+      ctx.fillStyle = borderColor;
+      drawRoundedRect(
+        frameX,
+        frameY,
+        frameSize,
+        frameSize,
+        radius + borderWidth
+      );
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      drawRoundedRect(
+        frameX + borderWidth,
+        frameY + borderWidth,
+        innerWidth,
+        whiteHeight,
+        radius
+      );
+      ctx.fill();
+
+      ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
 
       if (includeText && merchantName) {
-        const centerX = PNG_OUTPUT_SIZE / 2;
-        const textY = PNG_OUTPUT_SIZE + 40;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#000000";
-        ctx.font = "600 32px system-ui, -apple-system, sans-serif";
-        ctx.fillText(merchantName, centerX, textY);
+        ctx.font = HOLDER_NAME_FONT;
+        ctx.fillText(
+          merchantName,
+          frameX + borderWidth + innerWidth / 2,
+          qrY + qrSize + holderNameArea / 2
+        );
+      }
+
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = HOLDER_NAME_FONT;
+      ctx.fillText(
+        "MALAYSIA NATIONAL QR",
+        frameX + borderWidth + innerWidth / 2,
+        frameY + frameSize - barHeight / 2
+      );
+
+      if (watermark) {
+        ctx.fillStyle = "rgba(0,0,0,0.25)";
+        ctx.font = "12px system-ui, -apple-system, sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(
+          WATERMARK_TEXT,
+          totalWidth - 12,
+          totalHeight - 8
+        );
       }
 
       const dataUrl = canvas.toDataURL("image/png");
@@ -332,9 +459,14 @@ function renderSvgToPng(
 function downloadQrAsPng(
   svgElement: SVGSVGElement,
   filename: string,
-  merchantName?: string | null
+  merchantName?: string | null,
+  ratio?: "1:1" | "3:4"
 ) {
-  renderSvgToPng(svgElement, { merchantName, includeText: true }).then((dataUrl) => {
+  renderSvgToPng(svgElement, {
+    merchantName,
+    includeText: true,
+    ratio: ratio ?? "1:1",
+  }).then((dataUrl) => {
     const a = document.createElement("a");
     a.href = dataUrl;
     a.download = filename;
@@ -351,9 +483,20 @@ export default function Home() {
   const [isDecoding, setIsDecoding] = useState(false);
   const [qrFgColor, setQrFgColor] = useState("#000000");
   const [pngPreviewUrl, setPngPreviewUrl] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerAction, setDrawerAction] = useState<
+    "download" | "copy" | null
+  >(null);
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const merchantName = useMemo(
     () => (qrPayload ? parseEmvCoMerchantName(qrPayload) : null),
+    [qrPayload]
+  );
+
+  const merchantAmount = useMemo(
+    () => (qrPayload ? parseEmvCoAmount(qrPayload) : null),
     [qrPayload]
   );
 
@@ -361,6 +504,7 @@ export default function Home() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const qrSvgRef = useRef<SVGSVGElement>(null);
+  const resultCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setQrFgColor(getPrimaryColor());
@@ -373,7 +517,11 @@ export default function Home() {
     }
     const svg = qrSvgRef.current;
     const timer = requestAnimationFrame(() => {
-      renderSvgToPng(svg)
+      renderSvgToPng(svg, {
+        merchantName,
+        includeText: true,
+        ratio: "1:1",
+      })
         .then(setPngPreviewUrl)
         .catch(() => setPngPreviewUrl(null));
     });
@@ -381,6 +529,18 @@ export default function Home() {
       cancelAnimationFrame(timer);
       setPngPreviewUrl(null);
     };
+  }, [qrPayload, merchantName]);
+
+  useEffect(() => {
+    if (qrPayload && resultCardRef.current) {
+      const id = setTimeout(() => {
+        resultCardRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
+      return () => clearTimeout(id);
+    }
   }, [qrPayload]);
 
   async function handleImageFile(
@@ -475,13 +635,69 @@ export default function Home() {
     e.preventDefault();
   }
 
-  function handleDownload() {
+  function openDrawerForDownload() {
+    setDrawerAction("download");
+    setDrawerOpen(true);
+  }
+
+  function openDrawerForCopy() {
+    setDrawerAction("copy");
+    setDrawerOpen(true);
+  }
+
+  async function executeWithRatio(ratio: "1:1" | "3:4") {
     const svg = qrSvgRef.current;
-    if (!svg || !qrPayload) return;
-    downloadQrAsPng(svg, formatShortFilename(merchantName), merchantName);
-    toast.success("Berjaya", {
-      description: "QR DuitNow berjaya dimuat turun! Imbas dengan aplikasi bank anda.",
-    });
+    if (!svg || !qrPayload || !drawerAction) return;
+
+    setDrawerOpen(false);
+
+    if (drawerAction === "download") {
+      downloadQrAsPng(
+        svg,
+        formatShortFilename(merchantName),
+        merchantName,
+        ratio
+      );
+      toast.success("Berjaya", {
+        description:
+          "QR DuitNow berjaya dimuat turun! Imbas dengan aplikasi bank anda.",
+      });
+    } else if (drawerAction === "copy") {
+      if (!navigator.clipboard?.write) {
+        toast.error("Ralat", {
+          description: "Salin imej tidak disokong. Cuba muat turun imej.",
+        });
+        setDrawerAction(null);
+        return;
+      }
+      try {
+        const dataUrl = await renderSvgToPng(svg, {
+          merchantName,
+          includeText: true,
+          ratio,
+        });
+        const arr = dataUrl.split(",");
+        const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
+        const bstr = atob(arr[1] ?? "");
+        const u8arr = new Uint8Array(bstr.length);
+        for (let i = 0; i < bstr.length; i++) {
+          u8arr[i] = bstr.charCodeAt(i);
+        }
+        const blob = new Blob([u8arr], { type: mime });
+        await navigator.clipboard.write([
+          new ClipboardItem({ [mime]: blob }),
+        ]);
+        toast.success("Berjaya", {
+          description: "Imej QR berjaya disalin ke papan keratan",
+        });
+      } catch {
+        toast.error("Ralat", {
+          description: "Gagal menyalin imej. Cuba muat turun imej.",
+        });
+      }
+    }
+
+    setDrawerAction(null);
   }
 
   function handleReset() {
@@ -500,11 +716,14 @@ export default function Home() {
           <div className="inline-flex items-center gap-2">
             <QrCode className="size-8 text-primary" />
             <h1 className="text-[22px] md:text-[26px] font-semibold leading-[1.25] tracking-[-0.015em] text-foreground">
-              QRKita
+              Tukar QR
             </h1>
           </div>
           <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
             Tukar QR DuitNow yang kabur jadi QR code yang jelas dan bersih
+          </p>
+          <p className="text-[12px] leading-[1.5] text-muted-foreground/80">
+            Sahkan nama penerima dan jumlah sebelum bayar bila imbasan QR
           </p>
         </div>
 
@@ -548,6 +767,7 @@ export default function Home() {
                         src={originalImage}
                         alt="QR dimuat naik"
                         className="max-h-48 max-w-full rounded-md object-contain pointer-events-none"
+                        loading="lazy"
                         draggable={false}
                         onDragStart={(e) => e.preventDefault()}
                       />
@@ -633,6 +853,7 @@ export default function Home() {
 
         {/* Result Card */}
         {qrPayload && (
+          <div ref={resultCardRef}>
           <Card>
             <CardHeader>
               <CardTitle className="text-[19px] md:text-[22px]">
@@ -643,13 +864,29 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* User education: verify before pay + disclaimer */}
+              <div
+                role="alert"
+                className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2.5 text-[13px] text-amber-700 dark:text-amber-400 dark:border-amber-500/30 dark:bg-amber-500/10"
+              >
+                <p className="font-medium">Pastikan sebelum imbasan:</p>
+                <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
+                  <li>Sahkan nama penerima betul</li>
+                  <li>Semak jumlah bayaran jika ada</li>
+                  <li>Jangan imbasan QR dari sumber tidak dipercayai</li>
+                </ul>
+                <p className="mt-2 pt-2 border-t border-amber-500/30 text-[11px] text-muted-foreground">
+                  Alat ini hanya untuk kegunaan menukar QR DuitNow yang kabur atau gambar QR, kepada gambar yang jelas. Jangan gunakan untuk penipuan atau aktiviti haram. Pengguna bertanggungjawab sepenuhnya atas penggunaan alat ini.
+                </p>
+              </div>
+
               <div className="flex flex-col items-center gap-2">
-                <div className="rounded-lg bg-card border border-border p-6 select-none">
+                <div className="rounded-lg bg-card border border-border p-3 select-none">
                   <div className="relative inline-block">
                     <QRCodeSVG
                       ref={qrSvgRef}
                       value={qrPayload}
-                      size={200}
+                      size={280}
                       level="M"
                       marginSize={2}
                       fgColor={qrFgColor}
@@ -662,7 +899,8 @@ export default function Home() {
                       <img
                         src={pngPreviewUrl}
                         alt="QR DuitNow - Imbas untuk bayar"
-                        className="w-[200px] h-auto object-contain pointer-events-none"
+                        className="max-w-[320px] w-full aspect-square object-contain pointer-events-none"
+                        loading="lazy"
                         draggable={false}
                         onDragStart={(e) => e.preventDefault()}
                       />
@@ -670,8 +908,13 @@ export default function Home() {
                   </div>
                 </div>
                 {merchantName && (
-                  <p className="text-[15px] md:text-[16px] font-semibold text-foreground text-center">
+                  <p className="text-[18px] md:text-[20px] font-semibold text-foreground text-center">
                     {merchantName}
+                  </p>
+                )}
+                {merchantAmount && (
+                  <p className="text-[16px] md:text-[18px] font-medium text-foreground">
+                    {merchantAmount}
                   </p>
                 )}
                 <span className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
@@ -679,36 +922,96 @@ export default function Home() {
                 </span>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2">
                 <Button
-                  onClick={handleDownload}
-                  className="flex-1"
+                  onClick={openDrawerForDownload}
+                  className="w-full"
                 >
                   Muat Turun
                 </Button>
                 <Button
-                  onClick={handleReset}
+                  onClick={openDrawerForCopy}
                   variant="outline"
+                  className="w-full"
                 >
-                  Set Semula
+                  Salin Imej
                 </Button>
               </div>
             </CardContent>
           </Card>
+          </div>
         )}
 
         {/* Hidden canvas for QR decoding */}
         <canvas ref={canvasRef} className="hidden" />
 
+        {/* Ratio selection - Dialog on desktop, Drawer on mobile */}
+        {isDesktop ? (
+          <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Pilih nisbah</DialogTitle>
+                <DialogDescription>
+                  Pilih saiz imej untuk muat turun atau salin
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-2">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => executeWithRatio("1:1")}
+                >
+                  1:1 (1000 x 1000 px)
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => executeWithRatio("3:4")}
+                >
+                  3:4 (900 x 1200 px)
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <DrawerContent>
+              <div className="mx-auto w-full max-w-sm">
+                <DrawerHeader>
+                  <DrawerTitle>Pilih nisbah</DrawerTitle>
+                  <DrawerDescription>
+                    Pilih saiz imej untuk muat turun atau salin
+                  </DrawerDescription>
+                </DrawerHeader>
+                <div className="flex flex-col gap-2 p-4">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => executeWithRatio("1:1")}
+                  >
+                    1:1 (1000 x 1000 px)
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => executeWithRatio("3:4")}
+                  >
+                    3:4 (900 x 1200 px)
+                  </Button>
+                </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        )}
+
         {/* Footer */}
-        <div className="text-center space-y-1">
-          <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
-            QRKita &mdash; Penjana semula QR pembayaran DuitNow
-          </p>
-          <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-balance">
-            Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
-          </p>
-        </div>
+        {!qrPayload && (
+          <div className="text-center">
+            <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-balance">
+              Tukar QR &mdash; Penjana semula QR pembayaran DuitNow. Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
+            </p>
+          </div>
+        )}
       </div>
     </main>
   );

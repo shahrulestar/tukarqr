@@ -1,24 +1,27 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://qrkita.com"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.vercel.app"
   ),
-  title: "QRKita - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
+  title: "Tukar QR - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
   description:
     "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
   keywords: [
@@ -31,25 +34,25 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ms_MY",
-    siteName: "QRKita",
-    title: "QRKita - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
+    siteName: "Tukar QR",
+    title: "Tukar QR - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
     description:
       "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: [
       {
-        url: "/image.png",
+        url: "/tkrqr.png",
         width: 1200,
         height: 630,
-        alt: "QRKita - QR DuitNow Lebih Jelas",
+        alt: "Tukar QR - QR DuitNow Lebih Jelas",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "QRKita - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
+    title: "Tukar QR - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
     description:
       "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
-    images: ["/image.png"],
+    images: ["/tkrqr.png"],
   },
   icons: {
     icon: "/favicon.ico",
@@ -59,7 +62,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "QRKita",
+  name: "Tukar QR",
   description:
     "Ramai pengguna hanya mempunyai gambar QR DuitNow yang tidak jelas atau diambil menggunakan kamera. Dengan alat ini, anda boleh menukar gambar QR tersebut kepada QR digital yang kemas dan boleh digunakan semula untuk pembayaran.",
   applicationCategory: "UtilitiesApplication",
@@ -82,6 +85,7 @@ export default function RootLayout({
           />
           {children}
           <Toaster richColors position="top-center" />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
