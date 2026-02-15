@@ -2,7 +2,7 @@
 
 Convert blurry DuitNow QR images to clean digital QR codes. Upload a photo or use your camera to capture a DuitNow QR, and regenerate a crisp, scannable QR code for payment.
 
-**Live:** [tukarqr.vercel.app](https://tukarqr.vercel.app)
+**Live:** [tukarqr.my](https://tukarqr.my)
 
 ## Features
 

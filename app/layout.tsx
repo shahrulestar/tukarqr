@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.vercel.app"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my"
   ),
   title: "Tukar QR - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
   description:
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     images: ["/tkrqr.png"],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.ico?v=2",
   },
 };
 
