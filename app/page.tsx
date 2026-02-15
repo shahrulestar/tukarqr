@@ -36,6 +36,9 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { ResponsiveModal } from "@/components/responsive-modal";
+import { HowToStart } from "@/components/onboarding/how-to-start";
+import { PrivacyPolicy } from "@/components/onboarding/privacy-policy";
 
 function decodeQrFromCanvas(canvas: HTMLCanvasElement): string | null {
   const ctx = canvas.getContext("2d");
@@ -488,6 +491,8 @@ export default function Home() {
     "download" | "copy" | null
   >(null);
   const [alertDismissed, setAlertDismissed] = useState(false);
+  const [howToStartOpen, setHowToStartOpen] = useState(false);
+  const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -497,10 +502,28 @@ export default function Home() {
     if (stored === "true") setAlertDismissed(true);
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const completed = localStorage.getItem("qrkita-onboarding-completed");
+    if (completed !== "true") setHowToStartOpen(true);
+  }, []);
+
   function dismissAlert() {
     setAlertDismissed(true);
     if (typeof window !== "undefined") {
       localStorage.setItem("qrkita-alert-dismissed", "true");
+    }
+  }
+
+  function handleHowToStartNext() {
+    setHowToStartOpen(false);
+    setPrivacyPolicyOpen(true);
+  }
+
+  function handlePrivacyPolicyDone() {
+    setPrivacyPolicyOpen(false);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("qrkita-onboarding-completed", "true");
     }
   }
 
@@ -1028,14 +1051,32 @@ export default function Home() {
           </Drawer>
         )}
 
+        {/* Onboarding: How to Start */}
+        <ResponsiveModal
+          open={howToStartOpen}
+          onOpenChange={setHowToStartOpen}
+          title="Cara guna"
+          description="Ikuti langkah mudah untuk menukar QR DuitNow anda"
+        >
+          <HowToStart onNext={handleHowToStartNext} />
+        </ResponsiveModal>
+
+        {/* Onboarding: Privacy Policy */}
+        <ResponsiveModal
+          open={privacyPolicyOpen}
+          onOpenChange={setPrivacyPolicyOpen}
+          title="Dasar privasi"
+          description="Maklumat tentang privasi dan pemprosesan data"
+        >
+          <PrivacyPolicy onDone={handlePrivacyPolicyDone} />
+        </ResponsiveModal>
+
         {/* Footer */}
-        {!qrPayload && (
-          <div className="text-center">
-            <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-balance">
-              Tukar QR &mdash; Penjana semula QR pembayaran DuitNow. Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
-            </p>
-          </div>
-        )}
+        <div className="text-center">
+          <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-balance">
+            Tukar QR &mdash; Penjana semula QR pembayaran DuitNow. Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
+          </p>
+        </div>
       </div>
     </main>
   );

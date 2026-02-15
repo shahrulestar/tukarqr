@@ -17,11 +17,11 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my"
-  ),
-  title: "Tukar QR - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
+  metadataBase: new URL(siteUrl),
+  title: "Tukar QR - DuitNow QR Converter",
   description:
     "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
   keywords: [
@@ -35,7 +35,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ms_MY",
     siteName: "Tukar QR",
-    title: "Tukar QR - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
+    url: siteUrl,
+    title: "Tukar QR - DuitNow QR Converter",
     description:
       "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: [
@@ -49,13 +50,20 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tukar QR - QR DuitNow Lebih Jelas, Lebih Mudah Digunakan.",
+    title: "Tukar QR - DuitNow QR Converter",
     description:
       "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: ["/tkrqr.png"],
   },
   icons: {
-    icon: "/favicon.ico?v=2",
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+  },
+  alternates: {
+    canonical: siteUrl,
   },
 };
 
@@ -75,6 +83,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ms" suppressHydrationWarning>
+      <head>
+        <link rel="preload" href="/favicon.ico" as="image" />
+        <link rel="preload" href="/favicon-32x32.png" as="image" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
