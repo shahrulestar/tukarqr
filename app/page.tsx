@@ -273,8 +273,15 @@ function getPrimaryColor(): string {
 }
 
 const PNG_OUTPUT_SIZE = 1000;
+const PNG_TEXT_AREA_HEIGHT = 120;
 
-function renderSvgToPng(svgElement: SVGSVGElement): Promise<string> {
+function renderSvgToPng(
+  svgElement: SVGSVGElement,
+  options?: { merchantName?: string | null; includeText?: boolean }
+): Promise<string> {
+  const merchantName = options?.merchantName ?? null;
+  const includeText = options?.includeText ?? false;
+
   return new Promise((resolve, reject) => {
     const svgData = new XMLSerializer().serializeToString(svgElement);
     const svgBlob = new Blob([svgData], {
@@ -285,9 +292,10 @@ function renderSvgToPng(svgElement: SVGSVGElement): Promise<string> {
     img.onload = () => {
       const padding = 100;
       const qrSize = PNG_OUTPUT_SIZE - padding * 2;
+      const canvasHeight = includeText && merchantName ? PNG_OUTPUT_SIZE + PNG_TEXT_AREA_HEIGHT : PNG_OUTPUT_SIZE;
       const canvas = document.createElement("canvas");
       canvas.width = PNG_OUTPUT_SIZE;
-      canvas.height = PNG_OUTPUT_SIZE;
+      canvas.height = canvasHeight;
       const ctx = canvas.getContext("2d")!;
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -298,6 +306,16 @@ function renderSvgToPng(svgElement: SVGSVGElement): Promise<string> {
         qrSize,
         qrSize
       );
+
+      if (includeText && merchantName) {
+        const centerX = PNG_OUTPUT_SIZE / 2;
+        const textY = PNG_OUTPUT_SIZE + 40;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#000000";
+        ctx.font = "600 32px system-ui, -apple-system, sans-serif";
+        ctx.fillText(merchantName, centerX, textY);
+      }
 
       const dataUrl = canvas.toDataURL("image/png");
       URL.revokeObjectURL(url);
@@ -313,9 +331,10 @@ function renderSvgToPng(svgElement: SVGSVGElement): Promise<string> {
 
 function downloadQrAsPng(
   svgElement: SVGSVGElement,
-  filename: string
+  filename: string,
+  merchantName?: string | null
 ) {
-  renderSvgToPng(svgElement).then((dataUrl) => {
+  renderSvgToPng(svgElement, { merchantName, includeText: true }).then((dataUrl) => {
     const a = document.createElement("a");
     a.href = dataUrl;
     a.download = filename;
@@ -459,7 +478,7 @@ export default function Home() {
   function handleDownload() {
     const svg = qrSvgRef.current;
     if (!svg || !qrPayload) return;
-    downloadQrAsPng(svg, formatShortFilename(merchantName));
+    downloadQrAsPng(svg, formatShortFilename(merchantName), merchantName);
     toast.success("Berjaya", {
       description: "QR DuitNow berjaya dimuat turun! Imbas dengan aplikasi bank anda.",
     });
@@ -507,11 +526,11 @@ export default function Home() {
                 handleReset();
               }}
             >
-              <TabsList className="w-full">
-                <TabsTrigger value="upload" className="flex-1">
+              <TabsList>
+                <TabsTrigger value="upload">
                   Muat naik
                 </TabsTrigger>
-                <TabsTrigger value="camera" className="flex-1">
+                <TabsTrigger value="camera">
                   Kamera
                 </TabsTrigger>
               </TabsList>
@@ -524,11 +543,13 @@ export default function Home() {
                   className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50"
                 >
                   {originalImage ? (
-                    <div className="relative">
+                    <div className="relative select-none">
                       <img
                         src={originalImage}
                         alt="QR dimuat naik"
-                        className="max-h-48 max-w-full rounded-md object-contain"
+                        className="max-h-48 max-w-full rounded-md object-contain pointer-events-none"
+                        draggable={false}
+                        onDragStart={(e) => e.preventDefault()}
                       />
                       <button
                         onClick={(e) => {
@@ -623,7 +644,7 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col items-center gap-2">
-                <div className="rounded-lg bg-white p-6">
+                <div className="rounded-lg bg-card border border-border p-6 select-none">
                   <div className="relative inline-block">
                     <QRCodeSVG
                       ref={qrSvgRef}
@@ -641,8 +662,9 @@ export default function Home() {
                       <img
                         src={pngPreviewUrl}
                         alt="QR DuitNow - Imbas untuk bayar"
-                        className="w-[200px] h-auto object-contain"
+                        className="w-[200px] h-auto object-contain pointer-events-none"
                         draggable={false}
+                        onDragStart={(e) => e.preventDefault()}
                       />
                     )}
                   </div>
@@ -683,7 +705,7 @@ export default function Home() {
           <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
             QRKita &mdash; Penjana semula QR pembayaran DuitNow
           </p>
-          <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
+          <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-balance">
             Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
           </p>
         </div>
