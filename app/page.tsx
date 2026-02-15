@@ -487,8 +487,22 @@ export default function Home() {
   const [drawerAction, setDrawerAction] = useState<
     "download" | "copy" | null
   >(null);
+  const [alertDismissed, setAlertDismissed] = useState(false);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("qrkita-alert-dismissed");
+    if (stored === "true") setAlertDismissed(true);
+  }, []);
+
+  function dismissAlert() {
+    setAlertDismissed(true);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("qrkita-alert-dismissed", "true");
+    }
+  }
 
   const merchantName = useMemo(
     () => (qrPayload ? parseEmvCoMerchantName(qrPayload) : null),
@@ -760,7 +774,7 @@ export default function Home() {
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => fileInputRef.current?.click()}
-                  className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50"
+                  className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50 min-h-[220px]"
                 >
                   {originalImage ? (
                     <div className="relative select-none">
@@ -788,14 +802,12 @@ export default function Home() {
                       <div className="rounded-full bg-primary/10 p-3">
                         <ImageIcon className="size-6 text-primary" />
                       </div>
-                      <div className="text-center">
-                        <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground">
-                          Letakkan imej QR DuitNow di sini
-                        </p>
-                        <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground mt-1">
-                          atau klik untuk melayari
-                        </p>
-                      </div>
+                      <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
+                        Letakkan imej QR DuitNow di sini
+                      </p>
+                      <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center">
+                        atau klik untuk melayari
+                      </p>
                     </>
                   )}
                   <input
@@ -810,21 +822,19 @@ export default function Home() {
               </TabsContent>
 
               <TabsContent value="camera" className="mt-4">
-                <div className="space-y-3">
-                  <div
-                    onClick={() => cameraInputRef.current?.click()}
-                    className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50"
-                  >
-                    <div className="rounded-full bg-primary/10 p-3">
-                      <Scan className="size-6 text-primary" />
-                    </div>
-                    <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
+                <div
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50 min-h-[220px]"
+                >
+                  <div className="rounded-full bg-primary/10 p-3">
+                    <Scan className="size-6 text-primary" />
+                  </div>
+                  <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
                       Klik untuk buka kamera dan ambil gambar QR DuitNow
                     </p>
-                    <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
-                      Gambar akan digunakan untuk dekod QR
-                    </p>
-                  </div>
+                    <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center">
+                    Gambar akan digunakan untuk dekod QR
+                  </p>
                   <input
                     ref={cameraInputRef}
                     type="file"
@@ -854,11 +864,14 @@ export default function Home() {
 
         {/* Result Card */}
         {qrPayload && (
-          <div ref={resultCardRef}>
+          <div
+            ref={resultCardRef}
+            className="animate-in fade-in slide-in-from-bottom-4 duration-300"
+          >
           <Card>
             <CardHeader>
-              <CardTitle className="text-[19px] md:text-[22px]">
-                QR DuitNow Pembayaran Sedia
+              <CardTitle className="text-[16px] md:text-[18px]">
+                QR DuitNow Sedia Digunakan
               </CardTitle>
               <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
                 Imbas dengan aplikasi bank anda untuk bayar. Kandungan sama seperti asal.
@@ -866,20 +879,30 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* User education: verify before pay + disclaimer */}
-              <div
-                role="alert"
-                className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2.5 text-[13px] text-amber-700 dark:text-amber-400 dark:border-amber-500/30 dark:bg-amber-500/10"
-              >
-                <p className="font-medium">Pastikan sebelum imbasan:</p>
-                <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
-                  <li>Sahkan nama penerima betul</li>
-                  <li>Semak jumlah bayaran jika ada</li>
-                  <li>Jangan imbasan QR dari sumber tidak dipercayai</li>
-                </ul>
-                <p className="mt-2 pt-2 border-t border-amber-500/30 text-[11px] text-muted-foreground">
-                  Alat ini hanya untuk kegunaan menukar QR DuitNow yang kabur atau gambar QR, kepada gambar yang jelas. Jangan gunakan untuk penipuan atau aktiviti haram. Pengguna bertanggungjawab sepenuhnya atas penggunaan alat ini.
-                </p>
-              </div>
+              {!alertDismissed && (
+                <div
+                  role="alert"
+                  className="relative rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2.5 pr-9 text-[13px] text-amber-700 dark:text-amber-400 dark:border-amber-500/30 dark:bg-amber-500/10"
+                >
+                  <button
+                    type="button"
+                    onClick={dismissAlert}
+                    aria-label="Sembunyikan peringatan"
+                    className="absolute right-2 top-2 rounded p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
+                  >
+                    <X className="size-4" />
+                  </button>
+                  <p className="font-medium">Pastikan sebelum imbasan:</p>
+                  <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
+                    <li>Sahkan nama penerima betul</li>
+                    <li>Semak jumlah bayaran jika ada</li>
+                    <li>Jangan imbasan QR dari sumber tidak dipercayai</li>
+                  </ul>
+                  <p className="mt-2 pt-2 border-t border-amber-500/30 text-[11px] text-muted-foreground">
+                    Alat ini hanya untuk kegunaan menukar QR DuitNow yang kabur atau gambar QR, kepada gambar yang jelas. Jangan gunakan untuk penipuan atau aktiviti haram. Pengguna bertanggungjawab sepenuhnya atas penggunaan alat ini.
+                  </p>
+                </div>
+              )}
 
               <div className="flex flex-col items-center gap-2">
                 <div className="rounded-lg bg-card border border-border p-3 select-none">
