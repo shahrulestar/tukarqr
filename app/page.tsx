@@ -219,47 +219,47 @@ function validateEmvCoCrc(payload: string): boolean {
 
 function isDuitNowQr(payload: string): { valid: boolean; reason?: string } {
   if (typeof payload !== "string" || !payload) {
-    return { valid: false, reason: "Format QR DuitNow tidak sah. Kod QR mungkin rosak atau bukan QR pembayaran." };
+    return { valid: false, reason: "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran." };
   }
   if (payload.length > MAX_PAYLOAD_LENGTH) {
-    return { valid: false, reason: "Format QR DuitNow tidak sah. Kod QR mungkin rosak atau bukan QR pembayaran." };
+    return { valid: false, reason: "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran." };
   }
   if (!EMVCO_ASCII.test(payload)) {
-    return { valid: false, reason: "Format QR DuitNow tidak sah. Kod QR mungkin rosak atau bukan QR pembayaran." };
+    return { valid: false, reason: "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran." };
   }
   const tlv = parseEmvCoTlv(payload);
   const formatIndicator = tlv.get("00");
   if (formatIndicator !== "02") {
     return {
       valid: false,
-      reason: "Kod QR ini bukan QR pembayaran DuitNow. Hanya kod QR DuitNow Malaysia disokong.",
+      reason: "Kod QR ini bukan DuitNow QR pembayaran. Hanya kod DuitNow QR Malaysia disokong.",
     };
   }
   const countryCode = tlv.get("58");
   if (countryCode !== "MY") {
     return {
       valid: false,
-      reason: "Kod QR ini bukan QR pembayaran DuitNow. Hanya kod QR DuitNow Malaysia disokong.",
+      reason: "Kod QR ini bukan DuitNow QR pembayaran. Hanya kod DuitNow QR Malaysia disokong.",
     };
   }
   const merchantAccount = tlv.get("26");
   if (!merchantAccount) {
     return {
       valid: false,
-      reason: "Format QR DuitNow tidak sah. Kod QR mungkin rosak atau bukan QR pembayaran.",
+      reason: "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran.",
     };
   }
   const aid = getMerchantAccountAid(merchantAccount);
   if (aid !== DUITNOW_MALAYSIA_AID) {
     return {
       valid: false,
-      reason: "Kod QR ini bukan QR pembayaran DuitNow. Hanya kod QR DuitNow Malaysia disokong.",
+      reason: "Kod QR ini bukan DuitNow QR pembayaran. Hanya kod DuitNow QR Malaysia disokong.",
     };
   }
   if (!validateEmvCoCrc(payload)) {
     return {
       valid: false,
-      reason: "Kod QR DuitNow tidak sah atau rosak.",
+      reason: "Kod DuitNow QR tidak sah atau rosak.",
     };
   }
   return { valid: true };
@@ -305,14 +305,16 @@ function getPrimaryColor(): string {
   return value || "#000000";
 }
 
-const INNER_PADDING_TOP_BOTTOM = 16;
-const INNER_PADDING_LEFT_RIGHT = 24;
-const MALAYSIA_QR_BORDER_WIDTH = 12;
+const INNER_PADDING_TOP_BOTTOM = 24;
+const INNER_PADDING_LEFT_RIGHT = 36;
+const MALAYSIA_QR_BORDER_TOP = 20;
+const MALAYSIA_QR_BORDER_LEFT_RIGHT = 20;
+const MALAYSIA_QR_BORDER_BOTTOM = 12;
 const MALAYSIA_QR_BAR_HEIGHT = 100;
 const MALAYSIA_QR_RADIUS = 16;
 const HOLDER_NAME_FONT = "600 44px system-ui, -apple-system, sans-serif";
 
-const WATERMARK_TEXT = "Tukar QR";
+const WATERMARK_TEXT = "tukarqr.my";
 
 function renderSvgToPng(
   svgElement: SVGSVGElement,
@@ -336,7 +338,10 @@ function renderSvgToPng(
     const url = URL.createObjectURL(svgBlob);
     const img = new Image();
     img.onload = () => {
-      const borderWidth = MALAYSIA_QR_BORDER_WIDTH;
+      const borderTop = MALAYSIA_QR_BORDER_TOP;
+      const borderLeft = MALAYSIA_QR_BORDER_LEFT_RIGHT;
+      const borderRight = MALAYSIA_QR_BORDER_LEFT_RIGHT;
+      const borderBottom = MALAYSIA_QR_BORDER_BOTTOM;
       const barHeight = MALAYSIA_QR_BAR_HEIGHT;
       const radius = MALAYSIA_QR_RADIUS;
       const holderNameArea = includeText && merchantName ? 80 : 0;
@@ -352,15 +357,15 @@ function renderSvgToPng(
       const frameX = contentLeft + (contentWidth - frameSize) / 2;
       const frameY = contentTop + (contentHeight - frameSize) / 2;
 
-      const innerWidth = frameSize - borderWidth * 2;
-      const whiteHeight = frameSize - borderWidth - barHeight;
+      const innerWidth = frameSize - borderLeft - borderRight;
+      const whiteHeight = frameSize - borderTop - barHeight;
 
       const qrSize = Math.min(
         innerWidth - INNER_PADDING_TOP_BOTTOM * 2,
         whiteHeight - INNER_PADDING_TOP_BOTTOM * 2 - holderNameArea
       );
-      const qrX = frameX + borderWidth + (innerWidth - qrSize) / 2;
-      const qrY = frameY + borderWidth + INNER_PADDING_TOP_BOTTOM;
+      const qrX = frameX + borderLeft + (innerWidth - qrSize) / 2;
+      const qrY = frameY + borderTop + INNER_PADDING_TOP_BOTTOM;
 
       const canvas = document.createElement("canvas");
       canvas.width = totalWidth;
@@ -397,14 +402,14 @@ function renderSvgToPng(
         frameY,
         frameSize,
         frameSize,
-        radius + borderWidth
+        radius + Math.max(borderTop, borderLeft, borderRight, borderBottom)
       );
       ctx.fill();
 
       ctx.fillStyle = "#ffffff";
       drawRoundedRect(
-        frameX + borderWidth,
-        frameY + borderWidth,
+        frameX + borderLeft,
+        frameY + borderTop,
         innerWidth,
         whiteHeight,
         radius
@@ -420,7 +425,7 @@ function renderSvgToPng(
         ctx.font = HOLDER_NAME_FONT;
         ctx.fillText(
           merchantName,
-          frameX + borderWidth + innerWidth / 2,
+          frameX + borderLeft + innerWidth / 2,
           qrY + qrSize + holderNameArea / 2
         );
       }
@@ -431,7 +436,7 @@ function renderSvgToPng(
       ctx.font = HOLDER_NAME_FONT;
       ctx.fillText(
         "MALAYSIA NATIONAL QR",
-        frameX + borderWidth + innerWidth / 2,
+        frameX + borderLeft + innerWidth / 2,
         frameY + frameSize - barHeight / 2
       );
 
@@ -632,7 +637,7 @@ export default function Home() {
         if (validation.valid) {
           setQrPayload(payload);
           toast.success("Berjaya", {
-            description: "QR DuitNow berjaya dekod! QR pembayaran sudah sedia.",
+            description: "DuitNow QR berjaya dekod! QR pembayaran sudah sedia.",
           });
         } else {
           toast.error("Ralat", { description: validation.reason });
@@ -697,7 +702,7 @@ export default function Home() {
       );
       toast.success("Berjaya", {
         description:
-          "QR DuitNow berjaya dimuat turun! Imbas dengan aplikasi bank anda.",
+          "DuitNow QR berjaya dimuat turun! Imbas dengan aplikasi bank anda.",
       });
     } else if (drawerAction === "copy") {
       if (!navigator.clipboard?.write) {
@@ -761,7 +766,7 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
-            Tukar QR DuitNow yang kabur jadi QR code yang jelas dan bersih
+            Tukar DuitNow QR yang kabur jadi QR code yang jelas dan bersih
           </p>
         </div>
 
@@ -769,10 +774,10 @@ export default function Home() {
         <Card>
           <CardHeader>
             <CardTitle className="text-[16px] md:text-[18px]">
-              Imbas QR DuitNow
+              Imbas DuitNow QR
             </CardTitle>
             <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-              Muat naik foto atau guna kamera untuk merakam QR DuitNow untuk pembayaran
+              Muat naik foto atau guna kamera untuk merakam DuitNow QR untuk pembayaran
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -826,7 +831,7 @@ export default function Home() {
                         <ImageIcon className="size-6 text-primary" />
                       </div>
                       <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
-                        Letakkan imej QR DuitNow di sini
+                        Letakkan imej DuitNow QR di sini
                       </p>
                       <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center">
                         atau klik untuk melayari
@@ -853,7 +858,7 @@ export default function Home() {
                     <Scan className="size-6 text-primary" />
                   </div>
                   <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
-                      Klik untuk buka kamera dan ambil gambar QR DuitNow
+                      Buka kamera dan imbas DuitNow QR
                     </p>
                     <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center">
                     Gambar akan digunakan untuk dekod QR
@@ -894,7 +899,7 @@ export default function Home() {
           <Card>
             <CardHeader>
               <CardTitle className="text-[16px] md:text-[18px]">
-                QR DuitNow Sedia Digunakan
+                DuitNow QR Sedia Digunakan
               </CardTitle>
               <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
                 Imbas dengan aplikasi bank anda untuk bayar. Kandungan sama seperti asal.
@@ -922,13 +927,13 @@ export default function Home() {
                     <li>Jangan imbasan QR dari sumber tidak dipercayai</li>
                   </ul>
                   <p className="mt-2 pt-2 border-t border-amber-500/30 text-[11px] text-muted-foreground">
-                    Alat ini hanya untuk kegunaan menukar QR DuitNow yang kabur atau gambar QR, kepada gambar yang jelas. Jangan gunakan untuk penipuan atau aktiviti haram. Pengguna bertanggungjawab sepenuhnya atas penggunaan alat ini.
+                    Alat ini hanya untuk kegunaan menukar DuitNow QR yang kabur atau gambar QR, kepada gambar yang jelas. Jangan gunakan untuk penipuan atau aktiviti haram. Pengguna bertanggungjawab sepenuhnya atas penggunaan alat ini.
                   </p>
                 </div>
               )}
 
               <div className="flex flex-col items-center gap-2">
-                <div className="rounded-lg bg-card border border-border p-3 select-none">
+                <div className="rounded-lg bg-card border border-border pt-5 px-6 pb-4 select-none">
                   <div className="relative inline-block">
                     <QRCodeSVG
                       ref={qrSvgRef}
@@ -938,14 +943,14 @@ export default function Home() {
                       marginSize={2}
                       fgColor={qrFgColor}
                       bgColor="#ffffff"
-                      title="QR DuitNow - Imbas untuk bayar"
+                      title="DuitNow QR - Imbas untuk bayar"
                       className={pngPreviewUrl ? "sr-only" : undefined}
                       aria-hidden={!!pngPreviewUrl}
                     />
                     {pngPreviewUrl && (
                       <img
                         src={pngPreviewUrl}
-                        alt="QR DuitNow - Imbas untuk bayar"
+                        alt="DuitNow QR - Imbas untuk bayar"
                         className="max-w-[320px] w-full aspect-square object-contain pointer-events-none"
                         loading="lazy"
                         draggable={false}
@@ -1056,7 +1061,7 @@ export default function Home() {
           open={howToStartOpen}
           onOpenChange={setHowToStartOpen}
           title="Cara guna"
-          description="Ikuti langkah mudah untuk menukar QR DuitNow anda"
+          description="Ikuti langkah mudah untuk menukar DuitNow QR anda"
         >
           <HowToStart onNext={handleHowToStartNext} />
         </ResponsiveModal>
@@ -1072,11 +1077,13 @@ export default function Home() {
         </ResponsiveModal>
 
         {/* Footer */}
-        <div className="text-center">
-          <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-balance">
-            Tukar QR &mdash; Penjana semula QR pembayaran DuitNow. Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
-          </p>
-        </div>
+        {!qrPayload && (
+          <div className="text-center">
+            <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-balance">
+              Tukar QR &mdash; Penjana semula DuitNow QR pembayaran. Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
+            </p>
+          </div>
+        )}
       </div>
     </main>
   );

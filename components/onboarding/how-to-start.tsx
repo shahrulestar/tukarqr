@@ -11,12 +11,12 @@ const steps = [
   {
     icon: ImageIcon,
     title: "Muat naik atau ambil gambar",
-    description: "Muat naik foto QR DuitNow atau ambil gambar menggunakan kamera peranti anda.",
+    description: "Muat naik foto DuitNow QR atau ambil gambar menggunakan kamera peranti anda.",
   },
   {
     icon: Scan,
     title: "Dekod dan sahkan",
-    description: "Sistem akan dekod dan sahkan bahawa ia ialah QR pembayaran DuitNow Malaysia.",
+    description: "Sistem akan dekod dan sahkan bahawa ia ialah DuitNow QR pembayaran Malaysia.",
   },
   {
     icon: Download,

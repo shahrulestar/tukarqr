@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Tukar QR - DuitNow QR Converter",
   description:
-    "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
+    "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
   keywords: [
     "tukar qr duitnow",
     "qr duitnow tidak jelas",
@@ -38,13 +38,13 @@ export const metadata: Metadata = {
     url: siteUrl,
     title: "Tukar QR - DuitNow QR Converter",
     description:
-      "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
+      "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: [
       {
         url: "/tkrqr.png",
         width: 1200,
         height: 630,
-        alt: "Tukar QR - QR DuitNow Lebih Jelas",
+        alt: "Tukar QR - DuitNow QR Lebih Jelas",
       },
     ],
   },
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tukar QR - DuitNow QR Converter",
     description:
-      "Muat naik atau ambil gambar QR DuitNow yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
+      "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: ["/tkrqr.png"],
   },
   icons: {
@@ -72,7 +72,7 @@ const jsonLd = {
   "@type": "WebApplication",
   name: "Tukar QR",
   description:
-    "Ramai pengguna hanya mempunyai gambar QR DuitNow yang tidak jelas atau diambil menggunakan kamera. Dengan alat ini, anda boleh menukar gambar QR tersebut kepada QR digital yang kemas dan boleh digunakan semula untuk pembayaran.",
+    "Ramai pengguna hanya mempunyai gambar DuitNow QR yang tidak jelas atau diambil menggunakan kamera. Dengan alat ini, anda boleh menukar gambar QR tersebut kepada QR digital yang kemas dan boleh digunakan semula untuk pembayaran.",
   applicationCategory: "UtilitiesApplication",
 };
 
