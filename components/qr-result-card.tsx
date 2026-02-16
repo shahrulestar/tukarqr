@@ -55,8 +55,7 @@ export function QrResultCard({
             DuitNow QR Sedia Digunakan
           </CardTitle>
           <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-            Imbas dengan aplikasi bank anda untuk bayar. Kandungan sama seperti
-            asal.
+            Imbas dengan aplikasi bank anda untuk bayar.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

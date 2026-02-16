@@ -1,0 +1,11 @@
+# Tukar QR
+
+> Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan. Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
+
+## Main
+
+- [Tukar QR](https://tukarqr.my): Penjana semula DuitNow QR pembayaran Malaysia. Alat percuma untuk menukar gambar QR yang kabur kepada QR code digital yang jelas dan bersih.
+
+## Optional
+
+- [DuitNow QR](https://www.paynet.my/duitnow-qr): Maklumat rasmi tentang DuitNow QR dari PayNet Malaysia.
