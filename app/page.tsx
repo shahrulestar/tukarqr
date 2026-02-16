@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { RefreshCw, QrCode, Square, Circle } from "lucide-react";
+import { Square, Circle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -70,8 +71,13 @@ export default function Home() {
   const [qrStyle, setQrStyle] = useState<"classic" | "rounded">("classic");
   const [showBankName, setShowBankName] = useState(true);
   const [outerBg, setOuterBg] = useState<"white" | "transparent">("white");
+  const [configRatio, setConfigRatio] = useState<"1:1" | "3:4">("1:1");
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  useEffect(() => {
+    if (drawerOpen) setConfigRatio("1:1");
+  }, [drawerOpen]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -408,14 +414,11 @@ export default function Home() {
     <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-[800px] w-full space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2">
-            <QrCode className="size-8 text-primary" />
-            <h1 className="text-[22px] md:text-[26px] font-semibold leading-[1.25] tracking-[-0.015em] text-foreground">
-              Tukar QR
-            </h1>
-          </div>
+          <h1 className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-[22px] md:text-[26px] font-semibold leading-[1.25] tracking-[-0.015em] text-primary-foreground">
+            Tukar QR
+          </h1>
           <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
-            Tukar imej DuitNow QR yang kabur jadi QR code yang jelas.
+            Jadikan imej DuitNow QR kembali seperti asal
           </p>
         </div>
 
@@ -439,11 +442,12 @@ export default function Home() {
             aria-live="polite"
             aria-busy={true}
           >
-            <CardContent className="flex items-center justify-center gap-3 py-8">
-              <RefreshCw className="size-5 animate-spin text-primary" />
-              <span className="text-[14px] md:text-[16px] font-medium text-muted-foreground">
-                Mendekod kod QR...
-              </span>
+            <CardContent className="flex items-center justify-center py-8">
+              <motion.span
+                className="inline-block text-[14px] md:text-[16px] font-bold uppercase tracking-wider text-primary"
+              >
+                MEMPROSES IMEJ
+              </motion.span>
             </CardContent>
           </Card>
         )}
@@ -481,22 +485,34 @@ export default function Home() {
                 <div className="flex w-full flex-col gap-2">
                   <label className="text-sm font-medium">Reka Bentuk QR</label>
                   <div className="grid w-full grid-cols-2 gap-2">
-                    <Button
-                      variant={qrStyle === "classic" ? "default" : "outline"}
-                      className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                      onClick={() => setQrStyle("classic")}
+                    <motion.div
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      className="min-w-0"
                     >
-                      <Square className="size-5 shrink-0" />
-                      <span className="text-xs">Classic</span>
-                    </Button>
-                    <Button
-                      variant={qrStyle === "rounded" ? "default" : "outline"}
-                      className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                      onClick={() => setQrStyle("rounded")}
+                      <Button
+                        variant={qrStyle === "classic" ? "default" : "outline"}
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
+                        onClick={() => setQrStyle("classic")}
+                      >
+                        <Square className="size-5 shrink-0" />
+                        <span className="text-xs">Classic</span>
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      className="min-w-0"
                     >
-                      <Circle className="size-5 shrink-0" />
-                      <span className="text-xs">Rounded</span>
-                    </Button>
+                      <Button
+                        variant={qrStyle === "rounded" ? "default" : "outline"}
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
+                        onClick={() => setQrStyle("rounded")}
+                      >
+                        <Circle className="size-5 shrink-0" />
+                        <span className="text-xs">Rounded</span>
+                      </Button>
+                    </motion.div>
                   </div>
                 </div>
                 <div className="flex w-full items-center justify-between gap-4">
@@ -515,80 +531,136 @@ export default function Home() {
                 <div className="flex w-full flex-col gap-2">
                   <label className="text-sm font-medium">Latar belakang</label>
                   <div className="grid w-full grid-cols-2 gap-2">
-                    <Button
-                      variant={outerBg === "white" ? "default" : "outline"}
-                      className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                      onClick={() => setOuterBg("white")}
+                    <motion.div
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      className="min-w-0"
                     >
-                      <span className="font-medium">Putih</span>
-                    </Button>
-                    <Button
-                      variant={outerBg === "transparent" ? "default" : "outline"}
-                      className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                      onClick={() => setOuterBg("transparent")}
+                      <Button
+                        variant={outerBg === "white" ? "default" : "outline"}
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        onClick={() => setOuterBg("white")}
+                      >
+                        <span className="font-medium">Putih</span>
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      className="min-w-0"
                     >
-                      <span className="font-medium">Lutsinar</span>
-                    </Button>
+                      <Button
+                        variant={outerBg === "transparent" ? "default" : "outline"}
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        onClick={() => setOuterBg("transparent")}
+                      >
+                        <span className="font-medium">Lutsinar</span>
+                      </Button>
+                    </motion.div>
                   </div>
                 </div>
                 <div className="flex w-full flex-col gap-2">
                   <label className="text-sm font-medium">Resolusi Imej</label>
                   <div className="grid w-full grid-cols-2 gap-2">
-                    <Button
-                      variant="outline"
-                      className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                      onClick={() => executeWithRatio("1:1")}
+                    <motion.div
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      className="min-w-0"
                     >
-                      <span className="font-medium">1:1</span>
-                      <span className="text-xs text-muted-foreground">
-                        1000 x 1000 px
-                      </span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                      onClick={() => executeWithRatio("3:4")}
+                      <Button
+                        variant={configRatio === "1:1" ? "default" : "outline"}
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        onClick={() => setConfigRatio("1:1")}
+                      >
+                        <span className="font-medium">1:1</span>
+                        <span
+                          className={
+                            configRatio === "1:1"
+                              ? "text-xs text-primary-foreground"
+                              : "text-xs text-muted-foreground"
+                          }
+                        >
+                          1000 x 1000 px
+                        </span>
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileTap={{ scale: 0.96 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      className="min-w-0"
                     >
-                      <span className="font-medium">3:4</span>
-                      <span className="text-xs text-muted-foreground">
-                        900 x 1200 px
-                      </span>
-                    </Button>
+                      <Button
+                        variant={configRatio === "3:4" ? "default" : "outline"}
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        onClick={() => setConfigRatio("3:4")}
+                      >
+                        <span className="font-medium">3:4</span>
+                        <span
+                          className={
+                            configRatio === "3:4"
+                              ? "text-xs text-primary-foreground"
+                              : "text-xs text-muted-foreground"
+                          }
+                        >
+                          900 x 1200 px
+                        </span>
+                      </Button>
+                    </motion.div>
                   </div>
                 </div>
+                {drawerAction && (
+                  <Button
+                    className="w-full"
+                    onClick={() => executeWithRatio(configRatio)}
+                  >
+                    {drawerAction === "download" ? "Muat Turun" : "Salin Imej"}
+                  </Button>
+                )}
               </div>
             </DialogContent>
           </Dialog>
         ) : (
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerContent>
-              <div className="mx-auto w-full max-w-sm p-4">
+              <div className="mx-auto w-full max-w-sm">
                 <DrawerHeader>
                   <DrawerTitle>Konfigurasi QR</DrawerTitle>
                   <DrawerDescription>
                     Tetapkan reka bentuk dan resolusi imej QR
                   </DrawerDescription>
                 </DrawerHeader>
-                <div className="flex w-full flex-col gap-5 pt-2">
+                <div className="flex w-full flex-col gap-5 p-4">
                   <div className="flex w-full flex-col gap-2">
                     <label className="text-sm font-medium">Reka Bentuk QR</label>
                     <div className="grid w-full grid-cols-2 gap-2">
-                      <Button
-                        variant={qrStyle === "classic" ? "default" : "outline"}
-                        className="h-[64px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                        onClick={() => setQrStyle("classic")}
+                      <motion.div
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="min-w-0"
                       >
-                        <Square className="size-5 shrink-0" />
-                        <span className="text-xs">Classic</span>
-                      </Button>
-                      <Button
-                        variant={qrStyle === "rounded" ? "default" : "outline"}
-                        className="h-[64px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                        onClick={() => setQrStyle("rounded")}
+                        <Button
+                          variant={qrStyle === "classic" ? "default" : "outline"}
+                          className="h-[64px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
+                          onClick={() => setQrStyle("classic")}
+                        >
+                          <Square className="size-5 shrink-0" />
+                          <span className="text-xs">Classic</span>
+                        </Button>
+                      </motion.div>
+                      <motion.div
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="min-w-0"
                       >
-                        <Circle className="size-5 shrink-0" />
-                        <span className="text-xs">Rounded</span>
-                      </Button>
+                        <Button
+                          variant={qrStyle === "rounded" ? "default" : "outline"}
+                          className="h-[64px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
+                          onClick={() => setQrStyle("rounded")}
+                        >
+                          <Circle className="size-5 shrink-0" />
+                          <span className="text-xs">Rounded</span>
+                        </Button>
+                      </motion.div>
                     </div>
                   </div>
                   <div className="flex w-full items-center justify-between gap-4">
@@ -607,47 +679,91 @@ export default function Home() {
                   <div className="flex w-full flex-col gap-2">
                     <label className="text-sm font-medium">Latar belakang</label>
                     <div className="grid w-full grid-cols-2 gap-2">
-                      <Button
-                        variant={outerBg === "white" ? "default" : "outline"}
-                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => setOuterBg("white")}
+                      <motion.div
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="min-w-0"
                       >
-                        <span className="font-medium">Putih</span>
-                      </Button>
-                      <Button
-                        variant={outerBg === "transparent" ? "default" : "outline"}
-                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => setOuterBg("transparent")}
+                        <Button
+                          variant={outerBg === "white" ? "default" : "outline"}
+                          className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                          onClick={() => setOuterBg("white")}
+                        >
+                          <span className="font-medium">Putih</span>
+                        </Button>
+                      </motion.div>
+                      <motion.div
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="min-w-0"
                       >
-                        <span className="font-medium">Lutsinar</span>
-                      </Button>
+                        <Button
+                          variant={outerBg === "transparent" ? "default" : "outline"}
+                          className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                          onClick={() => setOuterBg("transparent")}
+                        >
+                          <span className="font-medium">Lutsinar</span>
+                        </Button>
+                      </motion.div>
                     </div>
                   </div>
                   <div className="flex w-full flex-col gap-2">
                     <label className="text-sm font-medium">Resolusi Imej</label>
                     <div className="grid w-full grid-cols-2 gap-2">
-                      <Button
-                        variant="outline"
-                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => executeWithRatio("1:1")}
+                      <motion.div
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="min-w-0"
                       >
-                        <span className="font-medium">1:1</span>
-                        <span className="text-xs text-muted-foreground">
-                          1000 x 1000 px
-                        </span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => executeWithRatio("3:4")}
+                        <Button
+                          variant={configRatio === "1:1" ? "default" : "outline"}
+                          className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                          onClick={() => setConfigRatio("1:1")}
+                        >
+                          <span className="font-medium">1:1</span>
+                          <span
+                            className={
+                              configRatio === "1:1"
+                                ? "text-xs text-primary-foreground"
+                                : "text-xs text-muted-foreground"
+                            }
+                          >
+                            1000 x 1000 px
+                          </span>
+                        </Button>
+                      </motion.div>
+                      <motion.div
+                        whileTap={{ scale: 0.96 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="min-w-0"
                       >
-                        <span className="font-medium">3:4</span>
-                        <span className="text-xs text-muted-foreground">
-                          900 x 1200 px
-                        </span>
-                      </Button>
+                        <Button
+                          variant={configRatio === "3:4" ? "default" : "outline"}
+                          className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                          onClick={() => setConfigRatio("3:4")}
+                        >
+                          <span className="font-medium">3:4</span>
+                          <span
+                            className={
+                              configRatio === "3:4"
+                                ? "text-xs text-primary-foreground"
+                                : "text-xs text-muted-foreground"
+                            }
+                          >
+                            900 x 1200 px
+                          </span>
+                        </Button>
+                      </motion.div>
                     </div>
                   </div>
+                  {drawerAction && (
+                    <Button
+                      className="w-full"
+                      onClick={() => executeWithRatio(configRatio)}
+                    >
+                      {drawerAction === "download" ? "Muat Turun" : "Salin Imej"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </DrawerContent>

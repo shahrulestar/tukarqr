@@ -15,6 +15,7 @@
     "@zxing/browser": "^0.1.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.34.0",
     "heic2any": "^0.0.4",
     "jsqr": "^1.4.0",
     "lucide-react": "^0.564.0",
