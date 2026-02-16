@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { RefreshCw, QrCode, X } from "lucide-react";
+import { RefreshCw, QrCode, Square, Circle, SquareDot } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { Switch } from "@/components/ui/switch";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HowToStart } from "@/components/onboarding/how-to-start";
@@ -66,6 +67,11 @@ export default function Home() {
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [howToStartOpen, setHowToStartOpen] = useState(false);
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
+  const [qrStyle, setQrStyle] = useState<
+    "classic" | "rounded" | "dot"
+  >("classic");
+  const [showBankName, setShowBankName] = useState(true);
+  const [outerBg, setOuterBg] = useState<"white" | "transparent">("white");
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -135,9 +141,11 @@ export default function Home() {
     const timer = requestAnimationFrame(() => {
       renderSvgToPng(svg, {
         merchantName,
-        bankName,
+        bankName: showBankName ? bankName : null,
         includeText: true,
         ratio: "1:1",
+        watermark: false,
+        outerBg,
       })
         .then(setPngPreviewUrl)
         .catch(() => setPngPreviewUrl(null));
@@ -146,7 +154,7 @@ export default function Home() {
       cancelAnimationFrame(timer);
       setPngPreviewUrl(null);
     };
-  }, [qrPayload, merchantName, bankName]);
+  }, [qrPayload, merchantName, bankName, showBankName, qrStyle, outerBg]);
 
   useEffect(() => {
     if (qrPayload && resultCardRef.current) {
@@ -344,8 +352,9 @@ export default function Home() {
         svg,
         formatShortFilename(merchantName),
         merchantName,
-        bankName,
+        showBankName ? bankName : null,
         ratio,
+        outerBg,
         () => setDrawerAction(null)
       );
       toast.success("Berjaya", {
@@ -363,9 +372,11 @@ export default function Home() {
       const blobPromise = (async () => {
         const dataUrl = await renderSvgToPng(svg, {
           merchantName,
-          bankName,
+          bankName: showBankName ? bankName : null,
           includeText: true,
           ratio,
+          watermark: false,
+          outerBg,
         });
         const arr = dataUrl.split(",");
         const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
@@ -446,6 +457,7 @@ export default function Home() {
             qrPayload={qrPayload}
             pngPreviewUrl={pngPreviewUrl}
             qrFgColor={qrFgColor}
+            qrStyle={qrStyle}
             merchantName={merchantName}
             bankName={bankName}
             merchantAmount={merchantAmount}
@@ -462,54 +474,198 @@ export default function Home() {
           <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Pilih nisbah</DialogTitle>
+                <DialogTitle>Tetapan & Muat Turun</DialogTitle>
                 <DialogDescription>
-                  Pilih saiz imej untuk muat turun atau salin
+                  Pilih gaya dan nisbah untuk muat turun atau salin
                 </DialogDescription>
               </DialogHeader>
-              <div className="flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => executeWithRatio("1:1")}
-                >
-                  1:1 (1000 x 1000 px)
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => executeWithRatio("3:4")}
-                >
-                  3:4 (900 x 1200 px)
-                </Button>
+              <div className="flex w-full flex-col gap-5">
+                <div className="flex w-full flex-col gap-2">
+                  <label className="text-sm font-medium">Gaya QR Code</label>
+                  <div className="grid w-full grid-cols-3 gap-2">
+                    <Button
+                      variant={qrStyle === "classic" ? "default" : "outline"}
+                      className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                      onClick={() => setQrStyle("classic")}
+                    >
+                      <Square className="size-5 shrink-0" />
+                      <span className="text-xs">Classic</span>
+                    </Button>
+                    <Button
+                      variant={qrStyle === "rounded" ? "default" : "outline"}
+                      className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                      onClick={() => setQrStyle("rounded")}
+                    >
+                      <SquareDot className="size-5 shrink-0" />
+                      <span className="text-xs">Rounded</span>
+                    </Button>
+                    <Button
+                      variant={qrStyle === "dot" ? "default" : "outline"}
+                      className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                      onClick={() => setQrStyle("dot")}
+                    >
+                      <Circle className="size-5 shrink-0" />
+                      <span className="text-xs">Dot</span>
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex w-full items-center justify-between gap-4">
+                  <label
+                    htmlFor="show-bank-name"
+                    className="text-sm font-medium shrink-0"
+                  >
+                    Papar nama bank
+                  </label>
+                  <Switch
+                    id="show-bank-name"
+                    checked={showBankName}
+                    onCheckedChange={setShowBankName}
+                  />
+                </div>
+                <div className="flex w-full flex-col gap-2">
+                  <label className="text-sm font-medium">Latar belakang</label>
+                  <div className="grid w-full grid-cols-2 gap-2">
+                    <Button
+                      variant={outerBg === "white" ? "default" : "outline"}
+                      className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                      onClick={() => setOuterBg("white")}
+                    >
+                      <span className="font-medium">Putih</span>
+                    </Button>
+                    <Button
+                      variant={outerBg === "transparent" ? "default" : "outline"}
+                      className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                      onClick={() => setOuterBg("transparent")}
+                    >
+                      <span className="font-medium">Lut Sinar</span>
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex w-full flex-col gap-2">
+                  <label className="text-sm font-medium">Nisbah</label>
+                  <div className="grid w-full grid-cols-2 gap-2">
+                    <Button
+                      variant="outline"
+                      className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                      onClick={() => executeWithRatio("1:1")}
+                    >
+                      <span className="font-medium">1:1</span>
+                      <span className="text-xs text-muted-foreground">
+                        1000 x 1000 px
+                      </span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                      onClick={() => executeWithRatio("3:4")}
+                    >
+                      <span className="font-medium">3:4</span>
+                      <span className="text-xs text-muted-foreground">
+                        900 x 1200 px
+                      </span>
+                    </Button>
+                  </div>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
         ) : (
           <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DrawerContent>
-              <div className="mx-auto w-full max-w-sm">
+              <div className="mx-auto w-full max-w-sm p-4">
                 <DrawerHeader>
-                  <DrawerTitle>Pilih nisbah</DrawerTitle>
+                  <DrawerTitle>Tetapan & Muat Turun</DrawerTitle>
                   <DrawerDescription>
-                    Pilih saiz imej untuk muat turun atau salin
+                    Pilih gaya dan nisbah untuk muat turun atau salin
                   </DrawerDescription>
                 </DrawerHeader>
-                <div className="flex flex-col gap-2 p-4">
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => executeWithRatio("1:1")}
-                  >
-                    1:1 (1000 x 1000 px)
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => executeWithRatio("3:4")}
-                  >
-                    3:4 (900 x 1200 px)
-                  </Button>
+                <div className="flex w-full flex-col gap-5 pt-2">
+                  <div className="flex w-full flex-col gap-2">
+                    <label className="text-sm font-medium">Gaya QR Code</label>
+                    <div className="grid w-full grid-cols-3 gap-2">
+                      <Button
+                        variant={qrStyle === "classic" ? "default" : "outline"}
+                        className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                        onClick={() => setQrStyle("classic")}
+                      >
+                        <Square className="size-5 shrink-0" />
+                        <span className="text-xs">Classic</span>
+                      </Button>
+                      <Button
+                        variant={qrStyle === "rounded" ? "default" : "outline"}
+                        className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                        onClick={() => setQrStyle("rounded")}
+                      >
+                        <SquareDot className="size-5 shrink-0" />
+                        <span className="text-xs">Rounded</span>
+                      </Button>
+                      <Button
+                        variant={qrStyle === "dot" ? "default" : "outline"}
+                        className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                        onClick={() => setQrStyle("dot")}
+                      >
+                        <Circle className="size-5 shrink-0" />
+                        <span className="text-xs">Dot</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex w-full items-center justify-between gap-4">
+                    <label
+                      htmlFor="show-bank-name-drawer"
+                      className="text-sm font-medium shrink-0"
+                    >
+                      Papar nama bank
+                    </label>
+                    <Switch
+                      id="show-bank-name-drawer"
+                      checked={showBankName}
+                      onCheckedChange={setShowBankName}
+                    />
+                  </div>
+                  <div className="flex w-full flex-col gap-2">
+                    <label className="text-sm font-medium">Latar belakang luar</label>
+                    <div className="grid w-full grid-cols-2 gap-2">
+                      <Button
+                        variant={outerBg === "white" ? "default" : "outline"}
+                        className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                        onClick={() => setOuterBg("white")}
+                      >
+                        <span className="font-medium">Putih</span>
+                      </Button>
+                      <Button
+                        variant={outerBg === "transparent" ? "default" : "outline"}
+                        className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                        onClick={() => setOuterBg("transparent")}
+                      >
+                        <span className="font-medium">Transparent</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex w-full flex-col gap-2">
+                    <label className="text-sm font-medium">Nisbah</label>
+                    <div className="grid w-full grid-cols-2 gap-2">
+                      <Button
+                        variant="outline"
+                        className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                        onClick={() => executeWithRatio("1:1")}
+                      >
+                        <span className="font-medium">1:1</span>
+                        <span className="text-xs text-muted-foreground">
+                          1000 x 1000 px
+                        </span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                        onClick={() => executeWithRatio("3:4")}
+                      >
+                        <span className="font-medium">3:4</span>
+                        <span className="text-xs text-muted-foreground">
+                          900 x 1200 px
+                        </span>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </DrawerContent>

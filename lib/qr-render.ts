@@ -38,6 +38,7 @@ export function renderSvgToPng(
     includeText?: boolean;
     ratio?: "1:1" | "3:4";
     watermark?: boolean;
+    outerBg?: "white" | "transparent";
   }
 ): Promise<string> {
   const merchantName = options?.merchantName ?? null;
@@ -46,7 +47,8 @@ export function renderSvgToPng(
     : null;
   const includeText = options?.includeText ?? false;
   const ratio = options?.ratio ?? "1:1";
-  const watermark = options?.watermark ?? true;
+  const watermark = options?.watermark ?? false;
+  const outerBg = options?.outerBg ?? "white";
 
   return new Promise((resolve, reject) => {
     const svgData = new XMLSerializer().serializeToString(svgElement);
@@ -115,8 +117,10 @@ export function renderSvgToPng(
         ctx.closePath();
       };
 
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, totalWidth, totalHeight);
+      if (outerBg === "white") {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, totalWidth, totalHeight);
+      }
 
       const borderColor = getPrimaryColor();
       ctx.fillStyle = borderColor;
@@ -206,6 +210,7 @@ export function downloadQrAsPng(
   merchantName?: string | null,
   bankName?: string | null,
   ratio?: "1:1" | "3:4",
+  outerBg?: "white" | "transparent",
   onError?: () => void
 ) {
   renderSvgToPng(svgElement, {
@@ -213,6 +218,8 @@ export function downloadQrAsPng(
     bankName,
     includeText: true,
     ratio: ratio ?? "1:1",
+    watermark: false,
+    outerBg: outerBg ?? "white",
   })
     .then((dataUrl) => {
       const a = document.createElement("a");

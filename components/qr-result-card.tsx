@@ -1,7 +1,7 @@
 "use client";
 
-import { QRCodeSVG } from "qrcode.react";
 import { X } from "lucide-react";
+import { QrStyledSvg, type QrModuleStyle } from "@/components/qr-styled-svg";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,6 +17,7 @@ interface QrResultCardProps {
   qrPayload: string;
   pngPreviewUrl: string | null;
   qrFgColor: string;
+  qrStyle: QrModuleStyle;
   merchantName: string | null;
   bankName: string | null;
   merchantAmount: string | null;
@@ -32,6 +33,7 @@ export function QrResultCard({
   qrPayload,
   pngPreviewUrl,
   qrFgColor,
+  qrStyle,
   merchantName,
   bankName,
   merchantAmount,
@@ -89,11 +91,15 @@ export function QrResultCard({
 
           <div className="flex w-full flex-col items-center gap-2">
             <div className="select-none">
-              <div className="relative inline-block">
-                <QRCodeSVG
+              <div
+                className="relative inline-block w-[280px] h-[280px] min-w-[280px] min-h-[280px]"
+                aria-busy={!pngPreviewUrl && !!qrPayload}
+              >
+                <QrStyledSvg
                   ref={qrSvgRef}
                   value={qrPayload}
                   size={280}
+                  style={qrStyle}
                   level="M"
                   marginSize={2}
                   fgColor={qrFgColor}
@@ -102,16 +108,21 @@ export function QrResultCard({
                   className={pngPreviewUrl ? "sr-only" : undefined}
                   aria-hidden={!!pngPreviewUrl}
                 />
-                {pngPreviewUrl && (
+                {pngPreviewUrl ? (
                   <img
                     src={pngPreviewUrl}
                     alt="DuitNow QR - Imbas untuk bayar"
-                    className="max-w-[320px] w-full aspect-square object-contain pointer-events-none"
+                    className="absolute inset-0 w-full h-full object-contain pointer-events-none"
                     loading="lazy"
                     draggable={false}
                     onDragStart={(e) => e.preventDefault()}
                   />
-                )}
+                ) : qrPayload ? (
+                  <div
+                    className="absolute inset-0 bg-muted rounded-lg animate-pulse"
+                    aria-hidden
+                  />
+                ) : null}
               </div>
             </div>
             {(merchantName || bankName) && (
