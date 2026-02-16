@@ -65,7 +65,7 @@ export const metadata: Metadata = {
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: [
       {
-        url: "/tkrqr.png",
+        url: "/cover.png",
         width: 1200,
         height: 630,
         alt: "Tukar QR - DuitNow QR Lebih Jelas",
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     title: "Tukar QR - DuitNow QR Regenerator",
     description:
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
-    images: ["/tkrqr.png"],
+    images: ["/cover.png"],
   },
   icons: {
     icon: [

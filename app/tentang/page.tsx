@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
 
@@ -17,12 +18,34 @@ export default function TentangPage() {
       <div className="mx-auto max-w-[640px] w-full space-y-6 text-[15px] leading-[1.7] text-foreground">
         <h1 className="text-xl font-semibold">Tentang Tukar QR</h1>
 
+        <div className="flex justify-center">
+          <Image
+            src="/cover.png"
+            alt="Tukar QR - Tukar imej DuitNow QR seperti asal"
+            width={640}
+            height={336}
+            className="w-full max-w-[640px] rounded-xl object-cover"
+          />
+        </div>
+
         <p>
           Tukar QR ialah alat percuma yang membantu pengguna menukar gambar
           DuitNow QR yang kabur, tidak jelas, atau diambil melalui kamera kepada
           kod QR digital yang bersih, kemas, dan boleh diimbas semula untuk
           pembayaran.
         </p>
+
+        <blockquote className="border-l-4 border-primary pl-4 py-2 my-6 italic text-muted-foreground">
+          <p>
+            Tukar QR membolehkan pengguna regenerate semula imej QR yang dirakam
+            menggunakan kamera. Memandangkan rakyat Malaysia sering ambil gambar
+            QR untuk kegunaan kemudian, Tukar QR menjadikan QR tersebut lebih
+            jelas seperti DuitNow QR asal.
+          </p>
+          <footer className="mt-2 not-italic text-sm text-foreground">
+            — Shahrul Estar, Pencipta Tukar QR
+          </footer>
+        </blockquote>
 
         <h2 className="text-lg font-semibold pt-2">Bagaimana ia berfungsi</h2>
 

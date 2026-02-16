@@ -672,14 +672,6 @@ export default function Home() {
           <PrivacyPolicy onDone={handlePrivacyPolicyDone} />
         </ResponsiveModal>
 
-        {!qrPayload && (
-          <div className="text-center">
-            <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-balance">
-              Tukar QR &mdash; Penjana semula DuitNow QR pembayaran. Diproses
-              sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
-            </p>
-          </div>
-        )}
       </div>
     </main>
   );

@@ -15,6 +15,15 @@ const cspHeader = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/about",
+        destination: "/tentang",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
