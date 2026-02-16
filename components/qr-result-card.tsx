@@ -57,7 +57,7 @@ export function QrResultCard({
             DuitNow QR Sedia Digunakan
           </CardTitle>
           <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-            Imbas dengan aplikasi bank anda untuk bayar.
+            Imbas dengan aplikasi bank anda untuk bayar
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -112,7 +112,7 @@ export function QrResultCard({
                   <img
                     src={pngPreviewUrl}
                     alt="DuitNow QR - Imbas untuk bayar"
-                    className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+                    className="absolute inset-0 w-full h-full object-contain [-webkit-touch-callout:default]"
                     loading="lazy"
                     draggable={false}
                     onDragStart={(e) => e.preventDefault()}
@@ -144,8 +144,8 @@ export function QrResultCard({
                 {merchantAmount}
               </p>
             )}
-            <span className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
-              Serasi dengan DuitNow dan semua aplikasi bank Malaysia
+            <span className="block w-full text-center text-balance text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
+              Muat turun, salin, atau tekan & tahan QR di atas untuk simpan
             </span>
           </div>
 

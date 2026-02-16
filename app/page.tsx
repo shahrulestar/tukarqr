@@ -472,14 +472,14 @@ export default function Home() {
           <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Tetapan & Muat Turun</DialogTitle>
+                <DialogTitle>Konfigurasi QR</DialogTitle>
                 <DialogDescription>
-                  Pilih gaya dan nisbah untuk muat turun atau salin
+                  Tetapkan reka bentuk dan resolusi imej QR
                 </DialogDescription>
               </DialogHeader>
               <div className="flex w-full flex-col gap-5">
                 <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-medium">Gaya QR Code</label>
+                  <label className="text-sm font-medium">Reka Bentuk QR</label>
                   <div className="grid w-full grid-cols-2 gap-2">
                     <Button
                       variant={qrStyle === "classic" ? "default" : "outline"}
@@ -527,12 +527,12 @@ export default function Home() {
                       className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                       onClick={() => setOuterBg("transparent")}
                     >
-                      <span className="font-medium">Lut Sinar</span>
+                      <span className="font-medium">Lutsinar</span>
                     </Button>
                   </div>
                 </div>
                 <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-medium">Nisbah</label>
+                  <label className="text-sm font-medium">Resolusi Imej</label>
                   <div className="grid w-full grid-cols-2 gap-2">
                     <Button
                       variant="outline"
@@ -564,14 +564,14 @@ export default function Home() {
             <DrawerContent>
               <div className="mx-auto w-full max-w-sm p-4">
                 <DrawerHeader>
-                  <DrawerTitle>Tetapan & Muat Turun</DrawerTitle>
+                  <DrawerTitle>Konfigurasi QR</DrawerTitle>
                   <DrawerDescription>
-                    Pilih gaya dan nisbah untuk muat turun atau salin
+                    Tetapkan reka bentuk dan resolusi imej QR
                   </DrawerDescription>
                 </DrawerHeader>
                 <div className="flex w-full flex-col gap-5 pt-2">
                   <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-medium">Gaya QR Code</label>
+                    <label className="text-sm font-medium">Reka Bentuk QR</label>
                     <div className="grid w-full grid-cols-2 gap-2">
                       <Button
                         variant={qrStyle === "classic" ? "default" : "outline"}
@@ -619,12 +619,12 @@ export default function Home() {
                         className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => setOuterBg("transparent")}
                       >
-                        <span className="font-medium">Lut Sinar</span>
+                        <span className="font-medium">Lutsinar</span>
                       </Button>
                     </div>
                   </div>
                   <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-medium">Nisbah</label>
+                    <label className="text-sm font-medium">Resolusi Imej</label>
                     <div className="grid w-full grid-cols-2 gap-2">
                       <Button
                         variant="outline"
