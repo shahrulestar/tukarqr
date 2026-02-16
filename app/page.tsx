@@ -406,7 +406,7 @@ export default function Home() {
             </h1>
           </div>
           <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
-            Tukar DuitNow QR yang kabur jadi QR code yang jelas dan bersih
+            Tukar imej DuitNow QR yang kabur jadi QR code yang jelas.
           </p>
         </div>
 

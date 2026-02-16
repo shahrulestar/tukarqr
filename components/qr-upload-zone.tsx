@@ -40,8 +40,7 @@ export function QrUploadZone({
           Imbas DuitNow QR
         </CardTitle>
         <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-          Muat naik foto atau guna kamera untuk merakam DuitNow QR untuk
-          pembayaran
+          Muat naik atau imbas DuitNow QR untuk menukar ke QR yang jelas.
         </CardDescription>
       </CardHeader>
       <CardContent>

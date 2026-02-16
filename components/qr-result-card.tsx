@@ -88,7 +88,7 @@ export function QrResultCard({
             </div>
           )}
 
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex w-full flex-col items-center gap-2">
             <div className="rounded-lg bg-card border border-border pt-5 px-6 pb-4 select-none">
               <div className="relative inline-block">
                 <QRCodeSVG
@@ -116,14 +116,14 @@ export function QrResultCard({
               </div>
             </div>
             {(merchantName || bankName) && (
-              <div className="flex flex-col gap-0.5 items-center">
+              <div className="flex w-full min-w-0 flex-col gap-0.5 items-center">
                 {merchantName && (
-                  <p className="text-[18px] md:text-[20px] font-semibold text-foreground text-center">
+                  <p className="w-full min-w-0 break-words text-[18px] font-semibold text-foreground text-center">
                     {merchantName}
                   </p>
                 )}
                 {bankName && (
-                  <p className="text-[18px] md:text-[20px] font-semibold text-foreground text-center">
+                  <p className="w-full min-w-0 break-words text-[18px] font-semibold text-foreground text-center">
                     {bankName}
                   </p>
                 )}

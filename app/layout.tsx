@@ -21,7 +21,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Tukar QR - DuitNow QR Converter",
+  title: "Tukar QR - DuitNow QR Regenerator",
   description:
     "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
   keywords: [
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     locale: "ms_MY",
     siteName: "Tukar QR",
     url: siteUrl,
-    title: "Tukar QR - DuitNow QR Converter",
+    title: "Tukar QR - DuitNow QR Regenerator",
     description:
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: [
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tukar QR - DuitNow QR Converter",
+    title: "Tukar QR - DuitNow QR Regenerator",
     description:
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: ["/tkrqr.png"],
