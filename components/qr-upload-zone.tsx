@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { ImageIcon, Scan, X } from "lucide-react";
 import {
   Card,
@@ -8,7 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIsMac } from "@/hooks/use-is-mac";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface QrUploadZoneProps {
   fileInputRef: React.RefObject<HTMLInputElement | null>;
@@ -33,6 +37,38 @@ export function QrUploadZone({
   originalImage,
   onReset,
 }: QrUploadZoneProps) {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isMac = useIsMac();
+
+  useEffect(() => {
+    if (activeTab !== "upload") return;
+
+    function handlePaste(e: ClipboardEvent) {
+      const file = e.clipboardData?.files?.[0];
+      if (!file || !file.type.startsWith("image/")) return;
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      )
+        return;
+      e.preventDefault();
+      onFileSelect(file);
+    }
+
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, [activeTab, onFileSelect]);
+
+  function handlePasteOnZone(e: React.ClipboardEvent) {
+    const file = e.clipboardData?.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      e.preventDefault();
+      onFileSelect(file);
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -52,10 +88,20 @@ export function QrUploadZone({
 
           <TabsContent value="upload" className="mt-4">
             <div
+              role="button"
+              tabIndex={0}
               onDrop={onDrop}
               onDragOver={onDragOver}
+              onPaste={handlePasteOnZone}
               onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  fileInputRef.current?.click();
+                }
+              }}
               className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50 min-h-[220px]"
+              aria-label="Muat naik imej QR. Letak imej di sini atau tekan Ctrl+V untuk tampal."
             >
               {originalImage ? (
                 <div className="relative select-none">
@@ -84,10 +130,21 @@ export function QrUploadZone({
                     <ImageIcon className="size-6 text-primary" />
                   </div>
                   <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
-                    Letakkan imej DuitNow QR di sini
+                    Letak imej DuitNow QR di sini
                   </p>
-                  <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center">
-                    atau klik untuk melayari
+                  <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center flex flex-wrap items-center justify-center gap-1">
+                    {isDesktop ? (
+                      <>
+                        atau tekan{" "}
+                        <KbdGroup className="inline-flex">
+                          <Kbd>{isMac ? "⌘" : "Ctrl"}</Kbd>
+                          <Kbd>V</Kbd>
+                        </KbdGroup>{" "}
+                        untuk tampal
+                      </>
+                    ) : (
+                      "atau klik untuk mengimport"
+                    )}
                   </p>
                 </>
               )}
