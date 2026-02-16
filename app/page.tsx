@@ -485,7 +485,7 @@ export default function Home() {
                   <div className="grid w-full grid-cols-3 gap-2">
                     <Button
                       variant={qrStyle === "classic" ? "default" : "outline"}
-                      className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                      className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                       onClick={() => setQrStyle("classic")}
                     >
                       <Square className="size-5 shrink-0" />
@@ -493,7 +493,7 @@ export default function Home() {
                     </Button>
                     <Button
                       variant={qrStyle === "rounded" ? "default" : "outline"}
-                      className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                      className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                       onClick={() => setQrStyle("rounded")}
                     >
                       <SquareDot className="size-5 shrink-0" />
@@ -501,7 +501,7 @@ export default function Home() {
                     </Button>
                     <Button
                       variant={qrStyle === "dot" ? "default" : "outline"}
-                      className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                      className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                       onClick={() => setQrStyle("dot")}
                     >
                       <Circle className="size-5 shrink-0" />
@@ -527,14 +527,14 @@ export default function Home() {
                   <div className="grid w-full grid-cols-2 gap-2">
                     <Button
                       variant={outerBg === "white" ? "default" : "outline"}
-                      className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                      className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                       onClick={() => setOuterBg("white")}
                     >
                       <span className="font-medium">Putih</span>
                     </Button>
                     <Button
                       variant={outerBg === "transparent" ? "default" : "outline"}
-                      className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                      className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                       onClick={() => setOuterBg("transparent")}
                     >
                       <span className="font-medium">Lut Sinar</span>
@@ -546,7 +546,7 @@ export default function Home() {
                   <div className="grid w-full grid-cols-2 gap-2">
                     <Button
                       variant="outline"
-                      className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                      className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                       onClick={() => executeWithRatio("1:1")}
                     >
                       <span className="font-medium">1:1</span>
@@ -556,7 +556,7 @@ export default function Home() {
                     </Button>
                     <Button
                       variant="outline"
-                      className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                      className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                       onClick={() => executeWithRatio("3:4")}
                     >
                       <span className="font-medium">3:4</span>
@@ -585,7 +585,7 @@ export default function Home() {
                     <div className="grid w-full grid-cols-3 gap-2">
                       <Button
                         variant={qrStyle === "classic" ? "default" : "outline"}
-                        className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                         onClick={() => setQrStyle("classic")}
                       >
                         <Square className="size-5 shrink-0" />
@@ -593,7 +593,7 @@ export default function Home() {
                       </Button>
                       <Button
                         variant={qrStyle === "rounded" ? "default" : "outline"}
-                        className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                         onClick={() => setQrStyle("rounded")}
                       >
                         <SquareDot className="size-5 shrink-0" />
@@ -601,7 +601,7 @@ export default function Home() {
                       </Button>
                       <Button
                         variant={qrStyle === "dot" ? "default" : "outline"}
-                        className="aspect-square h-auto w-full min-w-0 flex flex-col gap-1 px-2 py-6"
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                         onClick={() => setQrStyle("dot")}
                       >
                         <Circle className="size-5 shrink-0" />
@@ -627,14 +627,14 @@ export default function Home() {
                     <div className="grid w-full grid-cols-2 gap-2">
                       <Button
                         variant={outerBg === "white" ? "default" : "outline"}
-                        className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => setOuterBg("white")}
                       >
                         <span className="font-medium">Putih</span>
                       </Button>
                       <Button
                         variant={outerBg === "transparent" ? "default" : "outline"}
-                        className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => setOuterBg("transparent")}
                       >
                         <span className="font-medium">Transparent</span>
@@ -646,7 +646,7 @@ export default function Home() {
                     <div className="grid w-full grid-cols-2 gap-2">
                       <Button
                         variant="outline"
-                        className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => executeWithRatio("1:1")}
                       >
                         <span className="font-medium">1:1</span>
@@ -656,7 +656,7 @@ export default function Home() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="aspect-[2/1] h-auto w-full min-w-0 flex flex-col gap-0.5 px-2 py-6"
+                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => executeWithRatio("3:4")}
                       >
                         <span className="font-medium">3:4</span>
