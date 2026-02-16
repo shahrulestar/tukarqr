@@ -483,7 +483,7 @@ export default function Home() {
               </DialogHeader>
               <div className="flex w-full flex-col gap-5">
                 <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-medium">Reka Bentuk QR</label>
+                  <label className="text-sm font-medium">Reka bentuk QR</label>
                   <div className="grid w-full grid-cols-2 gap-2">
                     <motion.div
                       whileTap={{ scale: 0.96 }}
@@ -560,7 +560,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-medium">Resolusi Imej</label>
+                  <label className="text-sm font-medium">Resolusi imej</label>
                   <div className="grid w-full grid-cols-2 gap-2">
                     <motion.div
                       whileTap={{ scale: 0.96 }}
@@ -631,7 +631,7 @@ export default function Home() {
                 </DrawerHeader>
                 <div className="flex w-full flex-col gap-5 p-4">
                   <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-medium">Reka Bentuk QR</label>
+                    <label className="text-sm font-medium">Reka bentuk QR</label>
                     <div className="grid w-full grid-cols-2 gap-2">
                       <motion.div
                         whileTap={{ scale: 0.96 }}
@@ -708,7 +708,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-medium">Resolusi Imej</label>
+                    <label className="text-sm font-medium">Resolusi imej</label>
                     <div className="grid w-full grid-cols-2 gap-2">
                       <motion.div
                         whileTap={{ scale: 0.96 }}
