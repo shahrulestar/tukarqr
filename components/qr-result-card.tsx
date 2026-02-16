@@ -88,7 +88,7 @@ export function QrResultCard({
           )}
 
           <div className="flex w-full flex-col items-center gap-2">
-            <div className="rounded-lg bg-card border border-border pt-5 px-6 pb-4 select-none">
+            <div className="select-none">
               <div className="relative inline-block">
                 <QRCodeSVG
                   ref={qrSvgRef}
