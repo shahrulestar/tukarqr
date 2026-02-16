@@ -20,7 +20,7 @@ export default function TentangPage() {
 
         <div className="flex justify-center">
           <Image
-            src="/cover.png"
+            src="/social-image.png"
             alt="Tukar QR - Tukar imej DuitNow QR seperti asal"
             width={640}
             height={336}
