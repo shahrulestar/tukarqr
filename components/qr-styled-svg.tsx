@@ -3,7 +3,7 @@
 import { forwardRef, useMemo } from "react";
 import QRCode from "qrcode";
 
-export type QrModuleStyle = "classic" | "rounded" | "dot";
+export type QrModuleStyle = "classic" | "rounded";
 
 interface QrStyledSvgProps {
   value: string;
@@ -81,7 +81,7 @@ export const QrStyledSvg = forwardRef<SVGSVGElement, QrStyledSvgProps>(
                   fill={fgColor}
                 />
               );
-            } else if (style === "rounded") {
+            } else {
               cells.push(
                 <rect
                   key={`${row}-${col}`}
@@ -91,16 +91,6 @@ export const QrStyledSvg = forwardRef<SVGSVGElement, QrStyledSvgProps>(
                   height={1}
                   rx={0.4}
                   ry={0.4}
-                  fill={fgColor}
-                />
-              );
-            } else {
-              cells.push(
-                <circle
-                  key={`${row}-${col}`}
-                  cx={x + 0.5}
-                  cy={y + 0.5}
-                  r={0.45}
                   fill={fgColor}
                 />
               );

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { RefreshCw, QrCode, Square, Circle, SquareDot } from "lucide-react";
+import { RefreshCw, QrCode, Square, Circle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -67,9 +67,7 @@ export default function Home() {
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [howToStartOpen, setHowToStartOpen] = useState(false);
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
-  const [qrStyle, setQrStyle] = useState<
-    "classic" | "rounded" | "dot"
-  >("classic");
+  const [qrStyle, setQrStyle] = useState<"classic" | "rounded">("classic");
   const [showBankName, setShowBankName] = useState(true);
   const [outerBg, setOuterBg] = useState<"white" | "transparent">("white");
 
@@ -482,7 +480,7 @@ export default function Home() {
               <div className="flex w-full flex-col gap-5">
                 <div className="flex w-full flex-col gap-2">
                   <label className="text-sm font-medium">Gaya QR Code</label>
-                  <div className="grid w-full grid-cols-3 gap-2">
+                  <div className="grid w-full grid-cols-2 gap-2">
                     <Button
                       variant={qrStyle === "classic" ? "default" : "outline"}
                       className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
@@ -496,16 +494,8 @@ export default function Home() {
                       className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                       onClick={() => setQrStyle("rounded")}
                     >
-                      <SquareDot className="size-5 shrink-0" />
-                      <span className="text-xs">Rounded</span>
-                    </Button>
-                    <Button
-                      variant={qrStyle === "dot" ? "default" : "outline"}
-                      className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                      onClick={() => setQrStyle("dot")}
-                    >
                       <Circle className="size-5 shrink-0" />
-                      <span className="text-xs">Dot</span>
+                      <span className="text-xs">Rounded</span>
                     </Button>
                   </div>
                 </div>
@@ -582,10 +572,10 @@ export default function Home() {
                 <div className="flex w-full flex-col gap-5 pt-2">
                   <div className="flex w-full flex-col gap-2">
                     <label className="text-sm font-medium">Gaya QR Code</label>
-                    <div className="grid w-full grid-cols-3 gap-2">
+                    <div className="grid w-full grid-cols-2 gap-2">
                       <Button
                         variant={qrStyle === "classic" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
+                        className="h-[64px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                         onClick={() => setQrStyle("classic")}
                       >
                         <Square className="size-5 shrink-0" />
@@ -593,19 +583,11 @@ export default function Home() {
                       </Button>
                       <Button
                         variant={qrStyle === "rounded" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
+                        className="h-[64px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
                         onClick={() => setQrStyle("rounded")}
                       >
-                        <SquareDot className="size-5 shrink-0" />
-                        <span className="text-xs">Rounded</span>
-                      </Button>
-                      <Button
-                        variant={qrStyle === "dot" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                        onClick={() => setQrStyle("dot")}
-                      >
                         <Circle className="size-5 shrink-0" />
-                        <span className="text-xs">Dot</span>
+                        <span className="text-xs">Rounded</span>
                       </Button>
                     </div>
                   </div>
@@ -623,21 +605,21 @@ export default function Home() {
                     />
                   </div>
                   <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-medium">Latar belakang luar</label>
+                    <label className="text-sm font-medium">Latar belakang</label>
                     <div className="grid w-full grid-cols-2 gap-2">
                       <Button
                         variant={outerBg === "white" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => setOuterBg("white")}
                       >
                         <span className="font-medium">Putih</span>
                       </Button>
                       <Button
                         variant={outerBg === "transparent" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => setOuterBg("transparent")}
                       >
-                        <span className="font-medium">Transparent</span>
+                        <span className="font-medium">Lut Sinar</span>
                       </Button>
                     </div>
                   </div>
@@ -646,7 +628,7 @@ export default function Home() {
                     <div className="grid w-full grid-cols-2 gap-2">
                       <Button
                         variant="outline"
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => executeWithRatio("1:1")}
                       >
                         <span className="font-medium">1:1</span>
@@ -656,7 +638,7 @@ export default function Home() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
                         onClick={() => executeWithRatio("3:4")}
                       >
                         <span className="font-medium">3:4</span>
