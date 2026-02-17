@@ -9,10 +9,21 @@ export interface CopyQrImageOptions {
   outerBg?: "white" | "transparent";
 }
 
+function dataUrlToBlob(dataUrl: string): Blob {
+  const arr = dataUrl.split(",");
+  const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
+  const bstr = atob(arr[1] ?? "");
+  const u8arr = new Uint8Array(bstr.length);
+  for (let i = 0; i < bstr.length; i++) {
+    u8arr[i] = bstr.charCodeAt(i);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+
 /**
- * Copies QR image to clipboard using Safari-compatible approach.
- * Passes a Promise to ClipboardItem so the clipboard call stays synchronous
- * from the user gesture (required by Safari and Chrome mobile).
+ * Safari requires clipboard.write() to be called synchronously from user gesture;
+ * passing a Promise to ClipboardItem preserves that. Chrome mobile may need the
+ * blob resolved first. We try both: Safari path first, fallback to Chrome path.
  */
 export async function copyQrImageToClipboard(
   svgElement: SVGSVGElement,
@@ -22,25 +33,32 @@ export async function copyQrImageToClipboard(
     throw new Error("Salin imej tidak disokong. Cuba muat turun imej.");
   }
 
-  const blobPromise = renderSvgToPng(svgElement, {
+  const renderOptions = {
     merchantName: options.merchantName ?? null,
     bankName: options.bankName ?? null,
     includeText: options.includeText ?? false,
     ratio: options.ratio ?? "1:1",
     watermark: options.watermark ?? false,
     outerBg: options.outerBg ?? "white",
-  }).then((dataUrl) => {
-    const arr = dataUrl.split(",");
-    const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
-    const bstr = atob(arr[1] ?? "");
-    const u8arr = new Uint8Array(bstr.length);
-    for (let i = 0; i < bstr.length; i++) {
-      u8arr[i] = bstr.charCodeAt(i);
-    }
-    return new Blob([u8arr], { type: mime });
-  });
+  };
 
-  await navigator.clipboard.write([
-    new ClipboardItem({ "image/png": blobPromise }),
-  ]);
+  const isSafari =
+    typeof navigator !== "undefined" &&
+    /Safari/.test(navigator.userAgent) &&
+    !/Chrome|CriOS|Chromium/.test(navigator.userAgent);
+
+  if (isSafari) {
+    const blobPromise = renderSvgToPng(svgElement, renderOptions).then(
+      dataUrlToBlob
+    );
+    await navigator.clipboard.write([
+      new ClipboardItem({ "image/png": blobPromise }),
+    ]);
+  } else {
+    const dataUrl = await renderSvgToPng(svgElement, renderOptions);
+    const blob = dataUrlToBlob(dataUrl);
+    await navigator.clipboard.write([
+      new ClipboardItem({ "image/png": blob }),
+    ]);
+  }
 }

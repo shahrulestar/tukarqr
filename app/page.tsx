@@ -177,6 +177,7 @@ export default function Home() {
       toast.success("Berjaya", {
         description: "Imej QR berjaya dimuat turun ke peranti anda.",
       });
+      handleConfigOpenChange(false);
     } else {
       copyQrImageToClipboard(svg, {
         merchantName,
@@ -195,9 +196,11 @@ export default function Home() {
           toast.error("Ralat", {
             description: "Gagal menyalin imej ke papan keratan. Sila gunakan Muat Turun sebagai alternatif.",
           });
+        })
+        .finally(() => {
+          handleConfigOpenChange(false);
         });
     }
-    handleConfigOpenChange(false);
   }
 
   function handleHowToStartNext() {
