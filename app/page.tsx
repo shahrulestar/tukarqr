@@ -737,7 +737,7 @@ export default function Home() {
                         onClick={() => setQrStyle("classic")}
                       >
                         <Square className="size-5 shrink-0" />
-                        <span className="text-xs">Classic</span>
+                        <span className="text-xs">Petak-Petak</span>
                       </Button>
                     </motion.div>
                     <motion.div
@@ -751,7 +751,7 @@ export default function Home() {
                         onClick={() => setQrStyle("rounded")}
                       >
                         <Circle className="size-5 shrink-0" />
-                        <span className="text-xs">Rounded</span>
+                        <span className="text-xs">Bulat-Bulat</span>
                       </Button>
                     </motion.div>
                   </div>
@@ -871,7 +871,7 @@ export default function Home() {
                           onClick={() => setQrStyle("classic")}
                         >
                           <Square className="size-5 shrink-0" />
-                          <span className="text-xs">Classic</span>
+                          <span className="text-xs">Petak-Petak</span>
                         </Button>
                       </motion.div>
                       <motion.div
@@ -885,7 +885,7 @@ export default function Home() {
                           onClick={() => setQrStyle("rounded")}
                         >
                           <Circle className="size-5 shrink-0" />
-                          <span className="text-xs">Rounded</span>
+                          <span className="text-xs">Bulat-Bulat</span>
                         </Button>
                       </motion.div>
                     </div>

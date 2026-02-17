@@ -10,6 +10,20 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `${siteUrl}/tentang`,
   },
+  openGraph: {
+    images: [
+      {
+        url: "/about.png",
+        width: 1200,
+        height: 630,
+        alt: "Tentang Tukar QR",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/about.png"],
+  },
 };
 
 export default function TentangPage() {
@@ -20,7 +34,7 @@ export default function TentangPage() {
 
         <div className="flex justify-center">
           <Image
-            src="/social-image.png"
+            src="/about.png"
             alt="Tukar QR - Tukar imej DuitNow QR seperti asal"
             width={640}
             height={336}

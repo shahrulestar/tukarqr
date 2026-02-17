@@ -282,7 +282,7 @@ export function QrUploadZone({
                         {successItems.length > 0 && (
                           <div className="space-y-2">
                             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                              Berjaya ({successItems.length})
+                              Selesai ({successItems.length})
                             </p>
                             {successItems.map((item) => (
                               <FileUploadItem
@@ -304,7 +304,7 @@ export function QrUploadZone({
                         {failedItems.length > 0 && (
                           <div className="space-y-2">
                             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                              Gagal ({failedItems.length})
+                              Ralat ({failedItems.length})
                             </p>
                             {failedItems.map((item) => (
                               <FileUploadItem

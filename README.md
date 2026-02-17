@@ -1,6 +1,8 @@
 # Tukar QR
 
-Convert blurry DuitNow QR images to clean digital QR codes. Upload a photo or use your camera to capture a DuitNow QR, and regenerate a crisp, scannable QR code for payment.
+![Tukar QR](public/major-image.png)
+
+Convert blurry DuitNow QR images into clean, scannable digital QR codes. Upload a photo or use your camera to capture a DuitNow QR, and regenerate a crisp QR code ready for payment.
 
 **Live:** [tukarqr.my](https://tukarqr.my)
 
@@ -10,11 +12,12 @@ Convert blurry DuitNow QR images to clean digital QR codes. Upload a photo or us
 - **Batch processing** – Process up to 10 images at once with concurrent decoding
 - **DuitNow validation** – Validates that the QR is a genuine Malaysia DuitNow EMVCo payment code
 - **Malaysia National QR styling** – Generated QR includes branded border and "MALAYSIA NATIONAL QR" label
-- **QR style options** – Choose between classic (square) and rounded module styles
+- **QR style options** – Choose between Petak-Petak (square) and Bulat-Bulat (rounded) module styles
 - **Bank name display** – Optionally show the issuing bank name on the generated QR
 - **Export options** – Download or copy as PNG in 1:1 or 3:4 ratio, with white or transparent background
 - **Batch download** – Download all decoded QR codes as a ZIP file
-- **Image preview** – Preview uploaded images in a fullscreen lightbox
+- **Cross-browser clipboard** – Copy QR images to clipboard on Safari, Chrome, and Chrome mobile
+- **Image preview** – Preview uploaded and generated images in a fullscreen lightbox
 - **Clipboard paste** – Paste images directly from clipboard with Ctrl+V / ⌘V
 - **Drag & drop** – Drag image files into the upload zone
 - **HEIC/HEIF support** – Automatically converts HEIC/HEIF images from iOS devices
