@@ -231,7 +231,9 @@ export function downloadQrAsPng(
       document.body.removeChild(a);
     })
     .catch(() => {
-      toast.error("Ralat", { description: "Gagal menjana imej. Cuba lagi." });
+      toast.error("Ralat", {
+        description: "Gagal menjana imej QR. Sila cuba lagi.",
+      });
       onError?.();
     });
 }
@@ -249,7 +251,7 @@ export function downloadAllQrsAsPng(
   const valid = items.filter((i) => i.svg);
   if (valid.length === 0) {
     toast.error("Ralat", {
-      description: "Tiada imej QR untuk dimuat turun.",
+      description: "Tiada imej QR tersedia untuk dimuat turun.",
     });
     return;
   }
@@ -292,13 +294,13 @@ export function downloadAllQrsAsPng(
         }
       } catch {
         toast.error("Ralat", {
-          description: `Gagal memuat turun ${item.merchantName || "QR"}.`,
+          description: "Gagal memuat turun imej QR ini. Sila cuba lagi.",
         });
       }
     }
     if (successCount > 0) {
       toast.success("Berjaya", {
-        description: `${successCount} imej QR berjaya dimuat turun!`,
+        description: `${successCount} imej QR berjaya dimuat turun ke peranti anda.`,
       });
     }
   }
@@ -313,7 +315,7 @@ export async function downloadAllQrsAsZip(
   const valid = items.filter((i) => i.svg);
   if (valid.length === 0) {
     toast.error("Ralat", {
-      description: "Tiada imej QR untuk dimuat turun.",
+      description: "Tiada imej QR tersedia untuk dimuat turun.",
     });
     return;
   }
@@ -353,9 +355,9 @@ export async function downloadAllQrsAsZip(
 
     const succeeded = results.filter((r) => r.status === "fulfilled" && r.value);
     if (succeeded.length === 0) {
-      toast.error("Ralat", {
-        description: "Gagal menjana imej. Cuba lagi.",
-      });
+    toast.error("Ralat", {
+      description: "Gagal menjana imej QR. Sila cuba lagi.",
+    });
       return;
     }
 
@@ -376,11 +378,11 @@ export async function downloadAllQrsAsZip(
     URL.revokeObjectURL(url);
 
     toast.success("Berjaya", {
-      description: `${succeeded.length} imej QR berjaya dimuat turun sebagai ZIP!`,
+      description: `${succeeded.length} imej QR berjaya dimuat turun sebagai fail ZIP.`,
     });
   } catch {
     toast.error("Ralat", {
-      description: "Gagal menjana ZIP. Cuba lagi.",
+      description: "Gagal menjana fail ZIP. Sila cuba lagi.",
     });
   }
 }

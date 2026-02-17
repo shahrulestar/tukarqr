@@ -23,7 +23,6 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
@@ -55,10 +54,10 @@ import {
 } from "@/lib/emvco";
 import {
   getPrimaryColor,
-  renderSvgToPng,
   downloadQrAsPng,
   formatShortFilename,
 } from "@/lib/qr-render";
+import { copyQrImageToClipboard } from "@/lib/clipboard-utils";
 
 const MAX_BATCH_SIZE = 10;
 const CONCURRENCY_LIMIT_DESKTOP = 2;
@@ -76,22 +75,23 @@ function createItem(file: File): UploadItem & { payload?: string } {
 
 function mapDecodeErrorToMessage(raw: string): string {
   if (raw.includes("memuatkan") || raw.includes("Format imej"))
-    return "Format tidak disokong. Cuba JPG, PNG atau HEIC.";
+    return "Format imej tidak disokong. Sila gunakan JPG, PNG atau HEIC.";
   if (raw.includes("bukan DuitNow") || raw.includes("Hanya kod DuitNow"))
-    return "Bukan QR DuitNow";
+    return "Ini bukan kod DuitNow QR yang sah.";
   if (
     raw.includes("tidak jelas") ||
     raw.includes("berkilat") ||
     raw.includes("kabur")
   )
-    return "Imej kabur";
-  if (raw.includes("Ralat semasa")) return "Imej kabur";
+    return "Imej QR tidak jelas atau kabur. Sila ambil gambar yang lebih jelas.";
+  if (raw.includes("Ralat semasa"))
+    return "Imej QR tidak jelas atau kabur. Sila ambil gambar yang lebih jelas.";
   if (
     raw.includes("Tiada") ||
     raw.includes("tidak sah") ||
     raw.includes("rosak")
   )
-    return "Tiada QR dikesan";
+    return "Tiada QR DuitNow dikesan dalam imej ini.";
   return raw;
 }
 
@@ -137,6 +137,14 @@ export default function Home() {
     if (completed !== "true") setHowToStartOpen(true);
   }, []);
 
+  const prevResultsLengthRef = useRef(results.length);
+  useEffect(() => {
+    if (prevResultsLengthRef.current > 0 && results.length === 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    prevResultsLengthRef.current = results.length;
+  }, [results.length]);
+
   function dismissAlert() {
     setAlertDismissed(true);
     if (typeof window !== "undefined") {
@@ -167,10 +175,10 @@ export default function Home() {
         () => {}
       );
       toast.success("Berjaya", {
-        description: "DuitNow QR berjaya dimuat turun!",
+        description: "Imej QR berjaya dimuat turun ke peranti anda.",
       });
     } else {
-      renderSvgToPng(svg, {
+      copyQrImageToClipboard(svg, {
         merchantName,
         bankName,
         includeText: true,
@@ -178,26 +186,14 @@ export default function Home() {
         watermark: false,
         outerBg,
       })
-        .then(async (dataUrl) => {
-          const arr = dataUrl.split(",");
-          const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
-          const bstr = atob(arr[1] ?? "");
-          const u8arr = new Uint8Array(bstr.length);
-          for (let i = 0; i < bstr.length; i++) {
-            u8arr[i] = bstr.charCodeAt(i);
-          }
-          await navigator.clipboard.write([
-            new ClipboardItem({
-              "image/png": new Blob([u8arr], { type: mime }),
-            }),
-          ]);
+        .then(() => {
           toast.success("Berjaya", {
-            description: "Imej QR berjaya disalin ke papan keratan",
+            description: "Imej QR berjaya disalin ke papan keratan.",
           });
         })
         .catch(() => {
           toast.error("Ralat", {
-            description: "Gagal menyalin imej. Cuba muat turun imej.",
+            description: "Gagal menyalin imej ke papan keratan. Sila gunakan Muat Turun sebagai alternatif.",
           });
         });
     }
@@ -556,7 +552,7 @@ export default function Home() {
       processingRef.current = false;
       if (successCount > 0) {
         toast.success("Berjaya", {
-          description: `${successCount} DuitNow QR berjaya dekod!`,
+          description: `${successCount} imej DuitNow QR berjaya dikesan dan diproses.`,
         });
       }
     },
@@ -579,13 +575,13 @@ export default function Home() {
         SUPPORTED_EXTENSIONS.test(f.name);
       if (!valid) {
         toast.error("Ralat", {
-          description: `${f.name}: Format tidak disokong.`,
+          description: `Format fail tidak disokong. Sila gunakan JPG, PNG atau HEIC.`,
         });
         return false;
       }
       if (f.size > MAX_FILE_SIZE_BYTES) {
         toast.error("Ralat", {
-          description: `${f.name}: Terlalu besar (maks 30MB).`,
+          description: `Saiz fail melebihi had (maksimum 30MB).`,
         });
         return false;
       }
@@ -600,7 +596,7 @@ export default function Home() {
 
     if (validFiles.length > MAX_BATCH_SIZE) {
       toast.error("Ralat", {
-        description: `Maksimum ${MAX_BATCH_SIZE} fail. Sebahagian tidak ditambah.`,
+        description: `Had maksimum ${MAX_BATCH_SIZE} fail. Sebahagian fail tidak ditambah.`,
       });
     }
 
@@ -833,10 +829,10 @@ export default function Home() {
                   </div>
                 </div>
                 {drawerAction && (
-                  <div className="flex flex-col gap-2 pt-2">
+                  <div className="flex flex-col sm:flex-row gap-2 pt-2">
                     <Button
                       onClick={() => executeSingleExport(drawerAction)}
-                      className="w-full"
+                      className="w-full sm:flex-1 sm:min-w-0"
                     >
                       {drawerAction === "download"
                         ? "Muat Turun"
@@ -967,16 +963,16 @@ export default function Home() {
                     </div>
                   </div>
                   {drawerAction && (
-                    <DrawerFooter>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         onClick={() => executeSingleExport(drawerAction)}
-                        className="w-full"
+                        className="w-full sm:flex-1 sm:min-w-0"
                       >
                         {drawerAction === "download"
                           ? "Muat Turun"
                           : "Salin Imej"}
                       </Button>
-                    </DrawerFooter>
+                    </div>
                   )}
                 </div>
               </div>

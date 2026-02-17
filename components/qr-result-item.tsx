@@ -12,6 +12,7 @@ import {
   renderSvgToPng,
   downloadQrAsPng,
 } from "@/lib/qr-render";
+import { copyQrImageToClipboard } from "@/lib/clipboard-utils";
 import { cn } from "@/lib/utils";
 import { parseEmvCoMerchantName, parseEmvCoBankName } from "@/lib/emvco";
 
@@ -71,21 +72,16 @@ export function QrResultItem({
       () => {}
     );
     toast.success("Berjaya", {
-      description: "DuitNow QR berjaya dimuat turun!",
+      description: "Imej QR berjaya dimuat turun ke peranti anda.",
     });
     onDownload();
   }
 
   async function handleCopy() {
     const svg = qrSvgRef.current;
-    if (!svg || !navigator.clipboard?.write) {
-      toast.error("Ralat", {
-        description: "Salin imej tidak disokong. Cuba muat turun imej.",
-      });
-      return;
-    }
+    if (!svg) return;
     try {
-      const dataUrl = await renderSvgToPng(svg, {
+      await copyQrImageToClipboard(svg, {
         merchantName,
         bankName: showBankName ? bankName : null,
         includeText: true,
@@ -93,23 +89,13 @@ export function QrResultItem({
         watermark: false,
         outerBg,
       });
-      const arr = dataUrl.split(",");
-      const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
-      const bstr = atob(arr[1] ?? "");
-      const u8arr = new Uint8Array(bstr.length);
-      for (let i = 0; i < bstr.length; i++) {
-        u8arr[i] = bstr.charCodeAt(i);
-      }
-      await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": new Blob([u8arr], { type: mime }) }),
-      ]);
       toast.success("Berjaya", {
-        description: "Imej QR berjaya disalin ke papan keratan",
+        description: "Imej QR berjaya disalin ke papan keratan.",
       });
       onCopy();
     } catch {
       toast.error("Ralat", {
-        description: "Gagal menyalin imej. Cuba muat turun imej.",
+        description: "Gagal menyalin imej ke papan keratan. Sila gunakan Muat Turun sebagai alternatif.",
       });
     }
   }
@@ -194,13 +180,13 @@ export function QrResultItem({
             </div>
             <div className="min-w-0 flex-1">
               <p
-                className="truncate text-[13px] font-medium text-foreground"
+                className="truncate text-[14px] sm:text-[15px] md:text-base font-medium text-foreground"
                 title={displayName}
               >
                 {truncatedName}
               </p>
               {bankName && (
-                <p className="truncate text-[11px] text-muted-foreground">
+                <p className="truncate text-[12px] sm:text-[13px] md:text-sm text-muted-foreground">
                   {bankName}
                 </p>
               )}

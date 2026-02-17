@@ -101,19 +101,18 @@ export function FileUploadItem({
           </div>
           <div className="min-w-0 flex-1">
             <p
-              className="truncate text-[13px] font-medium text-foreground"
+              className="truncate text-[14px] sm:text-[15px] md:text-base font-medium text-foreground"
               title={fileName}
             >
               {truncatedName}
             </p>
             {error && status === "failed" && (
-              <p className="mt-0.5 truncate text-[11px] text-[oklch(0.71_0.17_22)]">
+              <p className="mt-0.5 truncate text-[12px] sm:text-[13px] md:text-sm text-[oklch(0.71_0.17_22)]">
                 {error}
               </p>
             )}
           </div>
-          {(status === "pending" || status === "decoding" || status === "failed") &&
-            onRemove && (
+          {onRemove && (
               <Button
                 variant="ghost"
                 size="icon-xs"

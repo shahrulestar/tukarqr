@@ -139,7 +139,7 @@ export function QrUploadZone({
       onFilesSelect(imageFiles);
     } else if (e.dataTransfer.files?.length) {
       toast.error("Ralat", {
-        description: "Sila seret fail imej sahaja.",
+        description: "Sila seret fail imej sahaja (JPG, PNG, HEIC, dll.).",
       });
     }
   }
