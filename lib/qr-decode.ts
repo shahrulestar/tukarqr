@@ -1,5 +1,13 @@
 import jsQR from "jsqr";
 
+/** Yield to main thread so the browser can paint, handle events, and run animations */
+function yieldToMain(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+/** Yield every N attempts to keep the UI responsive without excessive overhead */
+const YIELD_EVERY = 3;
+
 function decodeQrFromCanvas(canvas: HTMLCanvasElement): string | null {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
@@ -12,12 +20,20 @@ function decodeQrFromCanvas(canvas: HTMLCanvasElement): string | null {
   return result?.data || null;
 }
 
+let zxingModule: Awaited<typeof import("@zxing/browser")> | null = null;
+
+async function getZxingReader() {
+  if (!zxingModule) {
+    zxingModule = await import("@zxing/browser");
+  }
+  return new zxingModule.BrowserQRCodeReader();
+}
+
 async function decodeWithZxing(
   canvas: HTMLCanvasElement
 ): Promise<string | null> {
   try {
-    const { BrowserQRCodeReader } = await import("@zxing/browser");
-    const reader = new BrowserQRCodeReader();
+    const reader = await getZxingReader();
     const result = await Promise.resolve(reader.decodeFromCanvas(canvas));
     return result?.getText() || null;
   } catch {
@@ -33,6 +49,21 @@ async function tryDecode(canvas: HTMLCanvasElement): Promise<string | null> {
   return null;
 }
 
+/** Reusable temp canvas to avoid GC pressure from creating many canvases */
+let _tempCanvas: HTMLCanvasElement | null = null;
+
+function getTempCanvas(w: number, h: number): {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+} | null {
+  if (!_tempCanvas) _tempCanvas = document.createElement("canvas");
+  _tempCanvas.width = w;
+  _tempCanvas.height = h;
+  const ctx = _tempCanvas.getContext("2d");
+  if (!ctx) return null;
+  return { canvas: _tempCanvas, ctx };
+}
+
 function tryDecodeAtScale(
   sourceCanvas: HTMLCanvasElement,
   scale: number,
@@ -40,11 +71,10 @@ function tryDecodeAtScale(
 ): Promise<string | null> {
   const w = Math.max(1, Math.round(sourceCanvas.width * scale));
   const h = Math.max(1, Math.round(sourceCanvas.height * scale));
-  const temp = document.createElement("canvas");
-  temp.width = w;
-  temp.height = h;
-  const ctx = temp.getContext("2d");
-  if (!ctx) return Promise.resolve(null);
+
+  const temp = getTempCanvas(w, h);
+  if (!temp) return Promise.resolve(null);
+  const { canvas, ctx } = temp;
 
   if (filter) ctx.filter = filter;
   ctx.drawImage(
@@ -60,7 +90,7 @@ function tryDecodeAtScale(
   );
   ctx.filter = "none";
 
-  return tryDecode(temp);
+  return tryDecode(canvas);
 }
 
 function centerSquareCrop(
@@ -74,14 +104,14 @@ function centerSquareCrop(
   const sx = Math.floor((w - size) / 2);
   const sy = Math.floor((h - size) / 2);
 
-  const temp = document.createElement("canvas");
-  temp.width = size;
-  temp.height = size;
-  const ctx = temp.getContext("2d");
+  const crop = document.createElement("canvas");
+  crop.width = size;
+  crop.height = size;
+  const ctx = crop.getContext("2d");
   if (!ctx) return sourceCanvas;
 
   ctx.drawImage(sourceCanvas, sx, sy, size, size, 0, 0, size, size);
-  return temp;
+  return crop;
 }
 
 function applyContrastStretch(
@@ -103,8 +133,8 @@ function applyContrastStretch(
   for (let i = 0; i < data.length; i += 4) {
     const luminance =
       0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-    min = Math.min(min, luminance);
-    max = Math.max(max, luminance);
+    if (luminance < min) min = luminance;
+    if (luminance > max) max = luminance;
   }
 
   const range = max - min || 1;
@@ -115,13 +145,13 @@ function applyContrastStretch(
     data[i] = data[i + 1] = data[i + 2] = Math.round(stretched);
   }
 
-  const temp = document.createElement("canvas");
-  temp.width = sourceCanvas.width;
-  temp.height = sourceCanvas.height;
-  const tempCtx = temp.getContext("2d");
-  if (!tempCtx) return sourceCanvas;
-  tempCtx.putImageData(imageData, 0, 0);
-  return temp;
+  const out = document.createElement("canvas");
+  out.width = sourceCanvas.width;
+  out.height = sourceCanvas.height;
+  const outCtx = out.getContext("2d");
+  if (!outCtx) return sourceCanvas;
+  outCtx.putImageData(imageData, 0, 0);
+  return out;
 }
 
 function applyBinarize(
@@ -146,13 +176,13 @@ function applyBinarize(
     data[i] = data[i + 1] = data[i + 2] = v;
   }
 
-  const temp = document.createElement("canvas");
-  temp.width = sourceCanvas.width;
-  temp.height = sourceCanvas.height;
-  const tempCtx = temp.getContext("2d");
-  if (!tempCtx) return sourceCanvas;
-  tempCtx.putImageData(imageData, 0, 0);
-  return temp;
+  const out = document.createElement("canvas");
+  out.width = sourceCanvas.width;
+  out.height = sourceCanvas.height;
+  const outCtx = out.getContext("2d");
+  if (!outCtx) return sourceCanvas;
+  outCtx.putImageData(imageData, 0, 0);
+  return out;
 }
 
 export async function preprocessAndDecode(
@@ -174,18 +204,27 @@ export async function preprocessAndDecode(
   const scales = [...new Set([...baseScales, ...portraitScales, ...landscapeScales])];
   const styledFilters = ["grayscale(1)", "contrast(1.3)", "contrast(1.5) brightness(0.95)"];
 
+  let attemptCount = 0;
+
+  async function maybeYield() {
+    attemptCount++;
+    if (attemptCount % YIELD_EVERY === 0) await yieldToMain();
+  }
+
   if (isNonSquare) {
     const cropped = centerSquareCrop(sourceCanvas);
     for (const scale of scales) {
       if (signal?.aborted) return null;
       const result = await tryDecodeAtScale(cropped, scale);
       if (result) return result;
+      await maybeYield();
     }
     for (const filter of styledFilters) {
       for (const scale of scales) {
         if (signal?.aborted) return null;
         const result = await tryDecodeAtScale(cropped, scale, filter);
         if (result) return result;
+        await maybeYield();
       }
     }
   }
@@ -194,6 +233,7 @@ export async function preprocessAndDecode(
     if (signal?.aborted) return null;
     const result = await tryDecodeAtScale(sourceCanvas, scale);
     if (result) return result;
+    await maybeYield();
   }
 
   for (const filter of styledFilters) {
@@ -201,6 +241,7 @@ export async function preprocessAndDecode(
       if (signal?.aborted) return null;
       const result = await tryDecodeAtScale(sourceCanvas, scale, filter);
       if (result) return result;
+      await maybeYield();
     }
   }
 
@@ -213,6 +254,7 @@ export async function preprocessAndDecode(
         "blur(0.5px)"
       );
       if (result) return result;
+      await maybeYield();
     }
     return null;
   }
@@ -225,14 +267,17 @@ export async function preprocessAndDecode(
       "blur(0.5px)"
     );
     if (result) return result;
+    await maybeYield();
   }
 
   for (const scale of scales) {
     if (signal?.aborted) return null;
-    const temp = document.createElement("canvas");
-    temp.width = Math.max(1, Math.round(sourceCanvas.width * scale));
-    temp.height = Math.max(1, Math.round(sourceCanvas.height * scale));
-    const ctx = temp.getContext("2d");
+    const scaleW = Math.max(1, Math.round(sourceCanvas.width * scale));
+    const scaleH = Math.max(1, Math.round(sourceCanvas.height * scale));
+    const stretchCanvas = document.createElement("canvas");
+    stretchCanvas.width = scaleW;
+    stretchCanvas.height = scaleH;
+    const ctx = stretchCanvas.getContext("2d");
     if (!ctx) continue;
     ctx.drawImage(
       sourceCanvas,
@@ -242,20 +287,24 @@ export async function preprocessAndDecode(
       sourceCanvas.height,
       0,
       0,
-      temp.width,
-      temp.height
+      scaleW,
+      scaleH
     );
-    const stretched = applyContrastStretch(temp);
+    await yieldToMain();
+    const stretched = applyContrastStretch(stretchCanvas);
     const result = await tryDecode(stretched);
     if (result) return result;
+    await maybeYield();
   }
 
   for (const scale of [1, 2, 3]) {
     if (signal?.aborted) return null;
-    const temp = document.createElement("canvas");
-    temp.width = Math.max(1, Math.round(sourceCanvas.width * scale));
-    temp.height = Math.max(1, Math.round(sourceCanvas.height * scale));
-    const ctx = temp.getContext("2d");
+    const scaleW = Math.max(1, Math.round(sourceCanvas.width * scale));
+    const scaleH = Math.max(1, Math.round(sourceCanvas.height * scale));
+    const binCanvas = document.createElement("canvas");
+    binCanvas.width = scaleW;
+    binCanvas.height = scaleH;
+    const ctx = binCanvas.getContext("2d");
     if (!ctx) continue;
     ctx.drawImage(
       sourceCanvas,
@@ -265,23 +314,27 @@ export async function preprocessAndDecode(
       sourceCanvas.height,
       0,
       0,
-      temp.width,
-      temp.height
+      scaleW,
+      scaleH
     );
-    const stretched = applyContrastStretch(temp);
+    await yieldToMain();
+    const stretched = applyContrastStretch(binCanvas);
     for (const threshold of [100, 128, 150]) {
       const binarized = applyBinarize(stretched, threshold);
       const result = await tryDecode(binarized);
       if (result) return result;
+      await maybeYield();
     }
   }
 
   for (const scale of scales) {
     if (signal?.aborted) return null;
-    const temp = document.createElement("canvas");
-    temp.width = Math.max(1, Math.round(sourceCanvas.width * scale));
-    temp.height = Math.max(1, Math.round(sourceCanvas.height * scale));
-    const ctx = temp.getContext("2d");
+    const scaleW = Math.max(1, Math.round(sourceCanvas.width * scale));
+    const scaleH = Math.max(1, Math.round(sourceCanvas.height * scale));
+    const grayCanvas = document.createElement("canvas");
+    grayCanvas.width = scaleW;
+    grayCanvas.height = scaleH;
+    const ctx = grayCanvas.getContext("2d");
     if (!ctx) continue;
     ctx.filter = "grayscale(1)";
     ctx.drawImage(
@@ -292,13 +345,15 @@ export async function preprocessAndDecode(
       sourceCanvas.height,
       0,
       0,
-      temp.width,
-      temp.height
+      scaleW,
+      scaleH
     );
     ctx.filter = "none";
-    const stretched = applyContrastStretch(temp);
+    await yieldToMain();
+    const stretched = applyContrastStretch(grayCanvas);
     const result = await tryDecode(stretched);
     if (result) return result;
+    await maybeYield();
   }
 
   return null;

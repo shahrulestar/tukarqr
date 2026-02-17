@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  startTransition,
+} from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Square, Circle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +23,7 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
@@ -29,8 +32,12 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HowToStart } from "@/components/onboarding/how-to-start";
 import { PrivacyPolicy } from "@/components/onboarding/privacy-policy";
-import { QrUploadZone } from "@/components/qr-upload-zone";
-import { QrResultCard } from "@/components/qr-result-card";
+import {
+  QrUploadZone,
+  type UploadItem,
+} from "@/components/qr-upload-zone";
+import { QrResultList } from "@/components/qr-result-card";
+import { QrResultCardSingle } from "@/components/qr-result-card-single";
 import {
   MAX_FILE_SIZE_BYTES,
   MAX_IMAGE_DIMENSION,
@@ -45,39 +52,78 @@ import {
   isDuitNowQr,
   parseEmvCoMerchantName,
   parseEmvCoBankName,
-  parseEmvCoAmount,
 } from "@/lib/emvco";
 import {
-  formatShortFilename,
   getPrimaryColor,
   renderSvgToPng,
   downloadQrAsPng,
+  formatShortFilename,
 } from "@/lib/qr-render";
+
+const MAX_BATCH_SIZE = 10;
+const CONCURRENCY_LIMIT_DESKTOP = 2;
+const CONCURRENCY_LIMIT_MOBILE = 1;
+const YIELD_BETWEEN_CHUNKS_MS = 16;
+
+function createItem(file: File): UploadItem & { payload?: string } {
+  return {
+    id: `${file.name}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    file,
+    status: "pending",
+    progress: 0,
+  };
+}
+
+function mapDecodeErrorToMessage(raw: string): string {
+  if (raw.includes("memuatkan") || raw.includes("Format imej"))
+    return "Format tidak disokong. Cuba JPG, PNG atau HEIC.";
+  if (raw.includes("bukan DuitNow") || raw.includes("Hanya kod DuitNow"))
+    return "Bukan QR DuitNow";
+  if (
+    raw.includes("tidak jelas") ||
+    raw.includes("berkilat") ||
+    raw.includes("kabur")
+  )
+    return "Imej kabur";
+  if (raw.includes("Ralat semasa")) return "Imej kabur";
+  if (
+    raw.includes("Tiada") ||
+    raw.includes("tidak sah") ||
+    raw.includes("rosak")
+  )
+    return "Tiada QR dikesan";
+  return raw;
+}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("upload");
-  const [qrPayload, setQrPayload] = useState<string | null>(null);
-  const [originalImage, setOriginalImage] = useState<string | null>(null);
-  const [isDecoding, setIsDecoding] = useState(false);
+  const [results, setResults] = useState<
+    (UploadItem & { payload?: string })[]
+  >([]);
   const [qrFgColor, setQrFgColor] = useState("#000000");
-  const [pngPreviewUrl, setPngPreviewUrl] = useState<string | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerAction, setDrawerAction] = useState<
-    "download" | "copy" | null
-  >(null);
+  const [configOpen, setConfigOpen] = useState(false);
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [howToStartOpen, setHowToStartOpen] = useState(false);
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
   const [qrStyle, setQrStyle] = useState<"classic" | "rounded">("classic");
   const [showBankName, setShowBankName] = useState(true);
   const [outerBg, setOuterBg] = useState<"white" | "transparent">("white");
-  const [configRatio, setConfigRatio] = useState<"1:1" | "3:4">("1:1");
+  const [drawerAction, setDrawerAction] = useState<
+    "download" | "copy" | null
+  >(null);
+  const [exportRatio, setExportRatio] = useState<"1:1" | "3:4">("1:1");
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const decodeAbortRef = useRef<AbortController | null>(null);
+  const resultCardRef = useRef<HTMLDivElement>(null);
+  const singleQrSvgRef = useRef<SVGSVGElement | null>(null);
+  const processingRef = useRef(false);
   useEffect(() => {
-    if (drawerOpen) setConfigRatio("1:1");
-  }, [drawerOpen]);
+    setQrFgColor(getPrimaryColor());
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -98,6 +144,66 @@ export default function Home() {
     }
   }
 
+  function handleConfigOpenChange(open: boolean) {
+    setConfigOpen(open);
+    if (!open) setDrawerAction(null);
+  }
+
+  function executeSingleExport(action: "download" | "copy") {
+    const svg = singleQrSvgRef.current;
+    if (!svg || !singleResult) return;
+    const merchantName = parseEmvCoMerchantName(singleResult.payload);
+    const bankName = showBankName
+      ? parseEmvCoBankName(singleResult.payload)
+      : null;
+    if (action === "download") {
+      downloadQrAsPng(
+        svg,
+        formatShortFilename(merchantName),
+        merchantName,
+        bankName,
+        exportRatio,
+        outerBg,
+        () => {}
+      );
+      toast.success("Berjaya", {
+        description: "DuitNow QR berjaya dimuat turun!",
+      });
+    } else {
+      renderSvgToPng(svg, {
+        merchantName,
+        bankName,
+        includeText: true,
+        ratio: exportRatio,
+        watermark: false,
+        outerBg,
+      })
+        .then(async (dataUrl) => {
+          const arr = dataUrl.split(",");
+          const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
+          const bstr = atob(arr[1] ?? "");
+          const u8arr = new Uint8Array(bstr.length);
+          for (let i = 0; i < bstr.length; i++) {
+            u8arr[i] = bstr.charCodeAt(i);
+          }
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              "image/png": new Blob([u8arr], { type: mime }),
+            }),
+          ]);
+          toast.success("Berjaya", {
+            description: "Imej QR berjaya disalin ke papan keratan",
+          });
+        })
+        .catch(() => {
+          toast.error("Ralat", {
+            description: "Gagal menyalin imej. Cuba muat turun imej.",
+          });
+        });
+    }
+    handleConfigOpenChange(false);
+  }
+
   function handleHowToStartNext() {
     setHowToStartOpen(false);
     setPrivacyPolicyOpen(true);
@@ -110,214 +216,395 @@ export default function Home() {
     }
   }
 
-  const merchantName = useMemo(
-    () => (qrPayload ? parseEmvCoMerchantName(qrPayload) : null),
-    [qrPayload]
+  const updateItem = useCallback(
+    (id: string, updates: Partial<UploadItem & { payload?: string }>) => {
+      setResults((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, ...updates } : r))
+      );
+    },
+    []
   );
 
-  const bankName = useMemo(
-    () => (qrPayload ? parseEmvCoBankName(qrPayload) : null),
-    [qrPayload]
-  );
+  const processSingleFile = useCallback(
+    async (
+      item: UploadItem & { payload?: string },
+      fromCamera: boolean,
+      signal: AbortSignal,
+      canvasOverride?: HTMLCanvasElement | null,
+      preloaded?: { img: HTMLImageElement; url: string },
+      batchSize = 1
+    ): Promise<boolean> => {
+      const { id, file } = item;
 
-  const merchantAmount = useMemo(
-    () => (qrPayload ? parseEmvCoAmount(qrPayload) : null),
-    [qrPayload]
-  );
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const qrSvgRef = useRef<SVGSVGElement>(null);
-  const resultCardRef = useRef<HTMLDivElement>(null);
-  const decodeAbortRef = useRef<AbortController | null>(null);
-
-  useEffect(() => {
-    setQrFgColor(getPrimaryColor());
-  }, []);
-
-  useEffect(() => {
-    if (!qrPayload || !qrSvgRef.current) {
-      setPngPreviewUrl(null);
-      return;
-    }
-    const svg = qrSvgRef.current;
-    const timer = requestAnimationFrame(() => {
-      renderSvgToPng(svg, {
-        merchantName,
-        bankName: showBankName ? bankName : null,
-        includeText: true,
-        ratio: "1:1",
-        watermark: false,
-        outerBg,
-      })
-        .then(setPngPreviewUrl)
-        .catch(() => setPngPreviewUrl(null));
-    });
-    return () => {
-      cancelAnimationFrame(timer);
-      setPngPreviewUrl(null);
-    };
-  }, [qrPayload, merchantName, bankName, showBankName, qrStyle, outerBg]);
-
-  useEffect(() => {
-    if (qrPayload && resultCardRef.current) {
-      const id = setTimeout(() => {
-        resultCardRef.current?.focus();
-        resultCardRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
+      const isFormatValid =
+        (file.type && SUPPORTED_MIME_TYPES.includes(file.type)) ||
+        SUPPORTED_EXTENSIONS.test(file.name);
+      if (!isFormatValid) {
+        const err = mapDecodeErrorToMessage("Format imej tidak disokong.");
+        updateItem(id, {
+          status: "failed",
+          progress: 100,
+          error: err,
         });
-      }, 100);
-      return () => clearTimeout(id);
-    }
-  }, [qrPayload]);
-
-  async function handleImageFile(
-    file: File,
-    options?: { fromCamera?: boolean }
-  ) {
-    const fromCamera = options?.fromCamera ?? false;
-
-    const isFormatValid =
-      (file.type && SUPPORTED_MIME_TYPES.includes(file.type)) ||
-      SUPPORTED_EXTENSIONS.test(file.name);
-    if (!isFormatValid) {
-      toast.error("Ralat", {
-        description:
-          "Format imej tidak disokong. Sila gunakan JPG, PNG, WebP, HEIC, atau BMP.",
-      });
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      toast.error("Ralat", {
-        description:
-          "Imej terlalu besar. Maksimum 30MB. Sila pilih imej yang lebih kecil.",
-      });
-      return;
-    }
-
-    if (originalImage?.startsWith?.("blob:")) {
-      URL.revokeObjectURL(originalImage);
-    }
-    decodeAbortRef.current?.abort();
-    decodeAbortRef.current = new AbortController();
-    const signal = decodeAbortRef.current.signal;
-    setIsDecoding(true);
-    setQrPayload(null);
-
-    let blobToUse: Blob = file;
-    if (isHeicFile(file)) {
-      try {
-        blobToUse = await convertHeicToJpeg(file);
-      } catch {
-        setIsDecoding(false);
-        toast.error("Ralat", {
-          description:
-            "Gagal menukar imej HEIC. Sila cuba imej lain atau tukar ke format JPG pada iPhone.",
-        });
-        return;
+        if (batchSize <= 1) toast.error("Ralat", { description: err });
+        return false;
       }
-    }
 
-    const imageUrl = URL.createObjectURL(blobToUse);
-    setOriginalImage(imageUrl);
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        const err = "Imej terlalu besar (maks 30MB).";
+        updateItem(id, {
+          status: "failed",
+          progress: 100,
+          error: err,
+        });
+        if (batchSize <= 1) toast.error("Ralat", { description: err });
+        return false;
+      }
 
-    const img = new Image();
-    img.onload = async () => {
-      try {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+      updateItem(id, { status: "decoding", progress: 0 });
 
-        let w = img.width;
-        let h = img.height;
-
-        if (w > MAX_IMAGE_DIMENSION_HARD || h > MAX_IMAGE_DIMENSION_HARD) {
-          toast.error("Ralat", {
-            description:
-              "Imej terlalu besar untuk diproses. Sila gunakan resolusi yang lebih kecil (maksimum 4096px).",
-          });
-          return;
-        }
-
-        if (w > MAX_IMAGE_DIMENSION || h > MAX_IMAGE_DIMENSION) {
-          const ratio = Math.min(
-            MAX_IMAGE_DIMENSION / w,
-            MAX_IMAGE_DIMENSION / h
-          );
-          w = Math.round(w * ratio);
-          h = Math.round(h * ratio);
-        }
-
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-
-        ctx.drawImage(img, 0, 0, w, h);
-
-        let payload: string | null = null;
-        if (fromCamera) {
-          payload = await preprocessAndDecode(canvas, {
-            full: false,
-            signal,
-          });
-          if (!payload) {
-            payload = await preprocessAndDecode(canvas, { full: true, signal });
+      const runDecode = async (img: HTMLImageElement, cleanup: () => void) => {
+        let progressInterval: ReturnType<typeof setInterval> | null = null;
+        try {
+          const canvas = canvasOverride ?? canvasRef.current;
+          if (!canvas || signal.aborted) {
+            cleanup();
+            return false;
           }
-        } else {
-          payload = await preprocessAndDecode(canvas, { full: true, signal });
-        }
 
-        if (payload) {
-          const validation = isDuitNowQr(payload);
-          if (validation.valid) {
-            setQrPayload(payload);
-            toast.success("Berjaya", {
-              description:
-                "DuitNow QR berjaya dekod! QR pembayaran sudah sedia.",
+          updateItem(id, { progress: 25 });
+
+          let w = img.width;
+          let h = img.height;
+
+          if (w > MAX_IMAGE_DIMENSION_HARD || h > MAX_IMAGE_DIMENSION_HARD) {
+            const err = "Imej terlalu besar (maks 4096px).";
+            updateItem(id, {
+              status: "failed",
+              progress: 100,
+              error: err,
             });
-          } else {
-            toast.error("Ralat", { description: validation.reason });
+            if (batchSize <= 1) toast.error("Ralat", { description: err });
+            cleanup();
+            return false;
           }
-        } else if (!signal.aborted) {
-          toast.error("Ralat", {
-            description:
-              "Imej tidak jelas atau berkilat. Sila ambil semula atau muat naik imej yang lebih jelas.",
+
+          if (w > MAX_IMAGE_DIMENSION || h > MAX_IMAGE_DIMENSION) {
+            const ratio = Math.min(
+              MAX_IMAGE_DIMENSION / w,
+              MAX_IMAGE_DIMENSION / h
+            );
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            cleanup();
+            return false;
+          }
+
+          ctx.drawImage(img, 0, 0, w, h);
+          updateItem(id, { progress: 45 });
+
+          const progressIntervalMs = batchSize >= 5 ? 300 : 200;
+          progressInterval = setInterval(() => {
+            if (signal.aborted) return;
+            startTransition(() => {
+              setResults((prev) =>
+                prev.map((r) => {
+                  if (r.id !== id || r.status !== "decoding") return r;
+                  const next = Math.min(90, r.progress + 10);
+                  return { ...r, progress: next };
+                })
+              );
+            });
+          }, progressIntervalMs);
+
+          let payload: string | null = null;
+          if (fromCamera) {
+            payload = await preprocessAndDecode(canvas, {
+              full: false,
+              signal,
+            });
+            if (!payload) {
+              payload = await preprocessAndDecode(canvas, {
+                full: true,
+                signal,
+              });
+            }
+          } else {
+            payload = await preprocessAndDecode(canvas, {
+              full: true,
+              signal,
+            });
+          }
+
+          if (progressInterval) clearInterval(progressInterval);
+          cleanup();
+
+          if (signal.aborted) return false;
+
+          if (payload) {
+            const validation = isDuitNowQr(payload);
+            if (validation.valid) {
+              updateItem(id, {
+                status: "success",
+                progress: 100,
+                payload,
+              });
+              return true;
+            }
+            const err = mapDecodeErrorToMessage(validation.reason ?? "");
+            updateItem(id, {
+              status: "failed",
+              progress: 100,
+              error: err,
+            });
+            if (batchSize <= 1) toast.error("Ralat", { description: err });
+            return false;
+          }
+          const err = mapDecodeErrorToMessage("Tiada QR dikesan.");
+          updateItem(id, {
+            status: "failed",
+            progress: 100,
+            error: err,
           });
+          if (batchSize <= 1) toast.error("Ralat", { description: err });
+          return false;
+        } catch {
+          if (progressInterval) clearInterval(progressInterval);
+          if (!signal.aborted) {
+            const err = mapDecodeErrorToMessage("Ralat semasa dekod.");
+            updateItem(id, {
+              status: "failed",
+              progress: 100,
+              error: err,
+            });
+            if (batchSize <= 1) toast.error("Ralat", { description: err });
+          }
+          return false;
         }
-      } catch {
-        if (!signal.aborted) {
-          toast.error("Ralat", {
-            description:
-              "Imej tidak jelas atau berkilat. Sila ambil semula atau muat naik imej yang lebih jelas.",
-          });
-        }
-      } finally {
-        setIsDecoding(false);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-        if (cameraInputRef.current) cameraInputRef.current.value = "";
+      };
+
+      if (preloaded) {
+        return runDecode(preloaded.img, () =>
+          URL.revokeObjectURL(preloaded!.url)
+        );
       }
-    };
 
-    img.onerror = () => {
-      URL.revokeObjectURL(imageUrl);
-      toast.error("Ralat", {
-        description:
-          "Gagal memuatkan imej. Format mungkin tidak disokong oleh pelayar. Cuba JPG, PNG atau HEIC.",
+      let blobToUse: Blob = file;
+      if (isHeicFile(file)) {
+        try {
+          blobToUse = await convertHeicToJpeg(file);
+        } catch {
+          const err = mapDecodeErrorToMessage("Gagal menukar HEIC.");
+          updateItem(id, {
+            status: "failed",
+            progress: 100,
+            error: err,
+          });
+          if (batchSize <= 1) toast.error("Ralat", { description: err });
+          return false;
+        }
+      }
+
+      updateItem(id, { progress: 10 });
+      const imageUrl = URL.createObjectURL(blobToUse);
+      const img = new Image();
+
+      const cleanup = () => {
+        URL.revokeObjectURL(imageUrl);
+      };
+
+      return new Promise<boolean>((resolve) => {
+        img.onerror = () => {
+          cleanup();
+          const err = mapDecodeErrorToMessage("Gagal memuatkan imej.");
+          updateItem(id, {
+            status: "failed",
+            progress: 100,
+            error: err,
+          });
+          if (batchSize <= 1) toast.error("Ralat", { description: err });
+          resolve(false);
+        };
+
+        img.onload = async () => {
+          const ok = await runDecode(img, cleanup);
+          resolve(ok);
+        };
+
+        img.src = imageUrl;
       });
-      setIsDecoding(false);
-    };
+    },
+    [updateItem]
+  );
 
-    img.src = imageUrl;
-  }
+  const processQueue = useCallback(
+    async (currentResults: (UploadItem & { payload?: string })[]) => {
+      if (processingRef.current) return;
 
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleImageFile(file);
-    else toast.error("Ralat", { description: "Sila seret fail imej sahaja." });
+      const pending = currentResults.filter((r) => r.status === "pending");
+      if (pending.length === 0) return;
+
+      processingRef.current = true;
+      decodeAbortRef.current?.abort();
+      decodeAbortRef.current = new AbortController();
+      const signal = decodeAbortRef.current.signal;
+
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      const concurrency = isMobile
+        ? CONCURRENCY_LIMIT_MOBILE
+        : CONCURRENCY_LIMIT_DESKTOP;
+
+      const canvasPool = Array.from(
+        { length: Math.min(concurrency, pending.length) },
+        () => document.createElement("canvas")
+      );
+
+      async function preloadChunk(
+        items: (UploadItem & { payload?: string })[]
+      ): Promise<{ img: HTMLImageElement; url: string }[] | null> {
+        if (signal.aborted || !items.length) return null;
+        const results: { img: HTMLImageElement; url: string }[] = [];
+        for (const item of items) {
+          if (signal.aborted) {
+            results.forEach((r) => URL.revokeObjectURL(r.url));
+            return null;
+          }
+          let blob: Blob = item.file;
+          if (isHeicFile(item.file)) {
+            try {
+              blob = await convertHeicToJpeg(item.file);
+            } catch {
+              results.forEach((r) => URL.revokeObjectURL(r.url));
+              return null;
+            }
+          }
+          const url = URL.createObjectURL(blob);
+          const img = new Image();
+          try {
+            await new Promise<void>((resolve, reject) => {
+              img.onload = () => resolve();
+              img.onerror = () => reject(new Error("Load failed"));
+              img.src = url;
+            });
+            if (signal.aborted) {
+              URL.revokeObjectURL(url);
+              results.forEach((r) => URL.revokeObjectURL(r.url));
+              return null;
+            }
+            results.push({ img, url });
+          } catch {
+            URL.revokeObjectURL(url);
+            results.forEach((r) => URL.revokeObjectURL(r.url));
+            return null;
+          }
+        }
+        return results;
+      }
+
+      let successCount = 0;
+      let nextPreload: Promise<{ img: HTMLImageElement; url: string }[] | null> =
+        pending.length > concurrency
+          ? preloadChunk(
+              pending.slice(concurrency, 2 * concurrency)
+            )
+          : Promise.resolve(null);
+      let preloadedForCurrent: { img: HTMLImageElement; url: string }[] | null =
+        null;
+
+      for (let i = 0; i < pending.length; i += concurrency) {
+        if (signal.aborted) break;
+        const chunk = pending.slice(i, i + concurrency);
+        const preloaded = await nextPreload;
+        nextPreload =
+          i + 2 * concurrency < pending.length
+            ? preloadChunk(
+                pending.slice(
+                  i + 2 * concurrency,
+                  i + 3 * concurrency
+                )
+              )
+            : Promise.resolve(null);
+        const toUse = preloadedForCurrent;
+        preloadedForCurrent = preloaded;
+        const outcomes = await Promise.all(
+          chunk.map((item, j) =>
+            processSingleFile(
+              item,
+              false,
+              signal,
+              canvasPool[j] ?? undefined,
+              toUse?.[j],
+              pending.length
+            )
+          )
+        );
+        if (toUse) {
+          toUse.forEach((p) => URL.revokeObjectURL(p.url));
+        }
+        successCount += outcomes.filter(Boolean).length;
+        await new Promise<void>((resolve) =>
+          setTimeout(resolve, YIELD_BETWEEN_CHUNKS_MS)
+        );
+      }
+
+      processingRef.current = false;
+      if (successCount > 0) {
+        toast.success("Berjaya", {
+          description: `${successCount} DuitNow QR berjaya dekod!`,
+        });
+      }
+    },
+    [processSingleFile]
+  );
+
+  useEffect(() => {
+    const hasPending = results.some((r) => r.status === "pending");
+    if (hasPending && !processingRef.current) {
+      processQueue(results);
+    }
+  }, [results, processQueue]);
+
+  function handleFilesSelect(files: File[]) {
+    if (!files.length) return;
+
+    const validFiles = files.filter((f) => {
+      const valid =
+        (f.type && SUPPORTED_MIME_TYPES.includes(f.type)) ||
+        SUPPORTED_EXTENSIONS.test(f.name);
+      if (!valid) {
+        toast.error("Ralat", {
+          description: `${f.name}: Format tidak disokong.`,
+        });
+        return false;
+      }
+      if (f.size > MAX_FILE_SIZE_BYTES) {
+        toast.error("Ralat", {
+          description: `${f.name}: Terlalu besar (maks 30MB).`,
+        });
+        return false;
+      }
+      return true;
+    });
+
+    if (!validFiles.length) return;
+
+    const toAdd = validFiles
+      .slice(0, MAX_BATCH_SIZE - results.length)
+      .map(createItem);
+
+    if (validFiles.length > MAX_BATCH_SIZE) {
+      toast.error("Ralat", {
+        description: `Maksimum ${MAX_BATCH_SIZE} fail. Sebahagian tidak ditambah.`,
+      });
+    }
+
+    setResults((prev) => [...prev, ...toAdd]);
   }
 
   function handleDragOver(e: React.DragEvent) {
@@ -325,90 +612,34 @@ export default function Home() {
   }
 
   function handleReset() {
-    if (originalImage?.startsWith?.("blob:")) {
-      URL.revokeObjectURL(originalImage);
-    }
-    setQrPayload(null);
-    setOriginalImage(null);
-    setIsDecoding(false);
+    decodeAbortRef.current?.abort();
+    setResults([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (cameraInputRef.current) cameraInputRef.current.value = "";
   }
 
-  function openDrawerForDownload() {
-    setDrawerAction("download");
-    setDrawerOpen(true);
-  }
-
-  function openDrawerForCopy() {
-    setDrawerAction("copy");
-    setDrawerOpen(true);
-  }
-
-  async function executeWithRatio(ratio: "1:1" | "3:4") {
-    const svg = qrSvgRef.current;
-    if (!svg || !qrPayload || !drawerAction) return;
-
-    setDrawerOpen(false);
-
-    if (drawerAction === "download") {
-      downloadQrAsPng(
-        svg,
-        formatShortFilename(merchantName),
-        merchantName,
-        showBankName ? bankName : null,
-        ratio,
-        outerBg,
-        () => setDrawerAction(null)
-      );
-      toast.success("Berjaya", {
-        description:
-          "DuitNow QR berjaya dimuat turun! Imbas dengan aplikasi bank anda.",
-      });
-    } else if (drawerAction === "copy") {
-      if (!navigator.clipboard?.write) {
-        toast.error("Ralat", {
-          description: "Salin imej tidak disokong. Cuba muat turun imej.",
-        });
-        setDrawerAction(null);
-        return;
-      }
-      const blobPromise = (async () => {
-        const dataUrl = await renderSvgToPng(svg, {
-          merchantName,
-          bankName: showBankName ? bankName : null,
-          includeText: true,
-          ratio,
-          watermark: false,
-          outerBg,
-        });
-        const arr = dataUrl.split(",");
-        const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
-        const bstr = atob(arr[1] ?? "");
-        const u8arr = new Uint8Array(bstr.length);
-        for (let i = 0; i < bstr.length; i++) {
-          u8arr[i] = bstr.charCodeAt(i);
-        }
-        return new Blob([u8arr], { type: mime });
-      })();
-      navigator.clipboard
-        .write([new ClipboardItem({ "image/png": blobPromise })])
-        .then(() =>
-          toast.success("Berjaya", {
-            description: "Imej QR berjaya disalin ke papan keratan",
-          })
-        )
-        .catch(() =>
-          toast.error("Ralat", {
-            description: "Gagal menyalin imej. Cuba muat turun imej.",
-          })
-        )
-        .finally(() => setDrawerAction(null));
-      return;
+  function handleRemoveItem(id: string) {
+    const item = results.find((r) => r.id === id);
+    if (item?.status === "decoding") {
+      decodeAbortRef.current?.abort();
     }
-
-    setDrawerAction(null);
+    setResults((prev) => prev.filter((r) => r.id !== id));
   }
+
+  const successfulResults = results.filter(
+    (r): r is UploadItem & { payload: string } =>
+      r.status === "success" && !!r.payload
+  );
+  const failedResults = results.filter((r) => r.status === "failed");
+  const isProcessingComplete =
+    results.length > 0 &&
+    !results.some((r) => r.status === "pending" || r.status === "decoding");
+  const isSingleMode = results.length === 1;
+  const singleResult = successfulResults.length === 1 ? successfulResults[0] : null;
+
+  const isDecoding = results.some(
+    (r) => r.status === "pending" || r.status === "decoding"
+  );
 
   return (
     <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
@@ -422,6 +653,48 @@ export default function Home() {
           </p>
         </div>
 
+        {singleResult && isSingleMode && isProcessingComplete && (
+            <QrResultCardSingle
+              resultCardRef={resultCardRef}
+              qrPayload={singleResult.payload}
+              qrFgColor={qrFgColor}
+              qrStyle={qrStyle}
+              showBankName={showBankName}
+              outerBg={outerBg}
+              exportRatio={exportRatio}
+              alertDismissed={alertDismissed}
+              onDismissAlert={dismissAlert}
+              onDownload={() => {
+                setDrawerAction("download");
+                setConfigOpen(true);
+              }}
+              onCopy={() => {
+                setDrawerAction("copy");
+                setConfigOpen(true);
+              }}
+              svgRefCallback={(el) => {
+                singleQrSvgRef.current = el;
+              }}
+              disabled={isDecoding}
+            />
+          )}
+
+        {results.length > 1 && successfulResults.length >= 1 && (
+            <QrResultList
+              resultCardRef={resultCardRef}
+              results={successfulResults}
+              qrFgColor={qrFgColor}
+              qrStyle={qrStyle}
+              showBankName={showBankName}
+              outerBg={outerBg}
+              exportRatio={exportRatio}
+              alertDismissed={alertDismissed}
+              onDismissAlert={dismissAlert}
+              onConfigOpen={() => setConfigOpen(true)}
+              disabled={isDecoding}
+            />
+          )}
+
         <QrUploadZone
           fileInputRef={fileInputRef}
           cameraInputRef={cameraInputRef}
@@ -430,50 +703,19 @@ export default function Home() {
             setActiveTab(val);
             handleReset();
           }}
-          onFileSelect={handleImageFile}
-          onDrop={handleDrop}
+          onFilesSelect={handleFilesSelect}
           onDragOver={handleDragOver}
-          originalImage={originalImage}
+          items={results}
           onReset={handleReset}
+          onRemoveItem={handleRemoveItem}
+          defaultCollapsed={isProcessingComplete && !isSingleMode}
+          isSingleMode={isSingleMode}
         />
-
-        {isDecoding && (
-          <Card
-            aria-live="polite"
-            aria-busy={true}
-          >
-            <CardContent className="flex items-center justify-center py-8">
-              <motion.span
-                className="inline-block text-[14px] md:text-[16px] font-bold uppercase tracking-wider text-primary"
-              >
-                MEMPROSES IMEJ
-              </motion.span>
-            </CardContent>
-          </Card>
-        )}
-
-        {qrPayload && (
-          <QrResultCard
-            resultCardRef={resultCardRef}
-            qrSvgRef={qrSvgRef}
-            qrPayload={qrPayload}
-            pngPreviewUrl={pngPreviewUrl}
-            qrFgColor={qrFgColor}
-            qrStyle={qrStyle}
-            merchantName={merchantName}
-            bankName={bankName}
-            merchantAmount={merchantAmount}
-            alertDismissed={alertDismissed}
-            onDismissAlert={dismissAlert}
-            onDownload={openDrawerForDownload}
-            onCopy={openDrawerForCopy}
-          />
-        )}
 
         <canvas ref={canvasRef} className="hidden" />
 
         {isDesktop ? (
-          <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <Dialog open={configOpen} onOpenChange={handleConfigOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Konfigurasi QR</DialogTitle>
@@ -568,20 +810,11 @@ export default function Home() {
                       className="min-w-0"
                     >
                       <Button
-                        variant={configRatio === "1:1" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => setConfigRatio("1:1")}
+                        variant={exportRatio === "1:1" ? "default" : "outline"}
+                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        onClick={() => setExportRatio("1:1")}
                       >
                         <span className="font-medium">1:1</span>
-                        <span
-                          className={
-                            configRatio === "1:1"
-                              ? "text-xs text-primary-foreground"
-                              : "text-xs text-muted-foreground"
-                          }
-                        >
-                          1000 x 1000 px
-                        </span>
                       </Button>
                     </motion.div>
                     <motion.div
@@ -590,37 +823,32 @@ export default function Home() {
                       className="min-w-0"
                     >
                       <Button
-                        variant={configRatio === "3:4" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => setConfigRatio("3:4")}
+                        variant={exportRatio === "3:4" ? "default" : "outline"}
+                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
+                        onClick={() => setExportRatio("3:4")}
                       >
                         <span className="font-medium">3:4</span>
-                        <span
-                          className={
-                            configRatio === "3:4"
-                              ? "text-xs text-primary-foreground"
-                              : "text-xs text-muted-foreground"
-                          }
-                        >
-                          900 x 1200 px
-                        </span>
                       </Button>
                     </motion.div>
                   </div>
                 </div>
                 {drawerAction && (
-                  <Button
-                    className="w-full"
-                    onClick={() => executeWithRatio(configRatio)}
-                  >
-                    {drawerAction === "download" ? "Muat Turun" : "Salin Imej"}
-                  </Button>
+                  <div className="flex flex-col gap-2 pt-2">
+                    <Button
+                      onClick={() => executeSingleExport(drawerAction)}
+                      className="w-full"
+                    >
+                      {drawerAction === "download"
+                        ? "Muat Turun"
+                        : "Salin Imej"}
+                    </Button>
+                  </div>
                 )}
               </div>
             </DialogContent>
           </Dialog>
         ) : (
-          <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <Drawer open={configOpen} onOpenChange={handleConfigOpenChange}>
             <DrawerContent>
               <div className="mx-auto w-full max-w-sm">
                 <DrawerHeader>
@@ -716,20 +944,11 @@ export default function Home() {
                         className="min-w-0"
                       >
                         <Button
-                          variant={configRatio === "1:1" ? "default" : "outline"}
+                          variant={exportRatio === "1:1" ? "default" : "outline"}
                           className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                          onClick={() => setConfigRatio("1:1")}
+                          onClick={() => setExportRatio("1:1")}
                         >
                           <span className="font-medium">1:1</span>
-                          <span
-                            className={
-                              configRatio === "1:1"
-                                ? "text-xs text-primary-foreground"
-                                : "text-xs text-muted-foreground"
-                            }
-                          >
-                            1000 x 1000 px
-                          </span>
                         </Button>
                       </motion.div>
                       <motion.div
@@ -738,31 +957,26 @@ export default function Home() {
                         className="min-w-0"
                       >
                         <Button
-                          variant={configRatio === "3:4" ? "default" : "outline"}
+                          variant={exportRatio === "3:4" ? "default" : "outline"}
                           className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                          onClick={() => setConfigRatio("3:4")}
+                          onClick={() => setExportRatio("3:4")}
                         >
                           <span className="font-medium">3:4</span>
-                          <span
-                            className={
-                              configRatio === "3:4"
-                                ? "text-xs text-primary-foreground"
-                                : "text-xs text-muted-foreground"
-                            }
-                          >
-                            900 x 1200 px
-                          </span>
                         </Button>
                       </motion.div>
                     </div>
                   </div>
                   {drawerAction && (
-                    <Button
-                      className="w-full"
-                      onClick={() => executeWithRatio(configRatio)}
-                    >
-                      {drawerAction === "download" ? "Muat Turun" : "Salin Imej"}
-                    </Button>
+                    <DrawerFooter>
+                      <Button
+                        onClick={() => executeSingleExport(drawerAction)}
+                        className="w-full"
+                      >
+                        {drawerAction === "download"
+                          ? "Muat Turun"
+                          : "Salin Imej"}
+                      </Button>
+                    </DrawerFooter>
                   )}
                 </div>
               </div>

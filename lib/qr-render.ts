@@ -1,3 +1,4 @@
+import JSZip from "jszip";
 import { toast } from "sonner";
 
 export function formatShortFilename(merchantName: string | null): string {
@@ -233,4 +234,153 @@ export function downloadQrAsPng(
       toast.error("Ralat", { description: "Gagal menjana imej. Cuba lagi." });
       onError?.();
     });
+}
+
+export interface DownloadAllItem {
+  svg: SVGSVGElement | undefined;
+  merchantName: string | null;
+  bankName: string | null;
+}
+
+export function downloadAllQrsAsPng(
+  items: DownloadAllItem[],
+  outerBg: "white" | "transparent" = "white"
+) {
+  const valid = items.filter((i) => i.svg);
+  if (valid.length === 0) {
+    toast.error("Ralat", {
+      description: "Tiada imej QR untuk dimuat turun.",
+    });
+    return;
+  }
+
+  let successCount = 0;
+  const baseDate = new Date()
+    .toISOString()
+    .slice(2, 10)
+    .replace(/-/g, "");
+  const baseTime = new Date().toTimeString().slice(0, 5).replace(":", "");
+
+  async function downloadSequentially() {
+    for (let index = 0; index < valid.length; index++) {
+      const item = valid[index];
+      if (!item.svg) continue;
+      try {
+        const base =
+          item.merchantName
+            ?.replace(/[^a-zA-Z0-9\s]/g, "")
+            .slice(0, 20)
+            .trim() || "qr";
+        const filename = `${base}_${baseDate}_${baseTime}_${index + 1}.png`;
+        const dataUrl = await renderSvgToPng(item.svg, {
+          merchantName: item.merchantName,
+          bankName: item.bankName,
+          includeText: true,
+          ratio: "1:1",
+          watermark: false,
+          outerBg,
+        });
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        successCount++;
+        if (index < valid.length - 1) {
+          await new Promise((r) => setTimeout(r, 150));
+        }
+      } catch {
+        toast.error("Ralat", {
+          description: `Gagal memuat turun ${item.merchantName || "QR"}.`,
+        });
+      }
+    }
+    if (successCount > 0) {
+      toast.success("Berjaya", {
+        description: `${successCount} imej QR berjaya dimuat turun!`,
+      });
+    }
+  }
+  downloadSequentially();
+}
+
+export async function downloadAllQrsAsZip(
+  items: DownloadAllItem[],
+  outerBg: "white" | "transparent" = "white",
+  ratio: "1:1" | "3:4" = "1:1"
+): Promise<void> {
+  const valid = items.filter((i) => i.svg);
+  if (valid.length === 0) {
+    toast.error("Ralat", {
+      description: "Tiada imej QR untuk dimuat turun.",
+    });
+    return;
+  }
+
+  const baseDate = new Date()
+    .toISOString()
+    .slice(2, 10)
+    .replace(/-/g, "");
+  const baseTime = new Date().toTimeString().slice(0, 5).replace(":", "");
+  const zipFilename = `duitnow-qr_${baseDate}_${baseTime}.zip`;
+
+  try {
+    const zip = new JSZip();
+
+    const results = await Promise.allSettled(
+      valid.map(async (item, index) => {
+        if (!item.svg) return null;
+        const base =
+          item.merchantName
+            ?.replace(/[^a-zA-Z0-9\s]/g, "")
+            .slice(0, 20)
+            .trim() || "qr";
+        const filename = `${base}_${baseDate}_${baseTime}_${index + 1}.png`;
+        const dataUrl = await renderSvgToPng(item.svg, {
+          merchantName: item.merchantName,
+          bankName: item.bankName,
+          includeText: true,
+          ratio,
+          watermark: false,
+          outerBg,
+        });
+        const base64 = dataUrl.split(",")[1];
+        if (!base64) throw new Error("Invalid data URL");
+        return { filename, base64 };
+      })
+    );
+
+    const succeeded = results.filter((r) => r.status === "fulfilled" && r.value);
+    if (succeeded.length === 0) {
+      toast.error("Ralat", {
+        description: "Gagal menjana imej. Cuba lagi.",
+      });
+      return;
+    }
+
+    for (const r of succeeded) {
+      if (r.status === "fulfilled" && r.value) {
+        zip.file(r.value.filename, r.value.base64, { base64: true });
+      }
+    }
+
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = zipFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast.success("Berjaya", {
+      description: `${succeeded.length} imej QR berjaya dimuat turun sebagai ZIP!`,
+    });
+  } catch {
+    toast.error("Ralat", {
+      description: "Gagal menjana ZIP. Cuba lagi.",
+    });
+  }
 }

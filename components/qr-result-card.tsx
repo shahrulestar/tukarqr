@@ -1,7 +1,8 @@
 "use client";
 
-import { X } from "lucide-react";
-import { QrStyledSvg, type QrModuleStyle } from "@/components/qr-styled-svg";
+import { useRef } from "react";
+import { X, Settings } from "lucide-react";
+import type { QrModuleStyle } from "@/components/qr-styled-svg";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,55 +11,85 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { QrResultItem } from "@/components/qr-result-item";
+import type { UploadItem } from "@/components/qr-upload-zone";
+import {
+  downloadAllQrsAsZip,
+  type DownloadAllItem,
+} from "@/lib/qr-render";
+import { parseEmvCoMerchantName, parseEmvCoBankName } from "@/lib/emvco";
 
-interface QrResultCardProps {
+interface QrResultListProps {
   resultCardRef: React.RefObject<HTMLDivElement | null>;
-  qrSvgRef: React.RefObject<SVGSVGElement | null>;
-  qrPayload: string;
-  pngPreviewUrl: string | null;
+  results: (UploadItem & { payload: string })[];
   qrFgColor: string;
   qrStyle: QrModuleStyle;
-  merchantName: string | null;
-  bankName: string | null;
-  merchantAmount: string | null;
+  showBankName: boolean;
+  outerBg: "white" | "transparent";
+  exportRatio?: "1:1" | "3:4";
   alertDismissed: boolean;
   onDismissAlert: () => void;
-  onDownload: () => void;
-  onCopy: () => void;
+  onConfigOpen: () => void;
+  disabled?: boolean;
 }
 
-export function QrResultCard({
+export function QrResultList({
   resultCardRef,
-  qrSvgRef,
-  qrPayload,
-  pngPreviewUrl,
+  results,
   qrFgColor,
   qrStyle,
-  merchantName,
-  bankName,
-  merchantAmount,
+  showBankName,
+  outerBg,
+  exportRatio = "1:1",
   alertDismissed,
   onDismissAlert,
-  onDownload,
-  onCopy,
-}: QrResultCardProps) {
+  onConfigOpen,
+  disabled = false,
+}: QrResultListProps) {
+  const svgRefsMap = useRef<Map<string, SVGSVGElement>>(new Map());
+
+  function getDownloadItems(): DownloadAllItem[] {
+    return results.map((r) => ({
+      svg: svgRefsMap.current.get(r.id),
+      merchantName: parseEmvCoMerchantName(r.payload),
+      bankName: showBankName ? parseEmvCoBankName(r.payload) : null,
+    }));
+  }
+
+  function handleDownloadAll() {
+    const items = getDownloadItems();
+    downloadAllQrsAsZip(items, outerBg, exportRatio);
+  }
+
   return (
     <div
       ref={resultCardRef}
-      className="animate-in fade-in slide-in-from-bottom-4 duration-300"
       role="region"
       aria-label="Keputusan QR"
       aria-live="polite"
       tabIndex={-1}
+      className="[transform:translateZ(0)] [contain:layout_style_paint]"
     >
       <Card>
         <CardHeader>
-          <CardTitle className="text-[16px] md:text-[18px]">
-            DuitNow QR Sedia Digunakan
-          </CardTitle>
-          <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-            Imbas dengan aplikasi bank anda untuk bayar
-          </CardDescription>
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <CardTitle className="text-[16px] md:text-[18px]">
+                Sedia Untuk Bayar
+              </CardTitle>
+              <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
+                Imbas dengan aplikasi bank anda untuk bayar
+              </CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={onConfigOpen}
+              aria-label="Tetapkan reka bentuk QR"
+            >
+              <Settings className="size-4" />
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {!alertDismissed && (
@@ -89,74 +120,37 @@ export function QrResultCard({
             </div>
           )}
 
-          <div className="flex w-full flex-col items-center gap-2">
-            <div className="select-none">
-              <div
-                className="relative inline-block w-[280px] h-[280px] min-w-[280px] min-h-[280px]"
-                aria-busy={!pngPreviewUrl && !!qrPayload}
-              >
-                <QrStyledSvg
-                  ref={qrSvgRef}
-                  value={qrPayload}
-                  size={280}
-                  style={qrStyle}
-                  level="M"
-                  marginSize={2}
-                  fgColor={qrFgColor}
-                  bgColor="#ffffff"
-                  title="DuitNow QR - Imbas untuk bayar"
-                  className={pngPreviewUrl ? "sr-only" : undefined}
-                  aria-hidden={!!pngPreviewUrl}
-                />
-                {pngPreviewUrl ? (
-                  <img
-                    src={pngPreviewUrl}
-                    alt="DuitNow QR - Imbas untuk bayar"
-                    className="absolute inset-0 w-full h-full object-contain [-webkit-touch-callout:default]"
-                    loading="lazy"
-                    draggable={false}
-                    onDragStart={(e) => e.preventDefault()}
-                  />
-                ) : qrPayload ? (
-                  <div
-                    className="absolute inset-0 bg-muted rounded-lg animate-pulse"
-                    aria-hidden
-                  />
-                ) : null}
-              </div>
-            </div>
-            {(merchantName || bankName) && (
-              <div className="flex w-full min-w-0 flex-col gap-0.5 items-center">
-                {merchantName && (
-                  <p className="w-full min-w-0 break-words text-[18px] font-semibold text-foreground text-center">
-                    {merchantName}
-                  </p>
-                )}
-                {bankName && (
-                  <p className="w-full min-w-0 break-words text-[18px] font-semibold text-foreground text-center">
-                    {bankName}
-                  </p>
-                )}
-              </div>
-            )}
-            {merchantAmount && (
-              <p className="text-[16px] md:text-[18px] font-medium text-foreground">
-                {merchantAmount}
-              </p>
-            )}
-            <span className="block w-full text-center text-balance text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
-              Muat turun, salin, atau tekan & tahan QR di atas untuk simpan
-            </span>
+          <div className="space-y-3">
+              {results.map((item) => (
+              <QrResultItem
+                key={item.id}
+                id={item.id}
+                payload={item.payload}
+                fileName={item.file.name}
+                qrFgColor={qrFgColor}
+                qrStyle={qrStyle}
+                showBankName={showBankName}
+                outerBg={outerBg}
+                exportRatio={exportRatio}
+                svgRefCallback={(el) => {
+                  if (el) svgRefsMap.current.set(item.id, el);
+                }}
+                onDownload={() => {}}
+                onCopy={() => {}}
+                disabled={disabled}
+              />
+            ))}
           </div>
-
-          <div className="flex flex-col gap-2">
-            <Button onClick={onDownload} className="w-full">
-              Muat Turun
+          {results.length > 1 && (
+            <Button
+              variant="default"
+              className="w-full"
+              onClick={handleDownloadAll}
+              disabled={disabled}
+            >
+              Muat Turun Semua ({results.length})
             </Button>
-            <Button onClick={onCopy} variant="outline" className="w-full">
-              Salin Imej
-            </Button>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>

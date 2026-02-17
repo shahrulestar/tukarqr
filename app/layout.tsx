@@ -130,7 +130,7 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           />
           {children}
-          <Toaster richColors position="top-center" />
+          <Toaster richColors position="top-center" visibleToasts={2} />
           <Analytics />
         </ThemeProvider>
       </body>

@@ -6,21 +6,37 @@ Convert blurry DuitNow QR images to clean digital QR codes. Upload a photo or us
 
 ## Features
 
-- **Upload or camera** – Upload a photo or capture a DuitNow QR with your device camera
-- **DuitNow validation** – Validates that the QR is a genuine Malaysia DuitNow payment code
+- **Upload or camera** – Upload photos or capture a DuitNow QR with your device camera
+- **Batch processing** – Process up to 10 images at once with concurrent decoding
+- **DuitNow validation** – Validates that the QR is a genuine Malaysia DuitNow EMVCo payment code
 - **Malaysia National QR styling** – Generated QR includes branded border and "MALAYSIA NATIONAL QR" label
-- **Export options** – Download or copy as PNG in 1:1 (1000×1000) or 3:4 (900×1200) ratio
-- **Responsive UI** – Dialog on desktop, drawer on mobile for ratio selection
+- **QR style options** – Choose between classic (square) and rounded module styles
+- **Bank name display** – Optionally show the issuing bank name on the generated QR
+- **Export options** – Download or copy as PNG in 1:1 or 3:4 ratio, with white or transparent background
+- **Batch download** – Download all decoded QR codes as a ZIP file
+- **Image preview** – Preview uploaded images in a fullscreen lightbox
+- **Clipboard paste** – Paste images directly from clipboard with Ctrl+V / ⌘V
+- **Drag & drop** – Drag image files into the upload zone
+- **HEIC/HEIF support** – Automatically converts HEIC/HEIF images from iOS devices
+- **Responsive UI** – Dialog on desktop, drawer on mobile for configuration
+- **Onboarding flow** – First-time users see a guided how-to and privacy policy modal
+- **Fully client-side** – All processing happens in the browser; no data leaves the device
 
 ## Tech Stack
 
 - [Next.js 16](https://nextjs.org) (App Router)
 - [React 19](https://react.dev)
 - [TypeScript](https://www.typescriptlang.org)
-- [Tailwind CSS](https://tailwindcss.com)
-- [shadcn/ui](https://ui.shadcn.com)
+- [Tailwind CSS 4](https://tailwindcss.com)
+- [shadcn/ui](https://ui.shadcn.com) + [Radix UI](https://www.radix-ui.com)
+- [Framer Motion](https://motion.dev) for animations
 - [jsQR](https://github.com/cozmo/jsQR) & [@zxing/browser](https://github.com/zxing-js/browser) for QR decoding
-- [qrcode.react](https://github.com/zpao/qrcode.react) for QR generation
+- [qrcode](https://github.com/soldair/node-qrcode) for QR generation
+- [JSZip](https://stuk.github.io/jszip/) for batch ZIP downloads
+- [heic2any](https://github.com/nicolo-ribaudo/heic2any) for HEIC/HEIF conversion
+- [Sonner](https://sonner.emilkowal.dev) for toast notifications
+- [Vaul](https://vaul.emilkowal.dev) for mobile drawers
+- [Vitest](https://vitest.dev) for testing
 
 ## Getting Started
 
@@ -54,6 +70,12 @@ npm run build
 npm start
 ```
 
+### Test
+
+```bash
+npm test
+```
+
 ## Deployment
 
 Deploy on [Vercel](https://vercel.com):
@@ -66,7 +88,7 @@ The app is optimized for Vercel and uses [Vercel Analytics](https://vercel.com/d
 
 ## Privacy
 
-All QR processing happens in your browser. No QR data or images are sent to any server. The app is fully client-side for decoding and generation.
+All QR processing happens entirely in your browser. No images, QR data, or payment information are sent to any server. Uploaded images are not stored, logged, or shared with any third party. Once you close the page, no data remains.
 
 ## License
 

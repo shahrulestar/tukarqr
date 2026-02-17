@@ -153,6 +153,12 @@
   --warning-text: oklch(0.55 0.15 85);
 }
 
+/* Image preview dialog - smooth scale in/out */
+.image-preview-scale {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 [data-sonner-toaster][data-sonner-theme="dark"] {
   --normal-bg: var(--popover);
   --normal-border: var(--border);
@@ -169,4 +175,32 @@
   --warning-bg: oklch(0.2 0.04 85);
   --warning-border: oklch(0.3 0.06 85);
   --warning-text: oklch(0.75 0.12 85);
+}
+
+/* GPU compositing layer - promotes element to own layer for smoother mobile scroll */
+.gpu-layer {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* GPU-accelerated spinner - runs on compositor thread, stays smooth even when main thread is blocked */
+.spinner {
+  display: inline-block;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  will-change: transform;
+  animation: spinner-rotate 0.75s linear infinite;
+}
+
+/* Apply to Loader2 or any icon for GPU-accelerated rotation */
+.spinner-gpu {
+  will-change: transform;
+  animation: spinner-rotate 0.75s linear infinite;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
