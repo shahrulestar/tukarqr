@@ -206,10 +206,10 @@ export function QrResultCardSingle({
             </span>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               onClick={onDownload}
-              className="w-full"
+              className="w-full sm:flex-1 sm:min-w-0"
               disabled={disabled}
             >
               Muat Turun
@@ -217,7 +217,7 @@ export function QrResultCardSingle({
             <Button
               onClick={onCopy}
               variant="outline"
-              className="w-full"
+              className="w-full sm:flex-1 sm:min-w-0"
               disabled={disabled}
             >
               Salin Imej
