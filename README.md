@@ -79,15 +79,42 @@ npm start
 npm test
 ```
 
-## Deployment
+## Deployment (Cloudflare Pages)
 
-Deploy on [Vercel](https://vercel.com):
+This project is configured for static export and Cloudflare Pages:
 
-1. Push your code to GitHub
-2. Import the project in [Vercel](https://vercel.com/new)
-3. Deploy
+- Build command: `npm run build`
+- Build output directory: `out`
+- Node version: `18+` (recommended `20`)
 
-The app is optimized for Vercel and uses [Vercel Analytics](https://vercel.com/docs/concepts/analytics) for privacy-friendly traffic insights. Enable Web Analytics in your project's Vercel dashboard.
+### 1) Unlink from Vercel (one-time)
+
+1. Remove the project from Vercel dashboard (Project Settings → Delete Project), or keep it and remove domain bindings.
+2. If you ever linked this repo with Vercel CLI locally, run:
+
+```bash
+vercel unlink
+```
+
+### 2) Deploy with Cloudflare Pages
+
+1. Push this repo to GitHub
+2. In Cloudflare Dashboard, go to **Workers & Pages** → **Create application** → **Pages** → **Connect to Git**
+3. Select this repository and set:
+   - Framework preset: `None` (static)
+   - Build command: `npm run build`
+   - Build output directory: `out`
+4. Add environment variable (Production and Preview):
+   - `NEXT_PUBLIC_SITE_URL=https://your-domain.com`
+5. Deploy
+
+### 3) Custom domain
+
+1. Open your Cloudflare Pages project → **Custom domains**
+2. Add your domain (for example `tukarqr.my`)
+3. Follow DNS instructions shown by Cloudflare
+
+Cloudflare will apply redirect/header rules from `public/_redirects` and `public/_headers`.
 
 ## Privacy
 

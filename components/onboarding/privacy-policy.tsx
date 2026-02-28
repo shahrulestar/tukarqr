@@ -10,7 +10,7 @@ interface PrivacyPolicyProps {
 const points = [
   "Semua pemprosesan QR berlaku dalam pelayar anda. Tiada data atau imej dihantar ke pelayan.",
   "Alat ini berfungsi sepenuhnya di sisi pelanggan untuk dekod dan penjanaan QR.",
-  "Vercel Analytics digunakan untuk statistik trafik yang mesra privasi. Tiada maklumat peribadi dikumpulkan.",
+  "Tiada skrip analitik pihak ketiga diperlukan untuk fungsi utama aplikasi ini.",
 ];
 
 export function PrivacyPolicy({ onDone }: PrivacyPolicyProps) {
