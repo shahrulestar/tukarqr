@@ -70,8 +70,8 @@ export default function TentangPage() {
             className="mt-3 inline-block"
           >
             <img
-              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist"
-              alt="GitHub stars: shahrulestar/tukarqr"
+              alt="badge"
+              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist&logo=github"
               loading="lazy"
               decoding="async"
               className="block h-auto w-auto max-w-none"
