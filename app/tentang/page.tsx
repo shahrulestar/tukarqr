@@ -4,13 +4,16 @@ import Image from "next/image";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
 
 export const metadata: Metadata = {
-  title: "Tentang",
+  title: {
+    absolute: "Tentang - Tukar QR",
+  },
   description:
     "Ketahui tentang Tukar QR — alat percuma untuk menukar gambar DuitNow QR yang kabur kepada QR digital yang jelas dan kemas.",
   alternates: {
     canonical: `${siteUrl}/tentang`,
   },
   openGraph: {
+    title: "Tentang - Tukar QR",
     images: [
       {
         url: "/about.png",
@@ -22,6 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    title: "Tentang - Tukar QR",
     images: ["/about.png"],
   },
 };
@@ -41,6 +45,42 @@ export default function TentangPage() {
             className="w-full max-w-[640px] rounded-xl object-cover"
           />
         </div>
+
+        <section
+          className="rounded-xl border border-border bg-muted/30 px-4 py-4 sm:px-5"
+          aria-labelledby="open-source-heading"
+        >
+          <h2
+            id="open-source-heading"
+            className="text-base font-semibold text-foreground"
+          >
+            Sumber terbuka dan telus
+          </h2>
+          <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+            Kod sumber Tukar QR tersedia di GitHub. Anda boleh menyemak
+            implementasi, membantu meningkatkan projek, atau melaporkan isu.
+            Lencana bintang mencerminkan sokongan komuniti terhadap repositori
+            terbuka ini — bukti bahawa alat ini dibangunkan secara terbuka dan
+            boleh dipercayai.
+          </p>
+          <a
+            href="https://github.com/shahrulestar/tukarqr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-block"
+          >
+            <img
+              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist"
+              alt="GitHub stars: shahrulestar/tukarqr"
+              loading="lazy"
+              decoding="async"
+              className="block h-auto w-auto max-w-none"
+            />
+            <span className="sr-only">
+              Buka repositori GitHub shahrulestar/tukarqr
+            </span>
+          </a>
+        </section>
 
         <p>
           Tukar QR ialah alat percuma yang membantu pengguna menukar gambar
