@@ -244,69 +244,6 @@ export interface DownloadAllItem {
   bankName: string | null;
 }
 
-export function downloadAllQrsAsPng(
-  items: DownloadAllItem[],
-  outerBg: "white" | "transparent" = "white"
-) {
-  const valid = items.filter((i) => i.svg);
-  if (valid.length === 0) {
-    toast.error("Ralat", {
-      description: "Tiada imej QR tersedia untuk dimuat turun.",
-    });
-    return;
-  }
-
-  let successCount = 0;
-  const baseDate = new Date()
-    .toISOString()
-    .slice(2, 10)
-    .replace(/-/g, "");
-  const baseTime = new Date().toTimeString().slice(0, 5).replace(":", "");
-
-  async function downloadSequentially() {
-    for (let index = 0; index < valid.length; index++) {
-      const item = valid[index];
-      if (!item.svg) continue;
-      try {
-        const base =
-          item.merchantName
-            ?.replace(/[^a-zA-Z0-9\s]/g, "")
-            .slice(0, 20)
-            .trim() || "qr";
-        const filename = `${base}_${baseDate}_${baseTime}_${index + 1}.png`;
-        const dataUrl = await renderSvgToPng(item.svg, {
-          merchantName: item.merchantName,
-          bankName: item.bankName,
-          includeText: true,
-          ratio: "1:1",
-          watermark: false,
-          outerBg,
-        });
-        const a = document.createElement("a");
-        a.href = dataUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        successCount++;
-        if (index < valid.length - 1) {
-          await new Promise((r) => setTimeout(r, 150));
-        }
-      } catch {
-        toast.error("Ralat", {
-          description: "Gagal memuat turun imej QR ini. Sila cuba lagi.",
-        });
-      }
-    }
-    if (successCount > 0) {
-      toast.success("Berjaya", {
-        description: `${successCount} imej QR berjaya dimuat turun ke peranti anda.`,
-      });
-    }
-  }
-  downloadSequentially();
-}
-
 export async function downloadAllQrsAsZip(
   items: DownloadAllItem[],
   outerBg: "white" | "transparent" = "white",

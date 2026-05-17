@@ -26,8 +26,6 @@ interface QrResultItemProps {
   outerBg: "white" | "transparent";
   exportRatio?: "1:1" | "3:4";
   svgRefCallback?: (el: SVGSVGElement | null) => void;
-  onDownload: () => void;
-  onCopy: () => void;
   disabled?: boolean;
 }
 
@@ -41,8 +39,6 @@ export function QrResultItem({
   outerBg,
   exportRatio = "1:1",
   svgRefCallback,
-  onDownload,
-  onCopy,
   disabled = false,
 }: QrResultItemProps) {
   const qrSvgRef = useRef<SVGSVGElement>(null);
@@ -74,7 +70,6 @@ export function QrResultItem({
     toast.success("Berjaya", {
       description: "Imej QR berjaya dimuat turun ke peranti anda.",
     });
-    onDownload();
   }
 
   async function handleCopy() {
@@ -92,7 +87,6 @@ export function QrResultItem({
       toast.success("Berjaya", {
         description: "Imej QR berjaya disalin ke papan keratan.",
       });
-      onCopy();
     } catch {
       toast.error("Ralat", {
         description: "Gagal menyalin imej ke papan keratan. Sila gunakan Muat Turun sebagai alternatif.",

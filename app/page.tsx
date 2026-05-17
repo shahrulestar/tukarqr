@@ -629,7 +629,6 @@ export default function Home() {
     (r): r is UploadItem & { payload: string } =>
       r.status === "success" && !!r.payload
   );
-  const failedResults = results.filter((r) => r.status === "failed");
   const isProcessingComplete =
     results.length > 0 &&
     !results.some((r) => r.status === "pending" || r.status === "decoding");

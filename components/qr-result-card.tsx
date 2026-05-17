@@ -135,8 +135,6 @@ export function QrResultList({
                 svgRefCallback={(el) => {
                   if (el) svgRefsMap.current.set(item.id, el);
                 }}
-                onDownload={() => {}}
-                onCopy={() => {}}
                 disabled={disabled}
               />
             ))}

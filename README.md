@@ -1,125 +1,59 @@
 # Tukar QR
 
+![Language · TypeScript](https://www.shieldcn.dev/badge/Language-TypeScript-3178C6.svg?logo=typescript&variant=branded&size=sm)
+![Lint · ESLint](https://www.shieldcn.dev/badge/Lint-ESLint-4B32C3.svg?logo=eslint&variant=branded&size=sm)
+![Framework · Next.js](https://www.shieldcn.dev/badge/Framework-Next.js-000000.svg?logo=nextdotjs&variant=branded&size=sm)
+![Tests · Vitest](https://www.shieldcn.dev/badge/Tests-Vitest-6E9F18.svg?logo=vitest&variant=branded&size=sm)
+![React](https://www.shieldcn.dev/badge/Stack-React-61DAFB.svg?logo=react&variant=branded&size=sm)
+![Tailwind CSS](https://www.shieldcn.dev/badge/Stack-Tailwind_CSS-06B6D4.svg?logo=tailwindcss&variant=branded&size=sm)
+
 ![Tukar QR](public/major-image.png)
 
-Convert blurry DuitNow QR images into clean, scannable digital QR codes. Upload a photo or use your camera to capture a DuitNow QR, and regenerate a crisp QR code ready for payment.
+[![GitHub stars](https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist)](https://github.com/shahrulestar/tukarqr)
+
+Convert blurry DuitNow QR photos into clean, scannable codes—upload, camera, or paste. All processing stays in the browser.
 
 **Live:** [tukarqr.my](https://tukarqr.my)
 
 ## Features
 
-- **Upload or camera** – Upload photos or capture a DuitNow QR with your device camera
-- **Batch processing** – Process up to 10 images at once with concurrent decoding
-- **DuitNow validation** – Validates that the QR is a genuine Malaysia DuitNow EMVCo payment code
-- **Malaysia National QR styling** – Generated QR includes branded border and "MALAYSIA NATIONAL QR" label
-- **QR style options** – Choose between Petak-Petak (square) and Bulat-Bulat (rounded) module styles
-- **Bank name display** – Optionally show the issuing bank name on the generated QR
-- **Export options** – Download or copy as PNG in 1:1 or 3:4 ratio, with white or transparent background
-- **Batch download** – Download all decoded QR codes as a ZIP file
-- **Cross-browser clipboard** – Copy QR images to clipboard on Safari, Chrome, and Chrome mobile
-- **Image preview** – Preview uploaded and generated images in a fullscreen lightbox
-- **Clipboard paste** – Paste images directly from clipboard with Ctrl+V / ⌘V
-- **Drag & drop** – Drag image files into the upload zone
-- **HEIC/HEIF support** – Automatically converts HEIC/HEIF images from iOS devices
-- **Responsive UI** – Dialog on desktop, drawer on mobile for configuration
-- **Onboarding flow** – First-time users see a guided how-to and privacy policy modal
-- **Fully client-side** – All processing happens in the browser; no data leaves the device
+- **Input** – Upload, camera, drag-and-drop, clipboard paste (Ctrl+V / ⌘V), HEIC/HEIF from iOS
+- **Batch** – Up to 10 images, concurrent decode, ZIP download of all results
+- **DuitNow** – Validates Malaysia EMVCo payment QR; optional bank name on the generated code
+- **Look & export** – Malaysia National QR frame, square or rounded modules, PNG copy/download (1:1 or 3:4, white or transparent background)
+- **UX** – Responsive dialog/drawer, lightbox preview, onboarding + privacy modal, cross-browser clipboard
 
-## Tech Stack
+## Stack
 
-- [Next.js 16](https://nextjs.org) (App Router)
-- [React 19](https://react.dev)
-- [TypeScript](https://www.typescriptlang.org)
-- [Tailwind CSS 4](https://tailwindcss.com)
-- [shadcn/ui](https://ui.shadcn.com) + [Radix UI](https://www.radix-ui.com)
-- [Framer Motion](https://motion.dev) for animations
-- [jsQR](https://github.com/cozmo/jsQR) & [@zxing/browser](https://github.com/zxing-js/browser) for QR decoding
-- [qrcode](https://github.com/soldair/node-qrcode) for QR generation
-- [JSZip](https://stuk.github.io/jszip/) for batch ZIP downloads
-- [heic2any](https://github.com/nicolo-ribaudo/heic2any) for HEIC/HEIF conversion
-- [Sonner](https://sonner.emilkowal.dev) for toast notifications
-- [Vaul](https://vaul.emilkowal.dev) for mobile drawers
-- [Vitest](https://vitest.dev) for testing
+Next.js (App Router), React, TypeScript, Tailwind CSS 4, shadcn/ui + Radix, Framer Motion. QR: jsQR, ZXing, `qrcode`; HEIC: heic2any; ZIP: JSZip. Toasts (Sonner), drawers (Vaul). Tests: Vitest.
 
-## Getting Started
+## Quick start
 
-### Prerequisites
-
-- Node.js 18 or later
-
-### Install
+Requires **Node.js 18+** (20 recommended).
 
 ```bash
 npm install
-```
-
-### Development
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Build
-
-```bash
-npm run build
-```
-
-### Start (production)
-
-```bash
-npm start
-```
-
-### Test
-
-```bash
+npm run dev          # http://localhost:3000
+npm run build && npm start
 npm test
 ```
 
-## Deployment (Cloudflare Pages)
+## Deploy (Cloudflare Pages)
 
-This project is configured for static export and Cloudflare Pages:
+Static export on **Cloudflare Pages** (not Vercel).
 
-- Build command: `npm run build`
-- Build output directory: `out`
-- Node version: `18+` (recommended `20`)
-
-### 1) Unlink from Vercel (one-time)
-
-1. Remove the project from Vercel dashboard (Project Settings → Delete Project), or keep it and remove domain bindings.
-2. If you ever linked this repo with Vercel CLI locally, run:
-
-```bash
-vercel unlink
-```
-
-### 2) Deploy with Cloudflare Pages
-
-1. Push this repo to GitHub
-2. In Cloudflare Dashboard, go to **Workers & Pages** → **Create application** → **Pages** → **Connect to Git**
-3. Select this repository and set:
-   - Framework preset: `None` (static)
-   - Build command: `npm run build`
-   - Build output directory: `out`
-4. Add environment variable (Production and Preview):
-   - `NEXT_PUBLIC_SITE_URL=https://your-domain.com`
-5. Deploy
-
-### 3) Custom domain
-
-1. Open your Cloudflare Pages project → **Custom domains**
-2. Add your domain (for example `tukarqr.my`)
-3. Follow DNS instructions shown by Cloudflare
-
-Cloudflare will apply redirect/header rules from `public/_redirects` and `public/_headers`.
+1. **Workers & Pages** → Create → Pages → connect Git (framework preset: **None**).
+2. Build: `npm run build` · Output: `out` · Env: `NEXT_PUBLIC_SITE_URL=https://your-domain.com`
+3. Optional: **Custom domains** in the Pages project. Rules live in [`public/_redirects`](public/_redirects) and [`public/_headers`](public/_headers).
 
 ## Privacy
 
-All QR processing happens entirely in your browser. No images, QR data, or payment information are sent to any server. Uploaded images are not stored, logged, or shared with any third party. Once you close the page, no data remains.
+Nothing is uploaded to a server—QR work runs in your tab only.
+
+## Forking this repo
+
+Scan for secrets before pushing; keep `.env*` out of git ([.gitignore](.gitignore)). Enable GitHub secret scanning / Dependabot if you can. Reports: [SECURITY.md](SECURITY.md).
 
 ## License
 
-MIT
+[MIT](LICENSE)
