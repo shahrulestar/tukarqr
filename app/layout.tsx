@@ -119,14 +119,14 @@ export default function RootLayout({
     <html
       lang="ms"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <head>
         <link rel="preload" href="/favicon.ico" as="image" />
         <link rel="preload" href="/favicon-32x32.png" as="image" />
       </head>
       <body
-        className={`min-h-full antialiased ${geistSans.className}`}
+        className={`antialiased ${geistSans.className}`}
         suppressHydrationWarning
       >
         <ThemeProvider
