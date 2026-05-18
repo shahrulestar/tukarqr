@@ -42,7 +42,7 @@ export default function ListPage() {
   const sourceUrl = acquirersData.source;
 
   return (
-    <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
+    <main className="bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-[800px] w-full space-y-6">
         <header>
           <h1 className="text-xl md:text-2xl font-semibold tracking-tight">

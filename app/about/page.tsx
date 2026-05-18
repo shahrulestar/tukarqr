@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
+    <main className="bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-[640px] w-full space-y-6 text-[15px] leading-[1.7] text-foreground">
         <h1 className="text-xl font-semibold">Tentang Tukar QR</h1>
 
