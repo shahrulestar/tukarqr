@@ -156,7 +156,7 @@ export function QrUploadZone({
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={onTabChange}>
-          <TabsList className="w-full sm:w-fit">
+          <TabsList className="w-full sm:w-fit lg:hidden">
             <TabsTrigger value="upload">Muat naik</TabsTrigger>
             <TabsTrigger value="camera">Kamera</TabsTrigger>
           </TabsList>
