@@ -1,5 +1,6 @@
 {
-  "title": "List of Acquirer IDs - Name and Number Only",
+  "title": "Senarai ID Acquirer - Nama dan Nombor Sahaja",
+  "nota": "Senarai bank dan institusi kewangan yang menyokong DuitNow QR di Malaysia.",
   "source": "https://docs.developer.paynet.my/docs/duitNow-QR/integration/QR-generation-specification/merchant-presented-mode/qr-data-object#acquirer-id-id-01",
   "acquirers": [
     {
