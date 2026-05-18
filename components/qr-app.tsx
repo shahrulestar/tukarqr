@@ -8,6 +8,7 @@ import {
   startTransition,
 } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Square, Circle } from "lucide-react";
@@ -96,7 +97,12 @@ function mapDecodeErrorToMessage(raw: string): string {
   return raw;
 }
 
-export default function Home() {
+export function QrApp() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const isDownloadRoute = pathname === "/download";
+  const isHomeRoute = pathname === "/";
+
   const [activeTab, setActiveTab] = useState("upload");
   const [results, setResults] = useState<
     (UploadItem & { payload?: string })[]
@@ -640,6 +646,22 @@ export default function Home() {
     (r) => r.status === "pending" || r.status === "decoding"
   );
 
+  useEffect(() => {
+    if (
+      isHomeRoute &&
+      isProcessingComplete &&
+      successfulResults.length > 0
+    ) {
+      router.push("/download");
+    }
+  }, [isHomeRoute, isProcessingComplete, successfulResults.length, router]);
+
+  useEffect(() => {
+    if (isDownloadRoute && results.length === 0) {
+      router.replace("/");
+    }
+  }, [isDownloadRoute, results.length, router]);
+
   return (
     <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-[800px] w-full space-y-6">
@@ -652,7 +674,7 @@ export default function Home() {
           </p>
         </div>
 
-        {singleResult && isSingleMode && isProcessingComplete && (
+        {isDownloadRoute && singleResult && isSingleMode && isProcessingComplete && (
             <QrResultCardSingle
               resultCardRef={resultCardRef}
               qrPayload={singleResult.payload}
@@ -678,7 +700,7 @@ export default function Home() {
             />
           )}
 
-        {results.length > 1 && successfulResults.length >= 1 && (
+        {isDownloadRoute && results.length > 1 && successfulResults.length >= 1 && (
             <QrResultList
               resultCardRef={resultCardRef}
               results={successfulResults}
@@ -1001,7 +1023,7 @@ export default function Home() {
           <PrivacyPolicy onDone={handlePrivacyPolicyDone} />
         </ResponsiveModal>
 
-        {results.length === 0 && (
+        {isHomeRoute && results.length === 0 && (
           <footer className="pt-6 text-center text-[13px] text-muted-foreground">
             <nav className="flex items-center justify-center gap-4">
               <Link
