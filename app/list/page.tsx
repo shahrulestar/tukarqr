@@ -83,9 +83,9 @@ export default function ListPage() {
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-foreground underline underline-offset-4 hover:text-primary break-all"
+            className="text-foreground underline underline-offset-4 hover:text-primary"
           >
-            {sourceUrl}
+            Paynet
           </a>
         </p>
       </div>
