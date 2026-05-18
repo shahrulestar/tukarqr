@@ -663,8 +663,8 @@ export function QrApp() {
   }, [isDownloadRoute, results.length, router]);
 
   return (
-    <main className="bg-background px-4 py-8 sm:py-12">
-      <div className="mx-auto max-w-[800px] w-full space-y-6">
+    <main className="bg-background flex min-h-dvh flex-col px-4 py-8 sm:py-12">
+      <div className="mx-auto flex w-full max-w-[800px] flex-1 flex-col gap-6">
         <div className="text-center space-y-2">
           <h1 className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-[22px] md:text-[26px] font-semibold leading-[1.25] tracking-[-0.015em] text-primary-foreground">
             Tukar QR
@@ -1024,7 +1024,7 @@ export function QrApp() {
         </ResponsiveModal>
 
         {isHomeRoute && results.length === 0 && (
-          <footer className="pt-6 text-center text-[13px] text-muted-foreground">
+          <footer className="mt-auto shrink-0 pt-6 text-center text-[13px] text-muted-foreground">
             <nav className="flex items-center justify-center gap-6">
               <Link
                 href="/about"

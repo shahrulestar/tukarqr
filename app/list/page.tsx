@@ -12,23 +12,25 @@ import acquirersData from "@/lib/duitnow-acquirers.json";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
 
+const listPageTitle =
+  "Senarai bank dan institusi kewangan yang menyokong DuitNow QR di Malaysia.";
+
 export const metadata: Metadata = {
   title: {
-    absolute: "List of Acquirer IDs with Verified Bank Types",
+    absolute: listPageTitle,
   },
-  description:
-    "Senarai lengkap Acquirer IDs untuk bank dan institusi kewangan yang menyokong DuitNow QR di Malaysia.",
+  description: listPageTitle,
   alternates: {
     canonical: `${siteUrl}/list`,
   },
   openGraph: {
-    title: "List of Acquirer IDs with Verified Bank Types",
-    description:
-      "Senarai lengkap Acquirer IDs untuk bank dan institusi kewangan yang menyokong DuitNow QR di Malaysia.",
+    title: listPageTitle,
+    description: listPageTitle,
   },
   twitter: {
     card: "summary",
-    title: "List of Acquirer IDs with Verified Bank Types",
+    title: listPageTitle,
+    description: listPageTitle,
   },
 };
 
@@ -46,8 +48,7 @@ export default function ListPage() {
       <div className="mx-auto max-w-[800px] w-full space-y-6">
         <header>
           <h1 className="text-xl md:text-2xl font-semibold tracking-tight">
-            Senarai bank dan institusi kewangan yang menyokong DuitNow QR di
-            Malaysia.
+            {listPageTitle}
           </h1>
         </header>
 

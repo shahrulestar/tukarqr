@@ -1,11 +1,31 @@
 # Tukar QR
 
-> Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan. Diproses sepenuhnya dalam pelayar anda. Tiada data dihantar ke pelayan.
+> EN: Free web app that turns blurry or photo-captured Malaysia DuitNow (EMVCo) payment QR images into clean, scannable QR codes. Upload, camera, drag-and-drop, or paste from clipboard. Batch up to 10 images with ZIP download. All decoding and rendering run in your browser; images are not uploaded to a server.
+>
+> MS: Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan. Diproses sepenuhnya dalam pelayar anda. Tiada data imej dihantar ke pelayan.
 
-## Main
+## Site
 
-- [Tukar QR](https://tukarqr.my): Penjana semula DuitNow QR pembayaran Malaysia. Alat percuma untuk menukar gambar QR yang kabur kepada QR code digital yang jelas dan bersih.
+- [Home — Tukar QR](https://tukarqr.my): Main tool (decode → validate DuitNow → regenerate QR).
+- [About](https://tukarqr.my/about): Product and privacy context (Malay `/tentang` redirects here).
+- [Download](https://tukarqr.my/download): Download/copy flow for regenerated QR artwork (used from the tool; `noindex` in metadata).
+- [List](https://tukarqr.my/list): Reference table of Malaysian banks and financial institutions that support DuitNow QR.
+
+## What it does
+
+- Accepts QR photos (JPG, PNG, HEIC/HEIF via client-side conversion), validates **Malaysia DuitNow / EMVCo merchant QR** payloads, then draws a new QR with optional **bank name** on the artwork.
+- **Exports**: PNG copy/download, Malaysia National QR-style frame, square or rounded modules, 1:1 or 3:4 aspect, white or transparent background.
+- **UX**: Responsive layout, dialog/drawer, lightbox preview, onboarding and privacy modal, theme (light/dark), clipboard image paste (Ctrl+V / ⌘V).
+
+## Privacy
+
+- **Client-side only**: QR decode, validation, and PNG generation run in the user’s tab. Do not assume any server-side image storage for this app’s core flow.
+
+## Stack (reference)
+
+- Next.js (App Router, static export), React, TypeScript, Tailwind CSS 4, shadcn/ui + Radix, Framer Motion, Sonner, Vaul.
+- QR: jsQR, ZXing (`@zxing/browser`), `qrcode`; HEIC: heic2any; ZIP: JSZip. Tests: Vitest.
 
 ## Optional
 
-- [DuitNow QR](https://www.paynet.my/duitnow-qr): Maklumat rasmi tentang DuitNow QR dari PayNet Malaysia.
+- [DuitNow QR (PayNet Malaysia)](https://docs.developer.paynet.my/docs/duitNow-QR/integration/QR-generation-specification/merchant-presented-mode/qr-data-object): Official information on DuitNow QR.
