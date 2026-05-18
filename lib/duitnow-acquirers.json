@@ -1,0 +1,286 @@
+{
+  "title": "List of Acquirer IDs - Name and Number Only",
+  "source": "https://docs.developer.paynet.my/docs/duitNow-QR/integration/QR-generation-specification/merchant-presented-mode/qr-data-object#acquirer-id-id-01",
+  "acquirers": [
+    {
+      "no": 1,
+      "name": "AEON Bank (M) Berhad"
+    },
+    {
+      "no": 2,
+      "name": "Affin Bank Berhad"
+    },
+    {
+      "no": 3,
+      "name": "Al Rajhi Banking & Investment Corporation (Malaysia) Berhad"
+    },
+    {
+      "no": 4,
+      "name": "Alliance Bank Malaysia Berhad"
+    },
+    {
+      "no": 5,
+      "name": "AmBank Malaysia Berhad"
+    },
+    {
+      "no": 6,
+      "name": "Ampersand Pay Sdn Bhd"
+    },
+    {
+      "no": 7,
+      "name": "Axiata Digital eCode Sdn Bhd"
+    },
+    {
+      "no": 8,
+      "name": "Bank Islam Malaysia Berhad"
+    },
+    {
+      "no": 9,
+      "name": "Bank Kerjasama Rakyat Malaysia Berhad"
+    },
+    {
+      "no": 10,
+      "name": "Bank Muamalat Malaysia Berhad"
+    },
+    {
+      "no": 11,
+      "name": "Bank of America (M) Berhad"
+    },
+    {
+      "no": 12,
+      "name": "Bank of China (M) Berhad"
+    },
+    {
+      "no": 13,
+      "name": "Bank Pertanian Malaysia Berhad (Agrobank)"
+    },
+    {
+      "no": 14,
+      "name": "Bank Simpanan Nasional"
+    },
+    {
+      "no": 15,
+      "name": "Beez Fintech Sdn Bhd"
+    },
+    {
+      "no": 16,
+      "name": "BigPay Malaysia Sdn Bhd"
+    },
+    {
+      "no": 17,
+      "name": "BNP Paribas Malaysia Berhad"
+    },
+    {
+      "no": 18,
+      "name": "Boost Bank Berhad"
+    },
+    {
+      "no": 19,
+      "name": "Boost Connect Sdn Bhd"
+    },
+    {
+      "no": 20,
+      "name": "China Construction Bank (Malaysia) Berhad"
+    },
+    {
+      "no": 21,
+      "name": "CIMB Bank Berhad"
+    },
+    {
+      "no": 22,
+      "name": "Citibank Berhad"
+    },
+    {
+      "no": 23,
+      "name": "Curlec Sdn Bhd"
+    },
+    {
+      "no": 24,
+      "name": "Deutsche Bank (M) Berhad"
+    },
+    {
+      "no": 25,
+      "name": "Fass Payment Solutions Sdn Bhd"
+    },
+    {
+      "no": 26,
+      "name": "Fave Asia Technologies Sdn Bhd"
+    },
+    {
+      "no": 27,
+      "name": "Finexus Cards Sdn Bhd"
+    },
+    {
+      "no": 28,
+      "name": "GHL Cardpay Sdn Bhd"
+    },
+    {
+      "no": 29,
+      "name": "Global Payments Asia-Pacific Limited"
+    },
+    {
+      "no": 30,
+      "name": "GPay Network (M) Sdn Bhd"
+    },
+    {
+      "no": 31,
+      "name": "GX Bank Berhad"
+    },
+    {
+      "no": 32,
+      "name": "Hong Leong Bank Berhad"
+    },
+    {
+      "no": 33,
+      "name": "HSBC Bank Berhad"
+    },
+    {
+      "no": 34,
+      "name": "Industrial and Commercial Bank of China (M) Berhad"
+    },
+    {
+      "no": 35,
+      "name": "Instapay Technologies Sdn Bhd"
+    },
+    {
+      "no": 36,
+      "name": "iPay88 (M) Sdn Bhd"
+    },
+    {
+      "no": 37,
+      "name": "JP Morgan Chase Bank Berhad"
+    },
+    {
+      "no": 38,
+      "name": "KAF Investment Bank Berhad"
+    },
+    {
+      "no": 39,
+      "name": "Kiplepay Sdn Bhd"
+    },
+    {
+      "no": 40,
+      "name": "Koperasi Co-opbank Pertama Malaysia Berhad"
+    },
+    {
+      "no": 41,
+      "name": "Kuwait Finance House (Malaysia) Berhad"
+    },
+    {
+      "no": 42,
+      "name": "Malayan Banking Berhad"
+    },
+    {
+      "no": 43,
+      "name": "ManagePay Systems Sdn Bhd"
+    },
+    {
+      "no": 44,
+      "name": "MBSB Bank Berhad"
+    },
+    {
+      "no": 45,
+      "name": "Merchantrade Asia Sdn Bhd"
+    },
+    {
+      "no": 46,
+      "name": "Mizuho Bank (Malaysia) Berhad"
+    },
+    {
+      "no": 47,
+      "name": "MobilityOne Sdn Bhd"
+    },
+    {
+      "no": 48,
+      "name": "Mobiedge E-commerce Sdn Bhd"
+    },
+    {
+      "no": 49,
+      "name": "MRuncit Commerce Sdn Bhd"
+    },
+    {
+      "no": 50,
+      "name": "MUFG Bank (Malaysia) Berhad"
+    },
+    {
+      "no": 51,
+      "name": "OCBC Bank Berhad"
+    },
+    {
+      "no": 52,
+      "name": "Paydibs Sdn Bhd"
+    },
+    {
+      "no": 53,
+      "name": "Payex PLT"
+    },
+    {
+      "no": 54,
+      "name": "Public Bank Berhad"
+    },
+    {
+      "no": 55,
+      "name": "Razer Merchant Services Sdn Bhd"
+    },
+    {
+      "no": 56,
+      "name": "Revenue Solution Sdn Bhd"
+    },
+    {
+      "no": 57,
+      "name": "RHB Bank Berhad"
+    },
+    {
+      "no": 58,
+      "name": "Setel Ventures Sdn Bhd"
+    },
+    {
+      "no": 59,
+      "name": "ShopeePay Malaysia Sdn Bhd"
+    },
+    {
+      "no": 60,
+      "name": "SiliconNet Technologies Sdn Bhd"
+    },
+    {
+      "no": 61,
+      "name": "Standard Chartered Bank Malaysia Berhad"
+    },
+    {
+      "no": 62,
+      "name": "Stripe Payments Singapore Pte Ltd"
+    },
+    {
+      "no": 63,
+      "name": "Sumitomo Mitsui Banking Corporation (M) Berhad"
+    },
+    {
+      "no": 64,
+      "name": "TNG Digital Sdn Bhd"
+    },
+    {
+      "no": 65,
+      "name": "UniPin (M) Sdn Bhd"
+    },
+    {
+      "no": 66,
+      "name": "United Overseas Bank (Malaysia) Berhad"
+    },
+    {
+      "no": 67,
+      "name": "Wannapay Sdn Bhd"
+    },
+    {
+      "no": 68,
+      "name": "YTL Digital Bank Berhad"
+    },
+    {
+      "no": 69,
+      "name": "2C2P System Sdn Bhd"
+    },
+    {
+      "no": 70,
+      "name": "JomPAY"
+    }
+  ]
+}
