@@ -7,6 +7,7 @@ import {
   useState,
   startTransition,
 } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Square, Circle } from "lucide-react";
@@ -999,6 +1000,26 @@ export default function Home() {
         >
           <PrivacyPolicy onDone={handlePrivacyPolicyDone} />
         </ResponsiveModal>
+
+        {results.length === 0 && (
+          <footer className="pt-6 text-center text-[13px] text-muted-foreground">
+            <nav className="flex items-center justify-center gap-4">
+              <Link
+                href="/tentang"
+                className="hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >
+                Tentang
+              </Link>
+              <span aria-hidden="true">·</span>
+              <Link
+                href="/list"
+                className="hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >
+                Senarai Bank
+              </Link>
+            </nav>
+          </footer>
+        )}
 
       </div>
     </main>
