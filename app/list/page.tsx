@@ -39,29 +39,27 @@ interface Acquirer {
 
 export default function ListPage() {
   const acquirers = acquirersData.acquirers as Acquirer[];
+  const sourceUrl = acquirersData.source;
 
   return (
     <main className="min-h-screen bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-[800px] w-full space-y-6">
-        <header className="space-y-2">
+        <header>
           <h1 className="text-xl md:text-2xl font-semibold tracking-tight">
-            List of Acquirer IDs with Verified Bank Types
-          </h1>
-          <p className="text-[14px] leading-[1.6] text-muted-foreground">
             Senarai bank dan institusi kewangan yang menyokong DuitNow QR di
             Malaysia.
-          </p>
+          </h1>
         </header>
 
         <div className="rounded-xl border border-border overflow-hidden">
           <Table>
             <TableCaption className="pb-4">
-              {acquirers.length} acquirers menyokong DuitNow.
+              {acquirers.length} bank dan institusi menyokong DuitNow.
             </TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[80px]">No</TableHead>
-                <TableHead>Name</TableHead>
+                <TableHead>Nama</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -78,6 +76,18 @@ export default function ListPage() {
             </TableBody>
           </Table>
         </div>
+
+        <p className="text-[13px] leading-[1.6] text-muted-foreground">
+          Sumber:{" "}
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-foreground underline underline-offset-4 hover:text-primary break-all"
+          >
+            {sourceUrl}
+          </a>
+        </p>
       </div>
     </main>
   );
