@@ -1,15 +1,6 @@
 # Tukar QR
 
-![Language · TypeScript](https://www.shieldcn.dev/badge/Language-TypeScript-3178C6.svg?logo=typescript&variant=branded&size=sm)
-![Lint · ESLint](https://www.shieldcn.dev/badge/Lint-ESLint-4B32C3.svg?logo=eslint&variant=branded&size=sm)
-![Framework · Next.js](https://www.shieldcn.dev/badge/Framework-Next.js-000000.svg?logo=nextdotjs&variant=branded&size=sm)
-![Tests · Vitest](https://www.shieldcn.dev/badge/Tests-Vitest-6E9F18.svg?logo=vitest&variant=branded&size=sm)
-![React](https://www.shieldcn.dev/badge/Stack-React-61DAFB.svg?logo=react&variant=branded&size=sm)
-![Tailwind CSS](https://www.shieldcn.dev/badge/Stack-Tailwind_CSS-06B6D4.svg?logo=tailwindcss&variant=branded&size=sm)
-
 ![Tukar QR](public/major-image.png)
-
-[![GitHub stars](https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist)](https://github.com/shahrulestar/tukarqr)
 
 Convert blurry DuitNow QR photos into clean, scannable codes—upload, camera, or paste. All processing stays in the browser.
 
