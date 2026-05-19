@@ -72,14 +72,14 @@ export default function AboutPage() {
           >
             <img
               alt="badge"
-              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist&logo=github&logoColor=white&theme=dark"
+              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&mode=light&font=geist"
               loading="lazy"
               decoding="async"
               className="block h-auto w-auto max-w-none dark:hidden"
             />
             <img
               alt="badge"
-              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist&logo=github&logoColor=black&theme=light"
+              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist"
               loading="lazy"
               decoding="async"
               className="hidden h-auto w-auto max-w-none dark:block"
