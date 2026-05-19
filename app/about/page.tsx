@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main className="bg-background px-4 py-8 sm:py-12">
-      <div className="mx-auto max-w-[640px] w-full space-y-6 text-[15px] leading-[1.7] text-foreground">
+      <div className="mx-auto max-w-[800px] w-full space-y-6 text-[15px] leading-[1.7] text-foreground">
         <h1 className="text-xl font-semibold">Tentang Tukar QR</h1>
 
         <div className="flex justify-center">
@@ -71,10 +71,17 @@ export default function AboutPage() {
           >
             <img
               alt="badge"
-              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist&logo=github"
+              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist&logo=github&logoColor=white&theme=dark"
               loading="lazy"
               decoding="async"
-              className="block h-auto w-auto max-w-none"
+              className="block h-auto w-auto max-w-none dark:hidden"
+            />
+            <img
+              alt="badge"
+              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist&logo=github&logoColor=black&theme=light"
+              loading="lazy"
+              decoding="async"
+              className="hidden h-auto w-auto max-w-none dark:block"
             />
             <span className="sr-only">
               Buka repositori GitHub shahrulestar/tukarqr
@@ -88,18 +95,6 @@ export default function AboutPage() {
           kod QR digital yang bersih, kemas, dan boleh diimbas semula untuk
           pembayaran.
         </p>
-
-        <blockquote className="border-l-4 border-primary pl-4 py-2 my-6 italic text-muted-foreground">
-          <p>
-            Tukar QR membolehkan pengguna regenerate semula imej QR yang dirakam
-            menggunakan kamera. Memandangkan rakyat Malaysia sering ambil gambar
-            QR untuk kegunaan kemudian, Tukar QR menjadikan QR tersebut lebih
-            jelas seperti DuitNow QR asal.
-          </p>
-          <footer className="mt-2 not-italic text-sm text-foreground">
-            — Shahrul Estar, Pencipta Tukar QR
-          </footer>
-        </blockquote>
 
         <h2 className="text-lg font-semibold pt-2">Bagaimana ia berfungsi</h2>
 
@@ -140,6 +135,106 @@ export default function AboutPage() {
           Application Identifier (AID) DuitNow sebelum menjana semula QR. Kod QR
           yang bukan DuitNow atau rosak akan ditolak secara automatik.
         </p>
+
+        <section
+          className="rounded-xl border border-border bg-muted/30 px-4 py-4 sm:px-5"
+          aria-labelledby="kenapa-heading"
+        >
+          <h2
+            id="kenapa-heading"
+            className="text-base font-semibold text-foreground"
+          >
+            Kenapa Tukar QR dicipta?
+          </h2>
+          <div className="mt-2 space-y-3 text-[14px] leading-relaxed text-muted-foreground">
+            <p>
+              Ramai rakyat Malaysia menyimpan gambar DuitNow QR dalam galeri
+              telefon untuk kegunaan kemudian — sama ada untuk pembayaran
+              berulang, kongsi nombor akaun, atau rujukan pantas. Namun, gambar
+              QR yang diambil melalui kamera atau tangkap skrin sering menjadi
+              kabur, pecah, atau sukar diimbas semula.
+            </p>
+            <p>
+              Tukar QR dicipta untuk menyelesaikan masalah ini. Ia membolehkan
+              sesiapa sahaja menjana semula kod QR digital yang jelas dan kemas
+              daripada gambar QR yang sudah ada — tanpa perlu minta QR baharu.
+            </p>
+            <h3 className="text-[14px] font-semibold text-foreground">
+              Tukar QR sesuai untuk:
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-[14px] font-semibold text-foreground">
+                  Pengguna peribadi
+                </h3>
+                <p>
+                  Simpan dan jana semula DuitNow QR daripada galeri telefon
+                  kepada QR berkualiti tinggi.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-semibold text-foreground">
+                  Pemilik perniagaan
+                </h3>
+                <p>
+                  Tukar gambar QR kedai yang kabur kepada QR digital yang boleh
+                  dicetak semula dengan jelas.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-semibold text-foreground">
+                  Penjual marketplace
+                </h3>
+                <p>
+                  Sediakan QR pembayaran yang kemas untuk pelanggan di Shopee,
+                  Lazada, atau media sosial.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-semibold text-foreground">
+                  Pereka dan pembangun
+                </h3>
+                <p>
+                  Dapatkan QR dalam format digital untuk digunakan dalam reka
+                  bentuk, aplikasi, atau bahan pemasaran.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-[14px] font-semibold text-foreground">
+                  Sesiapa sahaja
+                </h3>
+                <p>
+                  Yang mempunyai gambar DuitNow QR dalam galeri dan mahu
+                  menukarnya kepada QR yang jelas, kemas, dan sedia digunakan
+                  semula.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="rounded-xl border border-border bg-muted/30 px-4 py-4 sm:px-5"
+          aria-labelledby="senarai-bank-heading"
+        >
+          <h2
+            id="senarai-bank-heading"
+            className="text-base font-semibold text-foreground"
+          >
+            Senarai bank dan institusi kewangan menyokong DuitNow QR
+          </h2>
+          <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+            DuitNow QR disokong oleh pelbagai bank dan institusi kewangan di
+            Malaysia. Lihat senarai penuh institusi yang menyokong DuitNow QR
+            untuk memastikan bank anda termasuk dalam senarai.
+          </p>
+          <a
+            href="/list"
+            className="mt-3 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Lihat senarai penuh
+          </a>
+        </section>
 
         <h2 className="text-lg font-semibold pt-2">Penafian</h2>
 

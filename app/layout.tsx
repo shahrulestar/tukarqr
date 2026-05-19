@@ -92,7 +92,16 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
+const jsonLdWebSite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Tukar QR",
+  alternateName: "DuitNow QR Regenerator",
+  url: siteUrl,
+  inLanguage: "ms",
+};
+
+const jsonLdWebApp = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Tukar QR",
@@ -137,7 +146,15 @@ export default function RootLayout({
         >
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(jsonLdWebSite),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(jsonLdWebApp),
+            }}
           />
           <ThemeKeyboardShortcut />
           {children}
