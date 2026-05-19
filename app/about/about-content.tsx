@@ -161,7 +161,7 @@ export function AboutContent() {
           </p>
           <a
             href="/list"
-            className="mt-1 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="mt-1 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground no-underline transition-colors hover:bg-primary/90 hover:text-primary-foreground"
           >
             Lihat senarai penuh
           </a>
