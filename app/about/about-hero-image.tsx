@@ -13,8 +13,6 @@ export function AboutHeroImage() {
         afterSrc="/comparison-after.png"
         beforeAlt="QR fizikal asal — kabur dan tidak jelas"
         afterAlt="QR digital selepas ditukar — jelas dan kemas"
-        beforeLabel="Sebelum"
-        afterLabel="Selepas"
         defaultPosition={50}
       />
     </div>

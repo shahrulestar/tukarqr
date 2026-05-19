@@ -72,16 +72,14 @@ function AccordionBlockRenderer({ block }: { block: AccordionBlock }) {
       );
     case "audiences":
       return (
-        <div className="space-y-3">
+        <ol className="flex list-decimal list-inside flex-col gap-3">
           {block.items.map((item) => (
-            <div key={item.title}>
-              <h3 className="text-[14px] font-semibold text-foreground">
-                {item.title}
-              </h3>
-              <p>{item.text}</p>
-            </div>
+            <li key={item.title}>
+              <span className="font-semibold text-foreground">{item.title}</span>
+              <p className="mt-1">{item.text}</p>
+            </li>
           ))}
-        </div>
+        </ol>
       );
     case "link":
       if (block.variant === "button") {

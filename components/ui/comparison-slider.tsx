@@ -9,7 +9,6 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -19,8 +18,6 @@ interface ComparisonSliderProps {
   afterSrc: string;
   beforeAlt: string;
   afterAlt: string;
-  beforeLabel?: string;
-  afterLabel?: string;
   defaultPosition?: number;
   className?: string;
 }
@@ -30,8 +27,6 @@ export function ComparisonSlider({
   afterSrc,
   beforeAlt,
   afterAlt,
-  beforeLabel = "Sebelum",
-  afterLabel = "Selepas",
   defaultPosition = 50,
   className,
 }: ComparisonSliderProps) {
@@ -108,21 +103,8 @@ export function ComparisonSlider({
             />
           </div>
 
-          <Badge
-            variant="secondary"
-            className="pointer-events-none absolute top-3 left-3 z-10 shadow-sm"
-          >
-            {beforeLabel}
-          </Badge>
-          <Badge
-            variant="default"
-            className="pointer-events-none absolute top-3 right-3 z-10 shadow-sm"
-          >
-            {afterLabel}
-          </Badge>
-
           <div
-            className="pointer-events-none absolute inset-y-0 z-20 flex -translate-x-1/2 flex-col items-center"
+            className="pointer-events-none absolute inset-y-0 z-20 -translate-x-1/2"
             style={{ left: `${position}%` }}
             aria-hidden
           >
@@ -131,9 +113,15 @@ export function ComparisonSlider({
               decorative
               className="h-full w-0.5 bg-[#E6007E] shadow-sm"
             />
+          </div>
+
+          <div
+            className="pointer-events-none absolute top-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
+            style={{ left: `${position}%` }}
+          >
             <div
               className={cn(
-                "absolute top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-[#E6007E] bg-[#E6007E] text-white shadow-md transition-transform",
+                "flex size-10 items-center justify-center rounded-full border-2 border-[#E6007E] bg-[#E6007E] text-white shadow-md transition-transform",
                 isDragging && "scale-105"
               )}
             >
