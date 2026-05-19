@@ -26,11 +26,20 @@ export const metadata: Metadata = {
   openGraph: {
     title: listPageTitle,
     description: listPageTitle,
+    images: [
+      {
+        url: "/major-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Tukar QR - DuitNow QR Lebih Jelas",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: listPageTitle,
     description: listPageTitle,
+    images: ["/major-image.png"],
   },
 };
 
