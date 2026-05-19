@@ -1,0 +1,126 @@
+{
+  "defaultOpen": ["bagaimana"],
+  "feedback": {
+    "textBefore": "Untuk sebarang maklum balas, cadangan, atau laporan, hantar e-mel ke",
+    "email": "hello@shahrulestar.com"
+  },
+  "items": [
+    {
+      "value": "bagaimana",
+      "title": "Bagaimana ia berfungsi",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Proses ini ringkas dan pantas. Anda hanya perlu muat naik gambar QR atau gunakan kamera peranti anda untuk mengimbas DuitNow QR sedia ada. Sistem akan mendekod maklumat pembayaran daripada gambar tersebut dan menjana semula kod QR baharu yang jelas dalam format digital."
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Muat naik gambar DuitNow QR atau imbas menggunakan kamera.",
+            "Sistem mendekod dan mengesahkan bahawa ia ialah DuitNow QR pembayaran Malaysia yang sah.",
+            "QR digital yang jelas dijana semula dan sedia untuk dimuat turun atau disalin."
+          ]
+        }
+      ]
+    },
+    {
+      "value": "keselamatan",
+      "title": "Keselamatan dan privasi",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Semua pemprosesan dilakukan sepenuhnya dalam pelayar web anda. Tiada data, gambar, atau maklumat pembayaran dihantar ke mana-mana pelayan. Gambar yang dimuat naik tidak disimpan, tidak dilog, dan tidak dikongsi dengan mana-mana pihak ketiga. Sebaik sahaja anda menutup halaman, tiada data yang kekal."
+        }
+      ]
+    },
+    {
+      "value": "pengesahan",
+      "title": "Pengesahan DuitNow QR",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Tukar QR hanya menyokong kod DuitNow QR pembayaran Malaysia yang sah. Sistem mengesahkan format EMVCo, kod negara Malaysia (MY), dan Application Identifier (AID) DuitNow sebelum menjana semula QR. Kod QR yang bukan DuitNow atau rosak akan ditolak secara automatik."
+        }
+      ]
+    },
+    {
+      "value": "kenapa",
+      "title": "Kenapa Tukar QR dicipta?",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Ramai rakyat Malaysia menyimpan gambar DuitNow QR dalam galeri telefon untuk kegunaan kemudian — sama ada untuk pembayaran berulang, kongsi nombor akaun, atau rujukan pantas. Namun, gambar QR yang diambil melalui kamera atau tangkap skrin sering menjadi kabur, pecah, atau sukar diimbas semula."
+        },
+        {
+          "type": "paragraph",
+          "text": "Tukar QR dicipta untuk menyelesaikan masalah ini. Ia membolehkan sesiapa sahaja menjana semula kod QR digital yang jelas dan kemas daripada gambar QR yang sudah ada — tanpa perlu minta QR baharu."
+        },
+        {
+          "type": "heading",
+          "text": "Tukar QR sesuai untuk:"
+        },
+        {
+          "type": "audiences",
+          "items": [
+            {
+              "title": "Pengguna peribadi",
+              "text": "Simpan dan jana semula DuitNow QR daripada galeri telefon kepada QR berkualiti tinggi."
+            },
+            {
+              "title": "Pemilik perniagaan",
+              "text": "Tukar gambar QR kedai yang kabur kepada QR digital yang boleh dicetak semula dengan jelas."
+            },
+            {
+              "title": "Penjual marketplace",
+              "text": "Sediakan QR pembayaran yang kemas untuk pelanggan di platform media sosial."
+            },
+            {
+              "title": "Designer atau developer",
+              "text": "Dapatkan QR dalam format digital untuk digunakan dalam reka bentuk, aplikasi, atau bahan pemasaran."
+            },
+            {
+              "title": "Sesiapa sahaja",
+              "text": "Yang mempunyai gambar DuitNow QR dalam galeri dan mahu menukarnya kepada QR yang jelas, kemas, dan sedia digunakan semula."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "value": "senarai-bank",
+      "title": "Senarai bank dan institusi kewangan menyokong DuitNow QR",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "DuitNow QR disokong oleh pelbagai bank dan institusi kewangan di Malaysia. Lihat senarai penuh institusi yang menyokong DuitNow QR untuk memastikan bank anda termasuk dalam senarai."
+        },
+        {
+          "type": "link",
+          "href": "/list",
+          "label": "Lihat senarai penuh",
+          "variant": "button"
+        }
+      ]
+    },
+    {
+      "value": "penafian",
+      "title": "Penafian",
+      "noBorder": true,
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Tukar QR ialah alat bebas dan tidak bergabung, tidak disokong, dan tidak ditaja oleh Payments Network Malaysia Sdn Bhd (PayNet), DuitNow, atau mana-mana institusi kewangan. DuitNow dan logo DuitNow adalah tanda dagangan berdaftar milik PayNet."
+        },
+        {
+          "type": "paragraph",
+          "text": "Alat ini hanya bertujuan untuk membantu pengguna menukar gambar QR yang kabur kepada QR digital yang jelas. Pengguna bertanggungjawab sepenuhnya untuk mengesahkan butiran penerima dan jumlah bayaran sebelum membuat sebarang transaksi. Tukar QR tidak bertanggungjawab atas sebarang kerugian atau transaksi yang salah."
+        },
+        {
+          "type": "paragraph",
+          "text": "Jangan gunakan alat ini untuk penipuan, pemalsuan, atau sebarang aktiviti yang melanggar undang-undang."
+        }
+      ]
+    }
+  ]
+}

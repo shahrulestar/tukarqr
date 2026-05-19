@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import { AboutContent } from "./about-content";
+import { AboutHeroImage } from "./about-hero-image";
+import { AccordionAbout } from "./accordion-about";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
 
@@ -37,15 +37,14 @@ export default function AboutPage() {
       <div className="mx-auto max-w-[800px] w-full space-y-6 text-[15px] leading-[1.7] text-foreground">
         <h1 className="text-xl font-semibold">Tentang Tukar QR</h1>
 
-        <div className="flex justify-center">
-          <Image
-            src="/about.png"
-            alt="Tukar QR - Tukar imej DuitNow QR seperti asal"
-            width={640}
-            height={336}
-            className="w-full max-w-[640px] rounded-xl object-cover"
-          />
-        </div>
+        <AboutHeroImage />
+
+        <p>
+          Tukar QR ialah alat percuma yang membantu pengguna menukar gambar
+          DuitNow QR yang kabur, tidak jelas, atau diambil melalui kamera kepada
+          kod QR digital yang bersih, kemas, dan boleh diimbas semula untuk
+          pembayaran.
+        </p>
 
         <section
           className="rounded-xl border border-border bg-muted/30 px-4 py-4 sm:px-5"
@@ -90,14 +89,7 @@ export default function AboutPage() {
           </a>
         </section>
 
-        <p>
-          Tukar QR ialah alat percuma yang membantu pengguna menukar gambar
-          DuitNow QR yang kabur, tidak jelas, atau diambil melalui kamera kepada
-          kod QR digital yang bersih, kemas, dan boleh diimbas semula untuk
-          pembayaran.
-        </p>
-
-        <AboutContent />
+        <AccordionAbout />
       </div>
     </main>
   );

@@ -40,10 +40,11 @@ export function ImagePreviewDialog({
         />
         <DialogPrimitive.Content
           onOpenAutoFocus={(e) => e.preventDefault()}
+          onClick={() => onOpenChange(false)}
           className={cn(
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "fixed inset-0 z-50 flex items-center justify-center p-4 outline-none pointer-events-none",
+            "fixed inset-0 z-50 flex cursor-pointer items-center justify-center p-4 outline-none",
             "duration-300 image-preview-scale"
           )}
         >
@@ -54,10 +55,11 @@ export function ImagePreviewDialog({
           {open && (
             <div
               data-state={open ? "open" : "closed"}
+              onClick={(e) => e.stopPropagation()}
               className={cn(
                 "data-[state=open]:animate-in data-[state=closed]:animate-out",
                 "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-                "duration-300 image-preview-scale flex items-center justify-center pointer-events-auto w-fit h-fit max-w-[90vw] max-h-[90vh]"
+                "duration-300 image-preview-scale flex cursor-default items-center justify-center w-fit h-fit max-w-[90vw] max-h-[90vh]"
               )}
             >
               {isLoading ? (
@@ -75,7 +77,8 @@ export function ImagePreviewDialog({
             </div>
           )}
           <DialogPrimitive.Close
-            className="absolute right-6 top-6 rounded-full bg-primary p-2.5 text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none disabled:pointer-events-none [&_svg]:size-5 pointer-events-auto"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute right-6 top-6 cursor-pointer rounded-full bg-primary p-2.5 text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none disabled:pointer-events-none [&_svg]:size-5"
             aria-label="Tutup pratonton"
           >
             <XIcon />

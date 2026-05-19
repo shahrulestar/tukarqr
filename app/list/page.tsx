@@ -1,13 +1,5 @@
 import type { Metadata } from "next";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { AcquirersTable } from "@/components/acquirers-table";
 import acquirersData from "@/lib/duitnow-acquirers.json";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
@@ -61,31 +53,7 @@ export default function ListPage() {
           </h1>
         </header>
 
-        <div className="rounded-xl border border-border overflow-hidden">
-          <Table>
-            <TableCaption className="pb-4">
-              {acquirers.length} bank dan institusi menyokong DuitNow.
-            </TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[80px]">No</TableHead>
-                <TableHead>Nama</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {acquirers.map((acquirer) => (
-                <TableRow key={acquirer.no}>
-                  <TableCell className="font-medium tabular-nums">
-                    {acquirer.no}
-                  </TableCell>
-                  <TableCell className="whitespace-normal">
-                    {acquirer.name}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <AcquirersTable acquirers={acquirers} />
 
         <p className="text-[13px] leading-[1.6] text-muted-foreground">
           Sumber:{" "}
