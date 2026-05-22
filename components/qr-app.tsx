@@ -1038,6 +1038,14 @@ export function QrApp() {
               >
                 Senarai Bank
               </Link>
+              <a
+                href="https://bilauitmcuti.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >
+                Bila UiTM Cuti
+              </a>
             </nav>
           </footer>
         )}
