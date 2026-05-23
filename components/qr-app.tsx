@@ -9,11 +9,8 @@ import {
 } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { Square, Circle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -28,17 +25,19 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { Switch } from "@/components/ui/switch";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HowToStart } from "@/components/onboarding/how-to-start";
 import { PrivacyPolicy } from "@/components/onboarding/privacy-policy";
+import { ExportRatingPrompt } from "@/components/export-rating-prompt";
+import { hasSubmittedRating } from "@/lib/export-rating";
 import {
   QrUploadZone,
   type UploadItem,
 } from "@/components/qr-upload-zone";
 import { QrResultList } from "@/components/qr-result-card";
 import { QrResultCardSingle } from "@/components/qr-result-card-single";
+import { QrExportConfigForm } from "@/components/qr-export-config-form";
 import {
   MAX_FILE_SIZE_BYTES,
   MAX_IMAGE_DIMENSION,
@@ -58,6 +57,9 @@ import {
   getPrimaryColor,
   downloadQrAsPng,
   formatShortFilename,
+  buildPlainRenderOptions,
+  buildDuitnowRenderOptions,
+  type QrExportLayout,
 } from "@/lib/qr-render";
 import { copyQrImageToClipboard } from "@/lib/clipboard-utils";
 
@@ -112,6 +114,7 @@ export function QrApp() {
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [howToStartOpen, setHowToStartOpen] = useState(false);
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
+  const [ratingOpen, setRatingOpen] = useState(false);
   const [qrStyle, setQrStyle] = useState<"classic" | "rounded">("classic");
   const [showBankName, setShowBankName] = useState(true);
   const [outerBg, setOuterBg] = useState<"white" | "transparent">("white");
@@ -119,6 +122,7 @@ export function QrApp() {
     "download" | "copy" | null
   >(null);
   const [exportRatio, setExportRatio] = useState<"1:1" | "3:4">("1:1");
+  const [exportLayout, setExportLayout] = useState<QrExportLayout>("duitnow");
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -164,40 +168,54 @@ export function QrApp() {
     if (!open) setDrawerAction(null);
   }
 
+  function handleExportLayoutChange(layout: QrExportLayout) {
+    setExportLayout(layout);
+    if (layout === "plain") {
+      setExportRatio("1:1");
+      setOuterBg("white");
+    }
+  }
+
+  function maybeOpenRatingPrompt() {
+    if (!hasSubmittedRating()) {
+      setRatingOpen(true);
+    }
+  }
+
   function executeSingleExport(action: "download" | "copy") {
     const svg = singleQrSvgRef.current;
     if (!svg || !singleResult) return;
     const merchantName = parseEmvCoMerchantName(singleResult.payload);
-    const bankName = showBankName
-      ? parseEmvCoBankName(singleResult.payload)
-      : null;
+    const bankName = parseEmvCoBankName(singleResult.payload);
+    const renderOptions =
+      exportLayout === "plain"
+        ? buildPlainRenderOptions()
+        : buildDuitnowRenderOptions(
+            merchantName,
+            bankName,
+            showBankName,
+            exportRatio,
+            outerBg
+          );
     if (action === "download") {
       downloadQrAsPng(
         svg,
         formatShortFilename(merchantName),
-        merchantName,
-        bankName,
-        exportRatio,
-        outerBg,
+        renderOptions,
         () => {}
       );
       toast.success("Berjaya", {
         description: "Imej QR berjaya dimuat turun ke peranti anda.",
       });
       handleConfigOpenChange(false);
+      maybeOpenRatingPrompt();
     } else {
-      copyQrImageToClipboard(svg, {
-        merchantName,
-        bankName,
-        includeText: true,
-        ratio: exportRatio,
-        watermark: false,
-        outerBg,
-      })
+      copyQrImageToClipboard(svg, renderOptions)
         .then(() => {
           toast.success("Berjaya", {
             description: "Imej QR berjaya disalin ke papan keratan.",
           });
+          maybeOpenRatingPrompt();
         })
         .catch(() => {
           toast.error("Ralat", {
@@ -683,6 +701,7 @@ export function QrApp() {
               showBankName={showBankName}
               outerBg={outerBg}
               exportRatio={exportRatio}
+              exportLayout={exportLayout}
               alertDismissed={alertDismissed}
               onDismissAlert={dismissAlert}
               onDownload={() => {
@@ -709,10 +728,12 @@ export function QrApp() {
               showBankName={showBankName}
               outerBg={outerBg}
               exportRatio={exportRatio}
+              exportLayout={exportLayout}
               alertDismissed={alertDismissed}
               onDismissAlert={dismissAlert}
               onConfigOpen={() => setConfigOpen(true)}
               disabled={isDecoding}
+              onExportSuccess={maybeOpenRatingPrompt}
             />
           )}
 
@@ -744,128 +765,22 @@ export function QrApp() {
                   Tetapkan reka bentuk dan resolusi imej QR
                 </DialogDescription>
               </DialogHeader>
-              <div className="flex w-full flex-col gap-5">
-                <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-medium">Reka bentuk QR</label>
-                  <div className="grid w-full grid-cols-2 gap-2">
-                    <motion.div
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="min-w-0"
-                    >
-                      <Button
-                        variant={qrStyle === "classic" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                        onClick={() => setQrStyle("classic")}
-                      >
-                        <Square className="size-5 shrink-0" />
-                        <span className="text-xs">Petak-Petak</span>
-                      </Button>
-                    </motion.div>
-                    <motion.div
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="min-w-0"
-                    >
-                      <Button
-                        variant={qrStyle === "rounded" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                        onClick={() => setQrStyle("rounded")}
-                      >
-                        <Circle className="size-5 shrink-0" />
-                        <span className="text-xs">Bulat-Bulat</span>
-                      </Button>
-                    </motion.div>
-                  </div>
-                </div>
-                <div className="flex w-full items-center justify-between gap-4">
-                  <label
-                    htmlFor="show-bank-name"
-                    className="text-sm font-medium shrink-0"
-                  >
-                    Papar nama bank
-                  </label>
-                  <Switch
-                    id="show-bank-name"
-                    checked={showBankName}
-                    onCheckedChange={setShowBankName}
-                  />
-                </div>
-                <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-medium">Latar belakang</label>
-                  <div className="grid w-full grid-cols-2 gap-2">
-                    <motion.div
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="min-w-0"
-                    >
-                      <Button
-                        variant={outerBg === "white" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => setOuterBg("white")}
-                      >
-                        <span className="font-medium">Putih</span>
-                      </Button>
-                    </motion.div>
-                    <motion.div
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="min-w-0"
-                    >
-                      <Button
-                        variant={outerBg === "transparent" ? "default" : "outline"}
-                        className="h-[80px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => setOuterBg("transparent")}
-                      >
-                        <span className="font-medium">Lutsinar</span>
-                      </Button>
-                    </motion.div>
-                  </div>
-                </div>
-                <div className="flex w-full flex-col gap-2">
-                  <label className="text-sm font-medium">Resolusi imej</label>
-                  <div className="grid w-full grid-cols-2 gap-2">
-                    <motion.div
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="min-w-0"
-                    >
-                      <Button
-                        variant={exportRatio === "1:1" ? "default" : "outline"}
-                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => setExportRatio("1:1")}
-                      >
-                        <span className="font-medium">1:1</span>
-                      </Button>
-                    </motion.div>
-                    <motion.div
-                      whileTap={{ scale: 0.96 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="min-w-0"
-                    >
-                      <Button
-                        variant={exportRatio === "3:4" ? "default" : "outline"}
-                        className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                        onClick={() => setExportRatio("3:4")}
-                      >
-                        <span className="font-medium">3:4</span>
-                      </Button>
-                    </motion.div>
-                  </div>
-                </div>
-                {drawerAction && (
-                  <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                    <Button
-                      onClick={() => executeSingleExport(drawerAction)}
-                      className="w-full sm:flex-1 sm:min-w-0"
-                    >
-                      {drawerAction === "download"
-                        ? "Muat Turun"
-                        : "Salin Imej"}
-                    </Button>
-                  </div>
-                )}
-              </div>
+              <QrExportConfigForm
+                exportLayout={exportLayout}
+                onExportLayoutChange={handleExportLayoutChange}
+                qrStyle={qrStyle}
+                onQrStyleChange={setQrStyle}
+                showBankName={showBankName}
+                onShowBankNameChange={setShowBankName}
+                outerBg={outerBg}
+                onOuterBgChange={setOuterBg}
+                exportRatio={exportRatio}
+                onExportRatioChange={setExportRatio}
+                drawerAction={drawerAction}
+                onExecuteExport={() =>
+                  drawerAction && executeSingleExport(drawerAction)
+                }
+              />
             </DialogContent>
           </Dialog>
         ) : (
@@ -878,127 +793,25 @@ export function QrApp() {
                     Tetapkan reka bentuk dan resolusi imej QR
                   </DrawerDescription>
                 </DrawerHeader>
-                <div className="flex w-full flex-col gap-5 p-4">
-                  <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-medium">Reka bentuk QR</label>
-                    <div className="grid w-full grid-cols-2 gap-2">
-                      <motion.div
-                        whileTap={{ scale: 0.96 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="min-w-0"
-                      >
-                        <Button
-                          variant={qrStyle === "classic" ? "default" : "outline"}
-                          className="h-[64px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                          onClick={() => setQrStyle("classic")}
-                        >
-                          <Square className="size-5 shrink-0" />
-                          <span className="text-xs">Petak-Petak</span>
-                        </Button>
-                      </motion.div>
-                      <motion.div
-                        whileTap={{ scale: 0.96 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="min-w-0"
-                      >
-                        <Button
-                          variant={qrStyle === "rounded" ? "default" : "outline"}
-                          className="h-[64px] w-full min-w-0 flex flex-col gap-1 px-2 py-3"
-                          onClick={() => setQrStyle("rounded")}
-                        >
-                          <Circle className="size-5 shrink-0" />
-                          <span className="text-xs">Bulat-Bulat</span>
-                        </Button>
-                      </motion.div>
-                    </div>
-                  </div>
-                  <div className="flex w-full items-center justify-between gap-4">
-                    <label
-                      htmlFor="show-bank-name-drawer"
-                      className="text-sm font-medium shrink-0"
-                    >
-                      Papar nama bank
-                    </label>
-                    <Switch
-                      id="show-bank-name-drawer"
-                      checked={showBankName}
-                      onCheckedChange={setShowBankName}
-                    />
-                  </div>
-                  <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-medium">Latar belakang</label>
-                    <div className="grid w-full grid-cols-2 gap-2">
-                      <motion.div
-                        whileTap={{ scale: 0.96 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="min-w-0"
-                      >
-                        <Button
-                          variant={outerBg === "white" ? "default" : "outline"}
-                          className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                          onClick={() => setOuterBg("white")}
-                        >
-                          <span className="font-medium">Putih</span>
-                        </Button>
-                      </motion.div>
-                      <motion.div
-                        whileTap={{ scale: 0.96 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="min-w-0"
-                      >
-                        <Button
-                          variant={outerBg === "transparent" ? "default" : "outline"}
-                          className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                          onClick={() => setOuterBg("transparent")}
-                        >
-                          <span className="font-medium">Lutsinar</span>
-                        </Button>
-                      </motion.div>
-                    </div>
-                  </div>
-                  <div className="flex w-full flex-col gap-2">
-                    <label className="text-sm font-medium">Resolusi imej</label>
-                    <div className="grid w-full grid-cols-2 gap-2">
-                      <motion.div
-                        whileTap={{ scale: 0.96 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="min-w-0"
-                      >
-                        <Button
-                          variant={exportRatio === "1:1" ? "default" : "outline"}
-                          className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                          onClick={() => setExportRatio("1:1")}
-                        >
-                          <span className="font-medium">1:1</span>
-                        </Button>
-                      </motion.div>
-                      <motion.div
-                        whileTap={{ scale: 0.96 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="min-w-0"
-                      >
-                        <Button
-                          variant={exportRatio === "3:4" ? "default" : "outline"}
-                          className="h-[64px] w-full min-w-0 flex flex-col gap-0.5 px-2 py-3"
-                          onClick={() => setExportRatio("3:4")}
-                        >
-                          <span className="font-medium">3:4</span>
-                        </Button>
-                      </motion.div>
-                    </div>
-                  </div>
-                  {drawerAction && (
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button
-                        onClick={() => executeSingleExport(drawerAction)}
-                        className="w-full sm:flex-1 sm:min-w-0"
-                      >
-                        {drawerAction === "download"
-                          ? "Muat Turun"
-                          : "Salin Imej"}
-                      </Button>
-                    </div>
-                  )}
+                <div className="p-4">
+                <QrExportConfigForm
+                  exportLayout={exportLayout}
+                  onExportLayoutChange={handleExportLayoutChange}
+                  qrStyle={qrStyle}
+                  onQrStyleChange={setQrStyle}
+                  showBankName={showBankName}
+                  onShowBankNameChange={setShowBankName}
+                  outerBg={outerBg}
+                  onOuterBgChange={setOuterBg}
+                  exportRatio={exportRatio}
+                  onExportRatioChange={setExportRatio}
+                  drawerAction={drawerAction}
+                  onExecuteExport={() =>
+                    drawerAction && executeSingleExport(drawerAction)
+                  }
+                  compact
+                  showBankNameId="show-bank-name-drawer"
+                />
                 </div>
               </div>
             </DrawerContent>
@@ -1021,6 +834,15 @@ export function QrApp() {
           description="Maklumat tentang privasi dan pemprosesan data"
         >
           <PrivacyPolicy onDone={handlePrivacyPolicyDone} />
+        </ResponsiveModal>
+
+        <ResponsiveModal
+          open={ratingOpen}
+          onOpenChange={setRatingOpen}
+          title="Bagaimana pengalaman anda?"
+          description="Berikan penilaian supaya kami boleh terus menambah baik aplikasi ini."
+        >
+          <ExportRatingPrompt onClose={() => setRatingOpen(false)} />
         </ResponsiveModal>
 
         {isHomeRoute && results.length === 0 && (

@@ -30,18 +30,53 @@ const MALAYSIA_QR_RADIUS = 16;
 const HOLDER_NAME_FONT = "600 44px system-ui, -apple-system, sans-serif";
 const MAX_BANK_NAME_LENGTH = 45;
 const WATERMARK_TEXT = "tukarqr.my";
+const PLAIN_CANVAS_SIZE = 1000;
+const PLAIN_PADDING_RATIO = 0.08;
+
+export type QrExportLayout = "duitnow" | "plain";
+
+export interface QrRenderOptions {
+  layout?: QrExportLayout;
+  merchantName?: string | null;
+  bankName?: string | null;
+  includeText?: boolean;
+  ratio?: "1:1" | "3:4";
+  watermark?: boolean;
+  outerBg?: "white" | "transparent";
+}
+
+export function buildPlainRenderOptions(): QrRenderOptions {
+  return {
+    layout: "plain",
+    ratio: "1:1",
+    outerBg: "white",
+    watermark: false,
+  };
+}
+
+export function buildDuitnowRenderOptions(
+  merchantName: string | null,
+  bankName: string | null,
+  showBankName: boolean,
+  exportRatio: "1:1" | "3:4",
+  outerBg: "white" | "transparent"
+): QrRenderOptions {
+  return {
+    layout: "duitnow",
+    merchantName,
+    bankName: showBankName ? bankName : null,
+    includeText: true,
+    ratio: exportRatio,
+    outerBg,
+    watermark: false,
+  };
+}
 
 export function renderSvgToPng(
   svgElement: SVGSVGElement,
-  options?: {
-    merchantName?: string | null;
-    bankName?: string | null;
-    includeText?: boolean;
-    ratio?: "1:1" | "3:4";
-    watermark?: boolean;
-    outerBg?: "white" | "transparent";
-  }
+  options?: QrRenderOptions
 ): Promise<string> {
+  const layout = options?.layout ?? "duitnow";
   const merchantName = options?.merchantName ?? null;
   const bankName = options?.bankName
     ? options.bankName.slice(0, MAX_BANK_NAME_LENGTH)
@@ -59,6 +94,22 @@ export function renderSvgToPng(
     const url = URL.createObjectURL(svgBlob);
     const img = new Image();
     img.onload = () => {
+      if (layout === "plain") {
+        const canvas = document.createElement("canvas");
+        canvas.width = PLAIN_CANVAS_SIZE;
+        canvas.height = PLAIN_CANVAS_SIZE;
+        const ctx = canvas.getContext("2d")!;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, PLAIN_CANVAS_SIZE, PLAIN_CANVAS_SIZE);
+        const padding = PLAIN_CANVAS_SIZE * PLAIN_PADDING_RATIO;
+        const qrSize = PLAIN_CANVAS_SIZE - padding * 2;
+        ctx.drawImage(img, padding, padding, qrSize, qrSize);
+        const dataUrl = canvas.toDataURL("image/png");
+        URL.revokeObjectURL(url);
+        resolve(dataUrl);
+        return;
+      }
+
       const borderTop = MALAYSIA_QR_BORDER_TOP;
       const borderLeft = MALAYSIA_QR_BORDER_LEFT_RIGHT;
       const borderRight = MALAYSIA_QR_BORDER_LEFT_RIGHT;
@@ -208,20 +259,10 @@ export function renderSvgToPng(
 export function downloadQrAsPng(
   svgElement: SVGSVGElement,
   filename: string,
-  merchantName?: string | null,
-  bankName?: string | null,
-  ratio?: "1:1" | "3:4",
-  outerBg?: "white" | "transparent",
+  options: QrRenderOptions,
   onError?: () => void
 ) {
-  renderSvgToPng(svgElement, {
-    merchantName,
-    bankName,
-    includeText: true,
-    ratio: ratio ?? "1:1",
-    watermark: false,
-    outerBg: outerBg ?? "white",
-  })
+  renderSvgToPng(svgElement, options)
     .then((dataUrl) => {
       const a = document.createElement("a");
       a.href = dataUrl;
@@ -247,14 +288,15 @@ export interface DownloadAllItem {
 export async function downloadAllQrsAsZip(
   items: DownloadAllItem[],
   outerBg: "white" | "transparent" = "white",
-  ratio: "1:1" | "3:4" = "1:1"
-): Promise<void> {
+  ratio: "1:1" | "3:4" = "1:1",
+  layout: QrExportLayout = "duitnow"
+): Promise<boolean> {
   const valid = items.filter((i) => i.svg);
   if (valid.length === 0) {
     toast.error("Ralat", {
       description: "Tiada imej QR tersedia untuk dimuat turun.",
     });
-    return;
+    return false;
   }
 
   const baseDate = new Date()
@@ -276,14 +318,19 @@ export async function downloadAllQrsAsZip(
             .slice(0, 20)
             .trim() || "qr";
         const filename = `${base}_${baseDate}_${baseTime}_${index + 1}.png`;
-        const dataUrl = await renderSvgToPng(item.svg, {
-          merchantName: item.merchantName,
-          bankName: item.bankName,
-          includeText: true,
-          ratio,
-          watermark: false,
-          outerBg,
-        });
+        const renderOptions: QrRenderOptions =
+          layout === "plain"
+            ? buildPlainRenderOptions()
+            : {
+                layout: "duitnow",
+                merchantName: item.merchantName,
+                bankName: item.bankName,
+                includeText: true,
+                ratio,
+                watermark: false,
+                outerBg,
+              };
+        const dataUrl = await renderSvgToPng(item.svg, renderOptions);
         const base64 = dataUrl.split(",")[1];
         if (!base64) throw new Error("Invalid data URL");
         return { filename, base64 };
@@ -295,7 +342,7 @@ export async function downloadAllQrsAsZip(
     toast.error("Ralat", {
       description: "Gagal menjana imej QR. Sila cuba lagi.",
     });
-      return;
+      return false;
     }
 
     for (const r of succeeded) {
@@ -317,9 +364,11 @@ export async function downloadAllQrsAsZip(
     toast.success("Berjaya", {
       description: `${succeeded.length} imej QR berjaya dimuat turun sebagai fail ZIP.`,
     });
+    return true;
   } catch {
     toast.error("Ralat", {
       description: "Gagal menjana fail ZIP. Sila cuba lagi.",
     });
+    return false;
   }
 }

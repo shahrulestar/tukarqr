@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: {
@@ -9,7 +8,7 @@ export const metadata: Metadata = {
   description:
     "Muat turun atau salin imej DuitNow QR yang telah dijana semula dengan jelas dan kemas.",
   alternates: {
-    canonical: `${siteUrl}/download`,
+    canonical: `${SITE_URL}/download`,
   },
   robots: {
     index: false,

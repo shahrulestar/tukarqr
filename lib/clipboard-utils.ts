@@ -1,6 +1,7 @@
-import { renderSvgToPng } from "@/lib/qr-render";
+import { renderSvgToPng, type QrExportLayout } from "@/lib/qr-render";
 
 export interface CopyQrImageOptions {
+  layout?: QrExportLayout;
   merchantName?: string | null;
   bankName?: string | null;
   includeText?: boolean;
@@ -34,6 +35,7 @@ export async function copyQrImageToClipboard(
   }
 
   const renderOptions = {
+    layout: options.layout ?? "duitnow",
     merchantName: options.merchantName ?? null,
     bankName: options.bankName ?? null,
     includeText: options.includeText ?? false,

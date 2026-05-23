@@ -16,6 +16,7 @@ import type { UploadItem } from "@/components/qr-upload-zone";
 import {
   downloadAllQrsAsZip,
   type DownloadAllItem,
+  type QrExportLayout,
 } from "@/lib/qr-render";
 import { parseEmvCoMerchantName, parseEmvCoBankName } from "@/lib/emvco";
 
@@ -27,10 +28,12 @@ interface QrResultListProps {
   showBankName: boolean;
   outerBg: "white" | "transparent";
   exportRatio?: "1:1" | "3:4";
+  exportLayout?: QrExportLayout;
   alertDismissed: boolean;
   onDismissAlert: () => void;
   onConfigOpen: () => void;
   disabled?: boolean;
+  onExportSuccess?: () => void;
 }
 
 export function QrResultList({
@@ -41,10 +44,12 @@ export function QrResultList({
   showBankName,
   outerBg,
   exportRatio = "1:1",
+  exportLayout = "duitnow",
   alertDismissed,
   onDismissAlert,
   onConfigOpen,
   disabled = false,
+  onExportSuccess,
 }: QrResultListProps) {
   const svgRefsMap = useRef<Map<string, SVGSVGElement>>(new Map());
 
@@ -56,9 +61,15 @@ export function QrResultList({
     }));
   }
 
-  function handleDownloadAll() {
+  async function handleDownloadAll() {
     const items = getDownloadItems();
-    downloadAllQrsAsZip(items, outerBg, exportRatio);
+    const success = await downloadAllQrsAsZip(
+      items,
+      outerBg,
+      exportRatio,
+      exportLayout
+    );
+    if (success) onExportSuccess?.();
   }
 
   return (
@@ -132,10 +143,12 @@ export function QrResultList({
                 showBankName={showBankName}
                 outerBg={outerBg}
                 exportRatio={exportRatio}
+                exportLayout={exportLayout}
                 svgRefCallback={(el) => {
                   if (el) svgRefsMap.current.set(item.id, el);
                 }}
                 disabled={disabled}
+                onExportSuccess={onExportSuccess}
               />
             ))}
           </div>

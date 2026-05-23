@@ -7,5 +7,5 @@
 - **Dev server**: `npm run dev` starts on `localhost:3000`.
 - **Scripts**: `npm run lint` (ESLint), `npm run test` (Vitest), `npm run build` (static export).
 - **Pre-existing lint errors**: The repo has ~9 `react-hooks/set-state-in-effect` errors and a few `@next/next/no-img-element` warnings. These are pre-existing and not caused by agent changes.
-- **No env vars required**: The single optional var `NEXT_PUBLIC_SITE_URL` defaults to `https://tukarqr.my`.
+- **No env vars required**: Optional vars in `.env.example` — `NEXT_PUBLIC_SITE_URL` (defaults to `https://tukarqr.my`), `NEXT_PUBLIC_DISCORD_RATING_WEBHOOK_URL`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
 - **Static export**: `next build` produces a fully static site (`output: "export"` in `next.config.ts`). No server runtime needed.

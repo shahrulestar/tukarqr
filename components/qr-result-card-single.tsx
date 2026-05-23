@@ -12,7 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { renderSvgToPng } from "@/lib/qr-render";
+import {
+  renderSvgToPng,
+  buildPlainRenderOptions,
+  buildDuitnowRenderOptions,
+  type QrExportLayout,
+} from "@/lib/qr-render";
 import {
   parseEmvCoMerchantName,
   parseEmvCoBankName,
@@ -27,6 +32,7 @@ interface QrResultCardSingleProps {
   showBankName: boolean;
   outerBg: "white" | "transparent";
   exportRatio?: "1:1" | "3:4";
+  exportLayout?: QrExportLayout;
   alertDismissed: boolean;
   onDismissAlert: () => void;
   onDownload: () => void;
@@ -43,6 +49,7 @@ export function QrResultCardSingle({
   showBankName,
   outerBg,
   exportRatio = "1:1",
+  exportLayout = "duitnow",
   alertDismissed,
   onDismissAlert,
   onDownload,
@@ -73,14 +80,17 @@ export function QrResultCardSingle({
     }
     const svg = qrSvgRef.current;
     const timer = requestAnimationFrame(() => {
-      renderSvgToPng(svg, {
-        merchantName,
-        bankName: showBankName ? bankName : null,
-        includeText: true,
-        ratio: exportRatio,
-        watermark: false,
-        outerBg,
-      })
+      const renderOptions =
+        exportLayout === "plain"
+          ? buildPlainRenderOptions()
+          : buildDuitnowRenderOptions(
+              merchantName,
+              bankName,
+              showBankName,
+              exportRatio,
+              outerBg
+            );
+      renderSvgToPng(svg, renderOptions)
         .then(setPngPreviewUrl)
         .catch(() => setPngPreviewUrl(null));
     });
@@ -88,7 +98,7 @@ export function QrResultCardSingle({
       cancelAnimationFrame(timer);
       setPngPreviewUrl(null);
     };
-  }, [qrPayload, merchantName, bankName, showBankName, qrStyle, outerBg, exportRatio]);
+  }, [qrPayload, merchantName, bankName, showBankName, qrStyle, outerBg, exportRatio, exportLayout]);
 
   return (
     <div

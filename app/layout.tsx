@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { ThemeKeyboardShortcut } from "@/components/theme-keyboard-shortcut";
 import { Toaster } from "@/components/ui/sonner";
+import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,8 +19,6 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
-
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -33,7 +32,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Tukar QR - DuitNow QR Regenerator",
     template: "%s | Tukar QR",
@@ -61,7 +60,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ms_MY",
     siteName: "Tukar QR",
-    url: siteUrl,
+    url: SITE_URL,
     title: "Tukar QR - DuitNow QR Regenerator",
     description:
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
@@ -89,7 +88,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
   alternates: {
-    canonical: siteUrl,
+    canonical: SITE_URL,
   },
 };
 
@@ -98,7 +97,7 @@ const jsonLdWebSite = {
   "@type": "WebSite",
   name: "Tukar QR",
   alternateName: "DuitNow QR Regenerator",
-  url: siteUrl,
+  url: SITE_URL,
   inLanguage: "ms",
 };
 
@@ -110,7 +109,7 @@ const jsonLdWebApp = {
   description:
     "Ramai pengguna hanya mempunyai gambar DuitNow QR yang tidak jelas atau diambil menggunakan kamera. Dengan alat ini, anda boleh menukar gambar QR tersebut kepada QR digital yang kemas dan boleh digunakan semula untuk pembayaran.",
   applicationCategory: "UtilitiesApplication",
-  url: siteUrl,
+  url: SITE_URL,
   operatingSystem: "Web",
   offers: {
     "@type": "Offer",

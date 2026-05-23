@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { AboutHeroImage } from "./about-hero-image";
 import { AccordionAbout } from "./accordion-about";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: {
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "Ketahui tentang Tukar QR — alat percuma untuk menukar gambar DuitNow QR yang kabur kepada QR digital yang jelas dan kemas.",
   alternates: {
-    canonical: `${siteUrl}/about`,
+    canonical: `${SITE_URL}/about`,
   },
   openGraph: {
     title: "Tentang - Tukar QR",

@@ -11,6 +11,9 @@ import {
   formatShortFilename,
   renderSvgToPng,
   downloadQrAsPng,
+  buildPlainRenderOptions,
+  buildDuitnowRenderOptions,
+  type QrExportLayout,
 } from "@/lib/qr-render";
 import { copyQrImageToClipboard } from "@/lib/clipboard-utils";
 import { cn } from "@/lib/utils";
@@ -25,8 +28,10 @@ interface QrResultItemProps {
   showBankName: boolean;
   outerBg: "white" | "transparent";
   exportRatio?: "1:1" | "3:4";
+  exportLayout?: QrExportLayout;
   svgRefCallback?: (el: SVGSVGElement | null) => void;
   disabled?: boolean;
+  onExportSuccess?: () => void;
 }
 
 export function QrResultItem({
@@ -38,8 +43,10 @@ export function QrResultItem({
   showBankName,
   outerBg,
   exportRatio = "1:1",
+  exportLayout = "duitnow",
   svgRefCallback,
   disabled = false,
+  onExportSuccess,
 }: QrResultItemProps) {
   const qrSvgRef = useRef<SVGSVGElement>(null);
 
@@ -54,39 +61,38 @@ export function QrResultItem({
   const merchantName = parseEmvCoMerchantName(payload);
   const bankName = parseEmvCoBankName(payload);
 
+  function getRenderOptions() {
+    return exportLayout === "plain"
+      ? buildPlainRenderOptions()
+      : buildDuitnowRenderOptions(
+          merchantName,
+          bankName,
+          showBankName,
+          exportRatio,
+          outerBg
+        );
+  }
+
   function handleDownload() {
     const svg = qrSvgRef.current;
     if (!svg) return;
     const filename = formatShortFilename(merchantName);
-    downloadQrAsPng(
-      svg,
-      filename,
-      merchantName,
-      showBankName ? bankName : null,
-      exportRatio,
-      outerBg,
-      () => {}
-    );
+    downloadQrAsPng(svg, filename, getRenderOptions(), () => {});
     toast.success("Berjaya", {
       description: "Imej QR berjaya dimuat turun ke peranti anda.",
     });
+    onExportSuccess?.();
   }
 
   async function handleCopy() {
     const svg = qrSvgRef.current;
     if (!svg) return;
     try {
-      await copyQrImageToClipboard(svg, {
-        merchantName,
-        bankName: showBankName ? bankName : null,
-        includeText: true,
-        ratio: exportRatio,
-        watermark: false,
-        outerBg,
-      });
+      await copyQrImageToClipboard(svg, getRenderOptions());
       toast.success("Berjaya", {
         description: "Imej QR berjaya disalin ke papan keratan.",
       });
+      onExportSuccess?.();
     } catch {
       toast.error("Ralat", {
         description: "Gagal menyalin imej ke papan keratan. Sila gunakan Muat Turun sebagai alternatif.",
@@ -114,20 +120,13 @@ export function QrResultItem({
       return;
     }
     setPreviewLoading(true);
-    renderSvgToPng(svg, {
-      merchantName,
-      bankName: showBankName ? bankName : null,
-      includeText: true,
-      ratio: exportRatio,
-      watermark: false,
-      outerBg,
-    })
+    renderSvgToPng(svg, getRenderOptions())
       .then((url) => {
         setPreviewUrl(url);
         setPreviewLoading(false);
       })
       .catch(() => setPreviewLoading(false));
-  }, [previewOpen, merchantName, bankName, showBankName, outerBg, exportRatio]);
+  }, [previewOpen, merchantName, bankName, showBankName, outerBg, exportRatio, exportLayout]);
 
   function handlePreviewClick() {
     if (!disabled) setPreviewOpen(true);

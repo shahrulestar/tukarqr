@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { AcquirersTable } from "@/components/acquirers-table";
 import acquirersData from "@/lib/duitnow-acquirers.json";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://tukarqr.my";
+import { SITE_URL } from "@/lib/site-config";
 
 const listPageTitle =
   "Senarai bank dan institusi kewangan yang menyokong DuitNow QR di Malaysia.";
@@ -13,7 +12,7 @@ export const metadata: Metadata = {
   },
   description: listPageTitle,
   alternates: {
-    canonical: `${siteUrl}/list`,
+    canonical: `${SITE_URL}/list`,
   },
   openGraph: {
     title: listPageTitle,
