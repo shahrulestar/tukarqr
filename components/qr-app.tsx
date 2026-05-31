@@ -78,24 +78,33 @@ function createItem(file: File): UploadItem & { payload?: string } {
 }
 
 function mapDecodeErrorToMessage(raw: string): string {
-  if (raw.includes("memuatkan") || raw.includes("Format imej"))
+  if (raw.includes("30MB"))
+    return "Imej terlalu besar. Saiz fail maksimum ialah 30MB.";
+  if (raw.includes("4096px"))
+    return "Imej terlalu besar. Resolusi maksimum ialah 4096px setiap sisi.";
+  if (raw.includes("Format imej tidak disokong"))
     return "Format imej tidak disokong. Sila gunakan JPG, PNG atau HEIC.";
-  if (raw.includes("bukan DuitNow") || raw.includes("Hanya kod DuitNow"))
-    return "Ini bukan kod DuitNow QR yang sah.";
+  if (raw.includes("Gagal memuatkan imej") || raw.includes("Gagal menukar HEIC"))
+    return "Fail imej rosak atau tidak boleh dibaca. Sila cuba fail lain.";
+  if (raw.includes("Tiada QR dikesan"))
+    return "Tiada kod QR dikesan dalam imej ini. Pastikan imej mengandungi kod QR yang jelas.";
+  if (
+    raw.includes("bukan DuitNow QR pembayaran") ||
+    raw.includes("Hanya kod DuitNow")
+  )
+    return "Kod QR ini bukan DuitNow QR. Hanya kod DuitNow QR Malaysia disokong.";
+  if (
+    raw.includes("Kod DuitNow QR tidak sah atau rosak") ||
+    raw.includes("Format DuitNow QR tidak sah")
+  )
+    return "Kod DuitNow QR tidak sah atau rosak. Sila muat naik imej QR yang lebih jelas.";
   if (
     raw.includes("tidak jelas") ||
     raw.includes("berkilat") ||
-    raw.includes("kabur")
+    raw.includes("kabur") ||
+    raw.includes("Ralat semasa dekod")
   )
     return "Imej QR tidak jelas atau kabur. Sila ambil gambar yang lebih jelas.";
-  if (raw.includes("Ralat semasa"))
-    return "Imej QR tidak jelas atau kabur. Sila ambil gambar yang lebih jelas.";
-  if (
-    raw.includes("Tiada") ||
-    raw.includes("tidak sah") ||
-    raw.includes("rosak")
-  )
-    return "Tiada QR DuitNow dikesan dalam imej ini.";
   return raw;
 }
 
@@ -275,7 +284,7 @@ export function QrApp() {
       }
 
       if (file.size > MAX_FILE_SIZE_BYTES) {
-        const err = "Imej terlalu besar (maks 30MB).";
+        const err = mapDecodeErrorToMessage("Imej terlalu besar (maks 30MB).");
         updateItem(id, {
           status: "failed",
           progress: 100,
@@ -302,7 +311,7 @@ export function QrApp() {
           let h = img.height;
 
           if (w > MAX_IMAGE_DIMENSION_HARD || h > MAX_IMAGE_DIMENSION_HARD) {
-            const err = "Imej terlalu besar (maks 4096px).";
+            const err = mapDecodeErrorToMessage("Imej terlalu besar (maks 4096px).");
             updateItem(id, {
               status: "failed",
               progress: 100,
@@ -609,7 +618,7 @@ export function QrApp() {
       }
       if (f.size > MAX_FILE_SIZE_BYTES) {
         toast.error("Ralat", {
-          description: `Saiz fail melebihi had (maksimum 30MB).`,
+          description: mapDecodeErrorToMessage("Imej terlalu besar (maks 30MB)."),
         });
         return false;
       }
@@ -683,14 +692,16 @@ export function QrApp() {
   return (
     <main className="bg-background flex min-h-dvh flex-col px-4 py-8 sm:py-12">
       <div className="mx-auto flex w-full max-w-[800px] flex-1 flex-col gap-6">
-        <div className="text-center space-y-2">
-          <h1 className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-[22px] md:text-[26px] font-semibold leading-[1.25] tracking-[-0.015em] text-primary-foreground">
-            Tukar QR
-          </h1>
-          <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
-            Jadikan imej DuitNow QR kembali seperti asal
-          </p>
-        </div>
+        {!isDownloadRoute && (
+          <div className="text-center space-y-2">
+            <h1 className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-[22px] md:text-[26px] font-semibold leading-[1.25] tracking-[-0.015em] text-primary-foreground">
+              Tukar QR
+            </h1>
+            <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
+              Jadikan imej DuitNow QR kembali seperti asal
+            </p>
+          </div>
+        )}
 
         {isDownloadRoute && singleResult && isSingleMode && isProcessingComplete && (
             <QrResultCardSingle
