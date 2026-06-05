@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { ThemeKeyboardShortcut } from "@/components/theme-keyboard-shortcut";
 import { Toaster } from "@/components/ui/sonner";
-import { SITE_URL } from "@/lib/site-config";
+import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/site-config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: [
       {
-        url: "/major-image.png",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
         alt: "Tukar QR - DuitNow QR Lebih Jelas",
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     title: "Tukar QR - DuitNow QR Regenerator",
     description:
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
-    images: ["/major-image.png"],
+    images: [DEFAULT_OG_IMAGE],
   },
   icons: {
     icon: [

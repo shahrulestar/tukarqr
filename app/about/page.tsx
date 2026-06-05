@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { PageBackButton } from "@/components/page-back-button";
+import { Button } from "@/components/ui/button";
+import { GithubStarsButton } from "@/components/github-stars-button";
 import { AboutHeroImage } from "./about-hero-image";
 import { AccordionAbout } from "./accordion-about";
 import { SITE_URL } from "@/lib/site-config";
@@ -34,6 +37,7 @@ export default function AboutPage() {
   return (
     <main className="bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-[800px] w-full space-y-6 text-[15px] leading-[1.7] text-foreground">
+        <PageBackButton className="-ml-2" />
         <h1 className="text-xl font-semibold">Tentang Tukar QR</h1>
 
         <AboutHeroImage />
@@ -62,30 +66,18 @@ export default function AboutPage() {
             terbuka ini — bukti bahawa alat ini dibangunkan secara terbuka dan
             boleh dipercayai.
           </p>
-          <a
-            href="https://github.com/shahrulestar/tukarqr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-block"
-          >
-            <img
-              alt="badge"
-              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&mode=light&font=geist"
-              loading="lazy"
-              decoding="async"
-              className="block h-auto w-auto max-w-none dark:hidden"
-            />
-            <img
-              alt="badge"
-              src="https://shieldcn.dev/github/shahrulestar/tukarqr/stars.svg?size=default&font=geist"
-              loading="lazy"
-              decoding="async"
-              className="hidden h-auto w-auto max-w-none dark:block"
-            />
-            <span className="sr-only">
-              Buka repositori GitHub shahrulestar/tukarqr
-            </span>
-          </a>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <GithubStarsButton />
+            <Button variant="secondary" asChild>
+              <a
+                href="https://shahrulestar.com/sponsor"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Become Sponsor
+              </a>
+            </Button>
+          </div>
         </section>
 
         <AccordionAbout />

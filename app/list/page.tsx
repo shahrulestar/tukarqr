@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { PageBackButton } from "@/components/page-back-button";
 import { AcquirersTable } from "@/components/acquirers-table";
 import acquirersData from "@/lib/duitnow-acquirers.json";
-import { SITE_URL } from "@/lib/site-config";
+import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/site-config";
 
 const listPageTitle =
   "Senarai bank dan institusi kewangan yang menyokong DuitNow QR di Malaysia.";
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     description: listPageTitle,
     images: [
       {
-        url: "/major-image.png",
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
         alt: "Tukar QR - DuitNow QR Lebih Jelas",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: listPageTitle,
     description: listPageTitle,
-    images: ["/major-image.png"],
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 
@@ -46,6 +47,7 @@ export default function ListPage() {
   return (
     <main className="bg-background px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-[800px] w-full space-y-6">
+        <PageBackButton className="-ml-2" />
         <header>
           <h1 className="text-xl md:text-2xl font-semibold tracking-tight">
             {listPageTitle}
