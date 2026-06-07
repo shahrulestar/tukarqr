@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { GithubStarsButton } from "@/components/github-stars-button";
 import { AboutHeroImage } from "./about-hero-image";
 import { AccordionAbout } from "./accordion-about";
-import { SITE_URL } from "@/lib/site-config";
+import { SITE_URL, ABOUT_OG_IMAGE } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: "Tentang - Tukar QR",
     images: [
       {
-        url: "/about.png",
+        url: ABOUT_OG_IMAGE,
         width: 1200,
         height: 630,
         alt: "Tentang Tukar QR",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Tentang - Tukar QR",
-    images: ["/about.png"],
+    images: [ABOUT_OG_IMAGE],
   },
 };
 

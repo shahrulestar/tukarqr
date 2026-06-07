@@ -77,6 +77,25 @@ function createItem(file: File): UploadItem & { payload?: string } {
   };
 }
 
+function isPageScrollable(): boolean {
+  if (typeof window === "undefined") return false;
+  return document.documentElement.scrollHeight > window.innerHeight + 1;
+}
+
+function scrollToResultCard(
+  resultCardRef: React.RefObject<HTMLDivElement | null>
+) {
+  if (!isPageScrollable()) return;
+  const el = resultCardRef.current;
+  if (!el) return;
+
+  requestAnimationFrame(() => {
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    el.focus({ preventScroll: true });
+  });
+}
+
 function mapDecodeErrorToMessage(raw: string): string {
   if (raw.includes("30MB"))
     return "Imej terlalu besar. Saiz fail maksimum ialah 30MB.";
@@ -141,6 +160,7 @@ export function QrApp() {
   const resultCardRef = useRef<HTMLDivElement>(null);
   const singleQrSvgRef = useRef<SVGSVGElement | null>(null);
   const processingRef = useRef(false);
+  const successBaselineRef = useRef(0);
   useEffect(() => {
     setQrFgColor(getPrimaryColor());
   }, []);
@@ -637,6 +657,9 @@ export function QrApp() {
       });
     }
 
+    successBaselineRef.current = results.filter(
+      (r) => r.status === "success" && r.payload
+    ).length;
     setResults((prev) => [...prev, ...toAdd]);
   }
 
@@ -646,6 +669,7 @@ export function QrApp() {
 
   function handleReset() {
     decodeAbortRef.current?.abort();
+    successBaselineRef.current = 0;
     setResults([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (cameraInputRef.current) cameraInputRef.current.value = "";
@@ -688,6 +712,18 @@ export function QrApp() {
       router.replace("/");
     }
   }, [isDownloadRoute, results.length, router]);
+
+  useEffect(() => {
+    if (!isDownloadRoute || !isProcessingComplete) return;
+    if (successfulResults.length <= successBaselineRef.current) return;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollToResultCard(resultCardRef);
+        successBaselineRef.current = successfulResults.length;
+      });
+    });
+  }, [isDownloadRoute, isProcessingComplete, successfulResults.length]);
 
   return (
     <main className="bg-background flex min-h-dvh flex-col px-4 py-8 sm:py-12">

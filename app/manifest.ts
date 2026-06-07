@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { SITE_ICONS } from "@/lib/site-config";
+
 export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
@@ -16,19 +18,25 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     icons: [
       {
-        src: "/favicon-32x32.png",
+        src: SITE_ICONS.favicon16,
+        sizes: "16x16",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: SITE_ICONS.favicon32,
         sizes: "32x32",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/favicon-32x32.png",
+        src: SITE_ICONS.android192,
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/favicon-32x32.png",
+        src: SITE_ICONS.android512,
         sizes: "512x512",
         type: "image/png",
         purpose: "any",

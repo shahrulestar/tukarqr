@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Tukar QR website
+    url: https://tukarqr.my
+    about: Try the live app or report a problem you saw in production.
+  - name: Security or private report
+    url: mailto:hello@shahrulestar.com
+    about: Email the maintainer for sensitive or security-related reports.

@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { ThemeKeyboardShortcut } from "@/components/theme-keyboard-shortcut";
 import { Toaster } from "@/components/ui/sonner";
-import { SITE_URL, DEFAULT_OG_IMAGE } from "@/lib/site-config";
+import { SITE_URL, DEFAULT_OG_IMAGE, SITE_ICONS } from "@/lib/site-config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -82,10 +82,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: SITE_ICONS.favicon16, sizes: "16x16", type: "image/png" },
+      { url: SITE_ICONS.favicon32, sizes: "32x32", type: "image/png" },
+      { url: SITE_ICONS.android192, sizes: "192x192", type: "image/png" },
+      { url: SITE_ICONS.android512, sizes: "512x512", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
+    shortcut: SITE_ICONS.favicon,
+    apple: [
+      { url: SITE_ICONS.appleTouch, sizes: "180x180", type: "image/png" },
+    ],
   },
   alternates: {
     canonical: SITE_URL,
@@ -131,8 +136,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <head>
-        <link rel="preload" href="/favicon.ico" as="image" />
-        <link rel="preload" href="/favicon-32x32.png" as="image" />
+        <link rel="preload" href={SITE_ICONS.favicon} as="image" />
+        <link rel="preload" href={SITE_ICONS.favicon32} as="image" />
+        <link rel="preload" href={SITE_ICONS.appleTouch} as="image" />
       </head>
       <body
         className={`antialiased ${geistSans.className}`}

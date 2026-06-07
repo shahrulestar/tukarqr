@@ -1,10 +1,22 @@
 # Tukar QR
 
-![Tukar QR](public/major-image.png)
+<p align="center">
+  <a href="https://tukarqr.my">
+    <img
+      src="./public/og-image.png"
+      alt="Tukar QR — DuitNow QR Regenerator"
+      width="720"
+    />
+  </a>
+</p>
 
 Convert blurry DuitNow QR photos into clean, scannable codes—upload, camera, or paste. All processing stays in the browser.
 
 **Live:** [tukarqr.my](https://tukarqr.my)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Please follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Features
 
