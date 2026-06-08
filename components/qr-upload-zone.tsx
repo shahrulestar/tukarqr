@@ -7,6 +7,8 @@ import {
   ChevronDown,
   ChevronUp,
   Trash,
+  ClipboardPaste,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -26,6 +28,7 @@ import {
   type FileUploadStatus,
 } from "@/components/file-upload-item";
 import { Button } from "@/components/ui/button";
+import { readImageFromClipboard } from "@/lib/clipboard-utils";
 
 export interface UploadItem {
   id: string;
@@ -71,9 +74,10 @@ export function QrUploadZone({
   defaultCollapsed = false,
   isSingleMode = false,
 }: QrUploadZoneProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isLargeDesktop = useMediaQuery("(min-width: 1024px)");
   const isMac = useIsMac();
   const [expanded, setExpanded] = useState(!defaultCollapsed);
+  const [isPasting, setIsPasting] = useState(false);
 
   const successItems = items.filter((i) => i.status === "success");
   const failedItems = items.filter((i) => i.status === "failed");
@@ -144,6 +148,42 @@ export function QrUploadZone({
     }
   }
 
+  async function handlePasteImage() {
+    if (isPasting) return;
+    setIsPasting(true);
+    try {
+      const result = await readImageFromClipboard();
+      if (result.ok) {
+        onFilesSelect([result.file]);
+        return;
+      }
+
+      if (result.reason === "no-image") {
+        toast.error("Tiada imej dalam papan keratan");
+        return;
+      }
+
+      if (result.reason === "denied") {
+        toast.error("Kebenaran ditolak", {
+          description:
+            "Benarkan akses papan keratan, atau pilih imej dari galeri.",
+        });
+        return;
+      }
+
+      toast.error("Tampal imej tidak disokong", {
+        description:
+          "Pelayar ini mungkin tidak menyokong tampal imej. Sila pilih dari galeri.",
+      });
+    } finally {
+      setIsPasting(false);
+    }
+  }
+
+  const uploadZoneAriaLabel = isLargeDesktop
+    ? "Muat naik imej QR. Letak imej di sini atau tekan Ctrl+V untuk tampal."
+    : "Muat naik imej QR dari galeri, atau ketik Tampal imej.";
+
   return (
     <Card className="[transform:translateZ(0)] [contain:layout_style_paint]">
       <CardHeader>
@@ -176,7 +216,7 @@ export function QrUploadZone({
                 }
               }}
               className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50 min-h-[220px]"
-              aria-label="Muat naik imej QR. Letak imej di sini atau tekan Ctrl+V untuk tampal."
+              aria-label={uploadZoneAriaLabel}
             >
               <>
                 <div className="rounded-full bg-muted/50 p-3">
@@ -186,7 +226,7 @@ export function QrUploadZone({
                   Letak imej DuitNow QR di sini
                 </p>
                 <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center flex flex-wrap items-center justify-center gap-1">
-                  {isDesktop ? (
+                  {isLargeDesktop ? (
                     <>
                       atau tekan{" "}
                       <KbdGroup className="inline-flex">
@@ -196,9 +236,28 @@ export function QrUploadZone({
                       untuk tampal
                     </>
                   ) : (
-                    "atau klik untuk mengimport"
+                    "atau pilih dari galeri"
                   )}
                 </p>
+                {!isLargeDesktop && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-fit"
+                    disabled={isPasting}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      void handlePasteImage();
+                    }}
+                  >
+                    {isPasting ? (
+                      <Loader2 className="size-4 animate-spin" aria-hidden />
+                    ) : (
+                      <ClipboardPaste className="size-4" aria-hidden />
+                    )}
+                    Tampal imej
+                  </Button>
+                )}
               </>
               <input
                 ref={fileInputRef}

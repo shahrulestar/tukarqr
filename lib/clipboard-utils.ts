@@ -1,5 +1,64 @@
 import { renderSvgToPng, type QrExportLayout } from "@/lib/qr-render";
 
+export type ClipboardImageReadResult =
+  | { ok: true; file: File }
+  | { ok: false; reason: "unsupported" | "denied" | "no-image" };
+
+const MIME_TO_EXT: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/heic": "heic",
+  "image/heif": "heif",
+  "image/avif": "avif",
+};
+
+function mimeToExtension(mime: string): string {
+  return MIME_TO_EXT[mime] ?? mime.split("/")[1]?.split("+")[0] ?? "png";
+}
+
+function isPermissionDeniedError(error: unknown): boolean {
+  return (
+    error instanceof DOMException &&
+    (error.name === "NotAllowedError" || error.name === "SecurityError")
+  );
+}
+
+export async function readImageFromClipboard(): Promise<ClipboardImageReadResult> {
+  if (
+    typeof window === "undefined" ||
+    !window.isSecureContext ||
+    !navigator.clipboard?.read
+  ) {
+    return { ok: false, reason: "unsupported" };
+  }
+
+  try {
+    const items = await navigator.clipboard.read();
+
+    for (const item of items) {
+      const imageType = item.types.find((type) => type.startsWith("image/"));
+      if (!imageType) continue;
+
+      const blob = await item.getType(imageType);
+      const ext = mimeToExtension(imageType);
+      const file = new File([blob], `clipboard-${Date.now()}.${ext}`, {
+        type: imageType,
+      });
+      return { ok: true, file };
+    }
+
+    return { ok: false, reason: "no-image" };
+  } catch (error) {
+    if (isPermissionDeniedError(error)) {
+      return { ok: false, reason: "denied" };
+    }
+    return { ok: false, reason: "unsupported" };
+  }
+}
+
 export interface CopyQrImageOptions {
   layout?: QrExportLayout;
   merchantName?: string | null;
