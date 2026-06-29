@@ -142,9 +142,7 @@ export function QrUploadZone({
     if (imageFiles.length) {
       onFilesSelect(imageFiles);
     } else if (e.dataTransfer.files?.length) {
-      toast.error("Ralat", {
-        description: "Sila seret fail imej sahaja (JPG, PNG, HEIC, dll.).",
-      });
+      toast.error("Sila seret fail imej sahaja (JPG, PNG, HEIC, dll.).");
     }
   }
 
@@ -188,10 +186,10 @@ export function QrUploadZone({
     <Card className="[transform:translateZ(0)] [contain:layout_style_paint]">
       <CardHeader>
         <CardTitle className="text-[16px] md:text-[18px]">
-          Imbas DuitNow QR
+          Muat naik DuitNow QR
         </CardTitle>
         <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-          Muat naik DuitNow QR untuk versi lebih jelas
+          Tukar gambar kabur kepada QR digital yang jelas
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -275,7 +273,7 @@ export function QrUploadZone({
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex flex-col gap-0.5">
                     <p className="text-[13px] font-medium text-muted-foreground">
-                      {successItems.length}/10 Imej
+                      {successItems.length}/10 imej
                     </p>
                   </div>
                   <div className="flex items-center gap-1">

@@ -52,6 +52,7 @@ import {
   isDuitNowQr,
   parseEmvCoMerchantName,
   parseEmvCoBankName,
+  DUITNOW_QR_ERRORS,
 } from "@/lib/emvco";
 import {
   getPrimaryColor,
@@ -111,12 +112,11 @@ function mapDecodeErrorToMessage(raw: string): string {
     raw.includes("bukan DuitNow QR pembayaran") ||
     raw.includes("Hanya kod DuitNow")
   )
-    return "Kod QR ini bukan DuitNow QR. Hanya kod DuitNow QR Malaysia disokong.";
-  if (
-    raw.includes("Kod DuitNow QR tidak sah atau rosak") ||
-    raw.includes("Format DuitNow QR tidak sah")
-  )
-    return "Kod DuitNow QR tidak sah atau rosak. Sila muat naik imej QR yang lebih jelas.";
+    return DUITNOW_QR_ERRORS.notDuitNow;
+  if (raw.includes("Kod DuitNow QR tidak sah atau rosak"))
+    return `${DUITNOW_QR_ERRORS.invalidOrCorrupt} Sila muat naik imej QR yang lebih jelas.`;
+  if (raw.includes("Format DuitNow QR tidak sah"))
+    return `${DUITNOW_QR_ERRORS.invalidFormat} Sila muat naik imej QR yang lebih jelas.`;
   if (
     raw.includes("tidak jelas") ||
     raw.includes("berkilat") ||
@@ -233,22 +233,18 @@ export function QrApp() {
         renderOptions,
         () => {}
       );
-      toast.success("Berjaya", {
-        description: "Imej QR berjaya dimuat turun ke peranti anda.",
-      });
+      toast.success("QR dimuat turun.");
       handleConfigOpenChange(false);
       maybeOpenRatingPrompt();
     } else {
       copyQrImageToClipboard(svg, renderOptions)
         .then(() => {
-          toast.success("Berjaya", {
-            description: "Imej QR berjaya disalin ke papan keratan.",
-          });
+          toast.success("QR disalin ke papan keratan.");
           maybeOpenRatingPrompt();
         })
         .catch(() => {
-          toast.error("Ralat", {
-            description: "Gagal menyalin imej ke papan keratan. Sila gunakan Muat Turun sebagai alternatif.",
+          toast.error("Gagal salin", {
+            description: "Sila gunakan muat turun sebagai alternatif.",
           });
         })
         .finally(() => {
@@ -299,7 +295,7 @@ export function QrApp() {
           progress: 100,
           error: err,
         });
-        if (batchSize <= 1) toast.error("Ralat", { description: err });
+        if (batchSize <= 1) toast.error(err);
         return false;
       }
 
@@ -310,7 +306,7 @@ export function QrApp() {
           progress: 100,
           error: err,
         });
-        if (batchSize <= 1) toast.error("Ralat", { description: err });
+        if (batchSize <= 1) toast.error(err);
         return false;
       }
 
@@ -337,7 +333,7 @@ export function QrApp() {
               progress: 100,
               error: err,
             });
-            if (batchSize <= 1) toast.error("Ralat", { description: err });
+            if (batchSize <= 1) toast.error(err);
             cleanup();
             return false;
           }
@@ -416,7 +412,7 @@ export function QrApp() {
               progress: 100,
               error: err,
             });
-            if (batchSize <= 1) toast.error("Ralat", { description: err });
+            if (batchSize <= 1) toast.error(err);
             return false;
           }
           const err = mapDecodeErrorToMessage("Tiada QR dikesan.");
@@ -425,7 +421,7 @@ export function QrApp() {
             progress: 100,
             error: err,
           });
-          if (batchSize <= 1) toast.error("Ralat", { description: err });
+          if (batchSize <= 1) toast.error(err);
           return false;
         } catch {
           if (progressInterval) clearInterval(progressInterval);
@@ -436,7 +432,7 @@ export function QrApp() {
               progress: 100,
               error: err,
             });
-            if (batchSize <= 1) toast.error("Ralat", { description: err });
+            if (batchSize <= 1) toast.error(err);
           }
           return false;
         }
@@ -459,7 +455,7 @@ export function QrApp() {
             progress: 100,
             error: err,
           });
-          if (batchSize <= 1) toast.error("Ralat", { description: err });
+          if (batchSize <= 1) toast.error(err);
           return false;
         }
       }
@@ -481,7 +477,7 @@ export function QrApp() {
             progress: 100,
             error: err,
           });
-          if (batchSize <= 1) toast.error("Ralat", { description: err });
+          if (batchSize <= 1) toast.error(err);
           resolve(false);
         };
 
@@ -608,9 +604,7 @@ export function QrApp() {
 
       processingRef.current = false;
       if (successCount > 0) {
-        toast.success("Berjaya", {
-          description: `${successCount} imej DuitNow QR berjaya dikesan dan diproses.`,
-        });
+        toast.success(`${successCount} QR dikesan dan diproses.`);
       }
     },
     [processSingleFile]
@@ -631,15 +625,15 @@ export function QrApp() {
         (f.type && SUPPORTED_MIME_TYPES.includes(f.type)) ||
         SUPPORTED_EXTENSIONS.test(f.name);
       if (!valid) {
-        toast.error("Ralat", {
-          description: `Format fail tidak disokong. Sila gunakan JPG, PNG atau HEIC.`,
-        });
+        toast.error(
+          "Format fail tidak disokong. Sila gunakan JPG, PNG atau HEIC."
+        );
         return false;
       }
       if (f.size > MAX_FILE_SIZE_BYTES) {
-        toast.error("Ralat", {
-          description: mapDecodeErrorToMessage("Imej terlalu besar (maks 30MB)."),
-        });
+        toast.error(
+          mapDecodeErrorToMessage("Imej terlalu besar (maks 30MB).")
+        );
         return false;
       }
       return true;
@@ -652,9 +646,9 @@ export function QrApp() {
       .map(createItem);
 
     if (validFiles.length > MAX_BATCH_SIZE) {
-      toast.error("Ralat", {
-        description: `Had maksimum ${MAX_BATCH_SIZE} fail. Sebahagian fail tidak ditambah.`,
-      });
+      toast.error(
+        `Had maksimum ${MAX_BATCH_SIZE} fail. Sebahagian fail tidak ditambah.`
+      );
     }
 
     successBaselineRef.current = results.filter(
@@ -807,7 +801,7 @@ export function QrApp() {
           <Dialog open={configOpen} onOpenChange={handleConfigOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Konfigurasi QR</DialogTitle>
+                <DialogTitle>Tetapan eksport</DialogTitle>
                 <DialogDescription>
                   Tetapkan reka bentuk dan resolusi imej QR
                 </DialogDescription>
@@ -835,7 +829,7 @@ export function QrApp() {
             <DrawerContent>
               <div className="mx-auto w-full max-w-sm">
                 <DrawerHeader>
-                  <DrawerTitle>Konfigurasi QR</DrawerTitle>
+                  <DrawerTitle>Tetapan eksport</DrawerTitle>
                   <DrawerDescription>
                     Tetapkan reka bentuk dan resolusi imej QR
                   </DrawerDescription>
@@ -887,7 +881,7 @@ export function QrApp() {
           open={ratingOpen}
           onOpenChange={setRatingOpen}
           title="Bagaimana pengalaman anda?"
-          description="Berikan penilaian supaya kami boleh terus menambah baik aplikasi ini."
+          description="Berikan penilaian supaya kami boleh terus memperbaiki Tukar QR."
         >
           <ExportRatingPrompt onClose={() => setRatingOpen(false)} />
         </ResponsiveModal>
@@ -905,7 +899,7 @@ export function QrApp() {
                 href="/list"
                 className="hover:text-foreground transition-colors underline-offset-4 hover:underline"
               >
-                Senarai Bank
+                Senarai bank
               </Link>
               <a
                 href="https://bilauitmcuti.com/"

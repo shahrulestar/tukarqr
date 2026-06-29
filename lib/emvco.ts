@@ -4,6 +4,14 @@ const DUITNOW_MALAYSIA_AID = "A0000006150001";
 const MAX_PAYLOAD_LENGTH = 5000;
 const EMVCO_ASCII = /^[\x20-\x7E]*$/;
 
+export const DUITNOW_QR_ERRORS = {
+  invalidFormat:
+    "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran.",
+  notDuitNow:
+    "Kod QR ini bukan DuitNow QR pembayaran. Hanya kod DuitNow QR Malaysia disokong.",
+  invalidOrCorrupt: "Kod DuitNow QR tidak sah atau rosak.",
+} as const;
+
 export function parseEmvCoTlv(payload: string): Map<string, string> {
   const map = new Map<string, string>();
   let i = 0;
@@ -71,22 +79,19 @@ export function isDuitNowQr(
   if (typeof payload !== "string" || !payload) {
     return {
       valid: false,
-      reason:
-        "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran.",
+      reason: DUITNOW_QR_ERRORS.invalidFormat,
     };
   }
   if (payload.length > MAX_PAYLOAD_LENGTH) {
     return {
       valid: false,
-      reason:
-        "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran.",
+      reason: DUITNOW_QR_ERRORS.invalidFormat,
     };
   }
   if (!EMVCO_ASCII.test(payload)) {
     return {
       valid: false,
-      reason:
-        "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran.",
+      reason: DUITNOW_QR_ERRORS.invalidFormat,
     };
   }
   const tlv = parseEmvCoTlv(payload);
@@ -94,38 +99,34 @@ export function isDuitNowQr(
   if (formatIndicator !== "02") {
     return {
       valid: false,
-      reason:
-        "Kod QR ini bukan DuitNow QR pembayaran. Hanya kod DuitNow QR Malaysia disokong.",
+      reason: DUITNOW_QR_ERRORS.notDuitNow,
     };
   }
   const countryCode = tlv.get("58");
   if (countryCode !== "MY") {
     return {
       valid: false,
-      reason:
-        "Kod QR ini bukan DuitNow QR pembayaran. Hanya kod DuitNow QR Malaysia disokong.",
+      reason: DUITNOW_QR_ERRORS.notDuitNow,
     };
   }
   const merchantAccount = tlv.get("26");
   if (!merchantAccount) {
     return {
       valid: false,
-      reason:
-        "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran.",
+      reason: DUITNOW_QR_ERRORS.invalidFormat,
     };
   }
   const aid = getMerchantAccountAid(merchantAccount);
   if (aid !== DUITNOW_MALAYSIA_AID) {
     return {
       valid: false,
-      reason:
-        "Kod QR ini bukan DuitNow QR pembayaran. Hanya kod DuitNow QR Malaysia disokong.",
+      reason: DUITNOW_QR_ERRORS.notDuitNow,
     };
   }
   if (!validateEmvCoCrc(payload)) {
     return {
       valid: false,
-      reason: "Kod DuitNow QR tidak sah atau rosak.",
+      reason: DUITNOW_QR_ERRORS.invalidOrCorrupt,
     };
   }
   return { valid: true };

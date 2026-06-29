@@ -272,9 +272,7 @@ export function downloadQrAsPng(
       document.body.removeChild(a);
     })
     .catch(() => {
-      toast.error("Ralat", {
-        description: "Gagal menjana imej QR. Sila cuba lagi.",
-      });
+      toast.error("Gagal menjana QR. Sila cuba lagi.");
       onError?.();
     });
 }
@@ -293,9 +291,7 @@ export async function downloadAllQrsAsZip(
 ): Promise<boolean> {
   const valid = items.filter((i) => i.svg);
   if (valid.length === 0) {
-    toast.error("Ralat", {
-      description: "Tiada imej QR tersedia untuk dimuat turun.",
-    });
+    toast.error("Tiada imej QR untuk dimuat turun.");
     return false;
   }
 
@@ -339,9 +335,7 @@ export async function downloadAllQrsAsZip(
 
     const succeeded = results.filter((r) => r.status === "fulfilled" && r.value);
     if (succeeded.length === 0) {
-    toast.error("Ralat", {
-      description: "Gagal menjana imej QR. Sila cuba lagi.",
-    });
+      toast.error("Gagal menjana QR. Sila cuba lagi.");
       return false;
     }
 
@@ -361,14 +355,10 @@ export async function downloadAllQrsAsZip(
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    toast.success("Berjaya", {
-      description: `${succeeded.length} imej QR berjaya dimuat turun sebagai fail ZIP.`,
-    });
+    toast.success(`${succeeded.length} QR dimuat turun sebagai ZIP.`);
     return true;
   } catch {
-    toast.error("Ralat", {
-      description: "Gagal menjana fail ZIP. Sila cuba lagi.",
-    });
+    toast.error("Gagal menjana ZIP. Sila cuba lagi.");
     return false;
   }
 }

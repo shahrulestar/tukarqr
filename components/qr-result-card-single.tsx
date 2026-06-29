@@ -112,10 +112,10 @@ export function QrResultCardSingle({
       <Card>
         <CardHeader>
           <CardTitle className="text-[16px] md:text-[18px]">
-            Sedia Untuk Bayar
+            QR siap digunakan
           </CardTitle>
           <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-            Imbas dengan aplikasi bank anda untuk bayar
+            Imbas dengan app bank untuk bayar
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -136,14 +136,8 @@ export function QrResultCardSingle({
               <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
                 <li>Sahkan nama penerima betul</li>
                 <li>Semak jumlah bayaran jika ada</li>
-                <li>Jangan imbasan QR dari sumber tidak dipercayai</li>
+                <li>Jangan imbas QR dari sumber yang tidak dipercayai</li>
               </ul>
-              <p className="mt-2 pt-2 border-t border-amber-500/30 text-[11px] text-muted-foreground">
-                Alat ini hanya untuk kegunaan menukar DuitNow QR yang kabur atau
-                gambar QR, kepada gambar yang jelas. Jangan gunakan untuk
-                penipuan atau aktiviti haram. Pengguna bertanggungjawab
-                sepenuhnya atas penggunaan alat ini.
-              </p>
             </div>
           )}
 
@@ -222,7 +216,7 @@ export function QrResultCardSingle({
               className="w-full sm:flex-1 sm:min-w-0"
               disabled={disabled}
             >
-              Muat Turun
+              Muat turun
             </Button>
             <Button
               onClick={onCopy}
@@ -230,7 +224,7 @@ export function QrResultCardSingle({
               className="w-full sm:flex-1 sm:min-w-0"
               disabled={disabled}
             >
-              Salin Imej
+              Salin imej
             </Button>
           </div>
         </CardContent>

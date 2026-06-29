@@ -104,7 +104,7 @@ export function QrExportConfigForm({
               )}
               onClick={() => onQrStyleChange("classic")}
             >
-              <span className="font-medium text-xs sm:text-sm">Petak-Petak</span>
+              <span className="font-medium text-xs sm:text-sm">Petak</span>
             </Button>
           </motion.div>
           <motion.div
@@ -120,7 +120,7 @@ export function QrExportConfigForm({
               )}
               onClick={() => onQrStyleChange("rounded")}
             >
-              <span className="font-medium text-xs sm:text-sm">Bulat-Bulat</span>
+              <span className="font-medium text-xs sm:text-sm">Bulat</span>
             </Button>
           </motion.div>
         </div>
@@ -224,7 +224,7 @@ export function QrExportConfigForm({
             onClick={onExecuteExport}
             className="w-full sm:flex-1 sm:min-w-0"
           >
-            {drawerAction === "download" ? "Muat Turun" : "Salin Imej"}
+            {drawerAction === "download" ? "Muat turun" : "Salin imej"}
           </Button>
         </div>
       )}

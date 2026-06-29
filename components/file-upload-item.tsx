@@ -1,10 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileImage, CheckCircle2, X, XCircle, Loader2 } from "lucide-react";
+import { CheckIcon, FileImage, FileWarningIcon, X } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import {
+  Attachment,
+  AttachmentAction,
+  AttachmentActions,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentMedia,
+  AttachmentTitle,
+  AttachmentTrigger,
+} from "@/components/ui/attachment";
+import { Spinner } from "@/components/ui/spinner";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 
 export type FileUploadStatus = "pending" | "decoding" | "success" | "failed";
@@ -21,12 +30,88 @@ interface FileUploadItemProps {
   allowPreview?: boolean;
 }
 
-function LoadingSpinner({ className }: { className?: string }) {
+type AttachmentState = "idle" | "uploading" | "processing" | "error" | "done";
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) {
+    return kb < 10 ? `${kb.toFixed(1)} KB` : `${Math.round(kb)} KB`;
+  }
+  const mb = kb / 1024;
+  return mb < 10 ? `${mb.toFixed(1)} MB` : `${Math.round(mb)} MB`;
+}
+
+function getFileSizeLabel(file: File | undefined): string | null {
+  if (!file) return null;
+  return formatFileSize(file.size);
+}
+
+function getStateDescription(
+  state: AttachmentState,
+  fileSize: string | null,
+  error?: string
+): string {
+  if (state === "error") return error ?? "Dekod gagal.";
+
+  const labels: Record<Exclude<AttachmentState, "error">, string> = {
+    idle: "Sedia",
+    uploading: "Mendekod",
+    processing: "Memproses",
+    done: "Selesai",
+  };
+
+  const label = labels[state];
+  return fileSize ? `${label} · ${fileSize}` : label;
+}
+
+function toAttachmentState(
+  status: FileUploadStatus,
+  showLoadingForPending: boolean
+): AttachmentState {
+  switch (status) {
+    case "failed":
+      return "error";
+    case "success":
+      return "done";
+    case "decoding":
+      return "uploading";
+    case "pending":
+      return showLoadingForPending ? "processing" : "idle";
+    default:
+      return "idle";
+  }
+}
+
+function AttachmentMediaContent({
+  state,
+  imageUrl,
+  fileName,
+}: {
+  state: AttachmentState;
+  imageUrl: string | null;
+  fileName: string;
+}) {
+  if (imageUrl) {
+    return (
+      <AttachmentMedia variant="image">
+        <img src={imageUrl} alt={fileName} />
+      </AttachmentMedia>
+    );
+  }
+
   return (
-    <Loader2
-      className={cn("size-5 text-muted-foreground spinner-gpu", className)}
-      aria-hidden
-    />
+    <AttachmentMedia>
+      {state === "uploading" || state === "processing" ? (
+        <Spinner />
+      ) : state === "error" ? (
+        <FileWarningIcon />
+      ) : state === "done" ? (
+        <CheckIcon />
+      ) : (
+        <FileImage />
+      )}
+    </AttachmentMedia>
   );
 }
 
@@ -42,12 +127,13 @@ export function FileUploadItem({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  const truncatedName =
-    fileName.length > 32 ? `${fileName.slice(0, 29)}...` : fileName;
-
-  const effectiveStatus =
-    status === "pending" && showLoadingForPending ? "decoding" : status;
-  const isSpinning = effectiveStatus === "decoding";
+  const attachmentState = toAttachmentState(status, showLoadingForPending);
+  const fileSize = getFileSizeLabel(file);
+  const stateDescription = getStateDescription(
+    attachmentState,
+    fileSize,
+    error
+  );
 
   const canPreview =
     allowPreview && (status === "success" || status === "failed") && imageUrl;
@@ -64,85 +150,38 @@ export function FileUploadItem({
     setImageUrl(null);
   }, [file, status]);
 
-  function handleCardClick() {
-    if (canPreview) setPreviewOpen(true);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (canPreview && (e.key === "Enter" || e.key === " ")) {
-      e.preventDefault();
-      setPreviewOpen(true);
-    }
-  }
-
-  const cardClassName = cn(
-    "relative flex flex-col gap-2 rounded-lg border border-border bg-muted/30 p-3 min-h-[52px]",
-    canPreview && "cursor-pointer transition-colors hover:bg-muted/50"
-  );
-
-  const statusIcons = {
-    pending: <FileImage className="size-5 text-muted-foreground" />,
-    decoding: <LoadingSpinner />,
-    success: <CheckCircle2 className="size-5 text-[oklch(0.80_0.18_152)]" />,
-    failed: <XCircle className="size-5 text-[oklch(0.71_0.17_22)]" />,
-  };
-
-  const cardContent = (
-    <div className="flex items-center gap-3">
-          <div
-            className={cn(
-              "flex size-9 shrink-0 items-center justify-center rounded-md",
-              (effectiveStatus === "pending" || isSpinning) && "bg-muted/50",
-              effectiveStatus === "success" && "bg-background",
-              effectiveStatus === "failed" && "bg-background"
-            )}
-          >
-            {statusIcons[effectiveStatus]}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p
-              className="truncate text-[14px] sm:text-[15px] md:text-base font-medium text-foreground"
-              title={fileName}
-            >
-              {truncatedName}
-            </p>
-            {error && status === "failed" && (
-              <p className="mt-0.5 truncate text-[12px] sm:text-[13px] md:text-sm text-[oklch(0.71_0.17_22)]">
-                {error}
-              </p>
-            )}
-          </div>
-          {onRemove && (
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemove();
-                }}
-                aria-label="Buang fail"
-              >
-                <X className="size-3" />
-              </Button>
-            )}
-    </div>
-  );
-
   return (
     <>
-      {canPreview ? (
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={handleCardClick}
-          onKeyDown={handleKeyDown}
-          className={cardClassName}
-        >
-          {cardContent}
-        </div>
-      ) : (
-        <div className={cardClassName}>{cardContent}</div>
-      )}
+      <Attachment state={attachmentState} className="w-full">
+        <AttachmentMediaContent
+          state={attachmentState}
+          imageUrl={imageUrl}
+          fileName={fileName}
+        />
+        <AttachmentContent>
+          <AttachmentTitle title={fileName}>{fileName}</AttachmentTitle>
+          <AttachmentDescription>{stateDescription}</AttachmentDescription>
+        </AttachmentContent>
+        {onRemove && (
+          <AttachmentActions>
+            <AttachmentAction
+              aria-label="Buang fail"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+            >
+              <X />
+            </AttachmentAction>
+          </AttachmentActions>
+        )}
+        {canPreview && (
+          <AttachmentTrigger
+            aria-label={`Pratonton ${fileName}`}
+            onClick={() => setPreviewOpen(true)}
+          />
+        )}
+      </Attachment>
       <ImagePreviewDialog
         open={previewOpen}
         onOpenChange={setPreviewOpen}

@@ -34,7 +34,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Tukar QR - DuitNow QR Regenerator",
+    default: "Tukar QR — Jana semula DuitNow QR yang jelas",
     template: "%s | Tukar QR",
   },
   description:
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     locale: "ms_MY",
     siteName: "Tukar QR",
     url: SITE_URL,
-    title: "Tukar QR - DuitNow QR Regenerator",
+    title: "Tukar QR — Jana semula DuitNow QR yang jelas",
     description:
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: [
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tukar QR - DuitNow QR Regenerator",
+    title: "Tukar QR — Jana semula DuitNow QR yang jelas",
     description:
       "Muat naik atau ambil gambar DuitNow QR yang tidak jelas dan jana semula QR digital yang lebih jelas, kemas, dan sedia digunakan.",
     images: [DEFAULT_OG_IMAGE],
@@ -101,7 +101,7 @@ const jsonLdWebSite = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Tukar QR",
-  alternateName: "DuitNow QR Regenerator",
+  alternateName: "Jana semula DuitNow QR yang jelas",
   url: SITE_URL,
   inLanguage: "ms",
 };
@@ -110,7 +110,7 @@ const jsonLdWebApp = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Tukar QR",
-  alternateName: "DuitNow QR Regenerator",
+  alternateName: "Jana semula DuitNow QR yang jelas",
   description:
     "Ramai pengguna hanya mempunyai gambar DuitNow QR yang tidak jelas atau diambil menggunakan kamera. Dengan alat ini, anda boleh menukar gambar QR tersebut kepada QR digital yang kemas dan boleh digunakan semula untuk pembayaran.",
   applicationCategory: "UtilitiesApplication",

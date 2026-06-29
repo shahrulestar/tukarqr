@@ -11,7 +11,11 @@
       "blocks": [
         {
           "type": "paragraph",
-          "text": "Proses ini ringkas dan pantas. Anda hanya perlu muat naik gambar QR atau gunakan kamera peranti anda untuk mengimbas DuitNow QR sedia ada. Sistem akan mendekod maklumat pembayaran daripada gambar tersebut dan menjana semula kod QR baharu yang jelas dalam format digital."
+          "text": "Proses ini ringkas dan pantas."
+        },
+        {
+          "type": "paragraph",
+          "text": "Muat naik gambar QR atau gunakan kamera peranti anda untuk mengimbas DuitNow QR sedia ada. Sistem akan mendekod maklumat pembayaran daripada gambar tersebut dan menjana semula kod QR baharu yang jelas dalam format digital."
         },
         {
           "type": "list",
@@ -89,7 +93,7 @@
     },
     {
       "value": "senarai-bank",
-      "title": "Senarai bank dan institusi kewangan menyokong DuitNow QR",
+      "title": "Senarai bank dan institusi kewangan yang menyokong DuitNow QR",
       "blocks": [
         {
           "type": "paragraph",

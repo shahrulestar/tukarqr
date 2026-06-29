@@ -59,7 +59,5 @@ export async function shareApp(): Promise<void> {
   }
 
   await copyLinkToClipboard();
-  toast.success("Berjaya", {
-    description: "Pautan aplikasi ini disalin ke papan keratan.",
-  });
+  toast.success("Pautan disalin ke papan keratan.");
 }

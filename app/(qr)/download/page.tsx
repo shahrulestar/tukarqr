@@ -3,7 +3,7 @@ import { SITE_URL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Muat Turun - Tukar QR",
+    absolute: "Muat turun - Tukar QR",
   },
   description:
     "Muat turun atau salin imej DuitNow QR yang telah dijana semula dengan jelas dan kemas.",

@@ -21,7 +21,7 @@ const steps = [
   {
     icon: Download,
     title: "Muat turun atau salin",
-    description: "Muat turun imej QR yang jelas atau salin ke papan keratan untuk kegunaan anda.",
+    description: "Muat turun imej QR yang jelas atau salin ke papan keratan.",
   },
 ];
 

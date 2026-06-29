@@ -78,9 +78,7 @@ export function QrResultItem({
     if (!svg) return;
     const filename = formatShortFilename(merchantName);
     downloadQrAsPng(svg, filename, getRenderOptions(), () => {});
-    toast.success("Berjaya", {
-      description: "Imej QR berjaya dimuat turun ke peranti anda.",
-    });
+    toast.success("QR dimuat turun.");
     onExportSuccess?.();
   }
 
@@ -89,13 +87,11 @@ export function QrResultItem({
     if (!svg) return;
     try {
       await copyQrImageToClipboard(svg, getRenderOptions());
-      toast.success("Berjaya", {
-        description: "Imej QR berjaya disalin ke papan keratan.",
-      });
+      toast.success("QR disalin ke papan keratan.");
       onExportSuccess?.();
     } catch {
-      toast.error("Ralat", {
-        description: "Gagal menyalin imej ke papan keratan. Sila gunakan Muat Turun sebagai alternatif.",
+      toast.error("Gagal salin", {
+        description: "Sila gunakan muat turun sebagai alternatif.",
       });
     }
   }
@@ -195,7 +191,7 @@ export function QrResultItem({
               className="flex-1 md:flex-none"
               onClick={handleDownload}
               disabled={disabled}
-              aria-label="Muat Turun"
+              aria-label="Muat turun"
             >
               <Download className="size-4" />
             </Button>

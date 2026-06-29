@@ -1,11 +1,23 @@
 {
   "version": 1,
   "skills": {
+    "ab-testing": {
+      "source": "shahrulestar/ab-testing",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "cd93da3c0c4f8fa257abea4a0bceef5ebce8091d640569a3461da689759a2696"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
       "skillPath": "skills/shadcn/SKILL.md",
       "computedHash": "f0fdd03f4755cbb3b57e20fe6fd4a97c00d34e6780187b6559316986e8d848db"
+    },
+    "ux-writer": {
+      "source": "shahrulestar/ux-writer",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "6c23c63cd3af3feff5e6821a3865d35299e7a9045bb5c54b384790f457102067"
     }
   }
 }
