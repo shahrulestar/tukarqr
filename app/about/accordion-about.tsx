@@ -8,6 +8,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import accordionContent from "@/lib/accordion-content.json";
 
 interface AccordionAudienceItem {
@@ -44,7 +46,7 @@ const content = accordionContent as {
 };
 
 const contentClassName =
-  "text-[14px] leading-relaxed text-muted-foreground";
+  "text-[14px] leading-relaxed text-muted-foreground [&_[data-slot=button]]:no-underline [&_[data-slot=button]:hover]:no-underline";
 
 function AccordionBlockRenderer({ block }: { block: AccordionBlock }) {
   switch (block.type) {
@@ -84,12 +86,9 @@ function AccordionBlockRenderer({ block }: { block: AccordionBlock }) {
     case "link":
       if (block.variant === "button") {
         return (
-          <Link
-            href={block.href}
-            className="no-underline mt-1 inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 hover:text-primary-foreground"
-          >
-            {block.label}
-          </Link>
+          <Button asChild className="mt-1 !no-underline hover:!no-underline">
+            <Link href={block.href}>{block.label}</Link>
+          </Button>
         );
       }
       return (
@@ -122,7 +121,10 @@ export function AccordionAbout() {
           <AccordionItem
             key={item.value}
             value={item.value}
-            className={item.noBorder ? "border-b-0" : undefined}
+            className={cn(
+              "data-open:bg-transparent",
+              item.noBorder && "border-b-0"
+            )}
           >
             <AccordionTrigger className="text-base font-semibold">
               {item.title}

@@ -40,7 +40,7 @@ export function ResponsiveModal({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className={className ?? "sm:max-w-[425px]"} closeButtonTabIndex={-1}>
+        <DialogContent className={className ?? "sm:max-w-[425px]"}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             {description && (

@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { ThemeKeyboardShortcut } from "@/components/theme-keyboard-shortcut";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE_URL, DEFAULT_OG_IMAGE, SITE_ICONS } from "@/lib/site-config";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -133,7 +136,7 @@ export default function RootLayout({
     <html
       lang="ms"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={cn(geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
       <head>
         <link rel="preload" href={SITE_ICONS.favicon} as="image" />
