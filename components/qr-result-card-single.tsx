@@ -206,7 +206,12 @@ export function QrResultCardSingle({
               </p>
             )}
             <span className="block w-full text-center text-balance text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
-              Muat turun, salin, atau tekan & tahan QR di atas untuk simpan
+              <span className="md:hidden">
+                Kongsi, salin, atau tekan & tahan QR di atas untuk simpan
+              </span>
+              <span className="hidden md:inline">
+                Muat turun, salin, atau tekan & tahan QR di atas untuk simpan
+              </span>
             </span>
           </div>
 
@@ -216,7 +221,8 @@ export function QrResultCardSingle({
               className="w-full sm:flex-1 sm:min-w-0"
               disabled={disabled}
             >
-              Muat turun
+              <span className="md:hidden">Kongsi</span>
+              <span className="hidden md:inline">Muat turun</span>
             </Button>
             <Button
               onClick={onCopy}

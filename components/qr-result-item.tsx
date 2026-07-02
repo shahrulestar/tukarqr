@@ -2,7 +2,7 @@
 
 import { useRef, useCallback, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Download, Copy } from "lucide-react";
+import { Download, Copy, Share } from "lucide-react";
 
 import { QrStyledSvg, type QrModuleStyle } from "@/components/qr-styled-svg";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 import {
   formatShortFilename,
   renderSvgToPng,
-  downloadQrAsPng,
+  exportQrAsPng,
   buildPlainRenderOptions,
   buildDuitnowRenderOptions,
   type QrExportLayout,
@@ -73,13 +73,14 @@ export function QrResultItem({
         );
   }
 
-  function handleDownload() {
+  async function handleDownload() {
     const svg = qrSvgRef.current;
     if (!svg) return;
     const filename = formatShortFilename(merchantName);
-    downloadQrAsPng(svg, filename, getRenderOptions(), () => {});
-    toast.success("QR dimuat turun.");
-    onExportSuccess?.();
+    const result = await exportQrAsPng(svg, filename, getRenderOptions());
+    if (result === "shared" || result === "downloaded") {
+      onExportSuccess?.();
+    }
   }
 
   async function handleCopy() {
@@ -188,7 +189,17 @@ export function QrResultItem({
             <Button
               size="icon-sm"
               variant="ghost"
-              className="flex-1 md:flex-none"
+              className="flex-1 md:flex-none md:hidden"
+              onClick={handleDownload}
+              disabled={disabled}
+              aria-label="Kongsi"
+            >
+              <Share className="size-4" />
+            </Button>
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              className="hidden flex-1 md:flex md:flex-none"
               onClick={handleDownload}
               disabled={disabled}
               aria-label="Muat turun"

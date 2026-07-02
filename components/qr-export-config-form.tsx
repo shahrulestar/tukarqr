@@ -224,7 +224,14 @@ export function QrExportConfigForm({
             onClick={onExecuteExport}
             className="w-full sm:flex-1 sm:min-w-0"
           >
-            {drawerAction === "download" ? "Muat turun" : "Salin imej"}
+            {drawerAction === "download" ? (
+              <>
+                <span className="md:hidden">Kongsi</span>
+                <span className="hidden md:inline">Muat turun</span>
+              </>
+            ) : (
+              "Salin imej"
+            )}
           </Button>
         </div>
       )}

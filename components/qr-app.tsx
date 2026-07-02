@@ -56,7 +56,7 @@ import {
 } from "@/lib/emvco";
 import {
   getPrimaryColor,
-  downloadQrAsPng,
+  exportQrAsPng,
   formatShortFilename,
   buildPlainRenderOptions,
   buildDuitnowRenderOptions,
@@ -227,15 +227,16 @@ export function QrApp() {
             outerBg
           );
     if (action === "download") {
-      downloadQrAsPng(
+      void exportQrAsPng(
         svg,
         formatShortFilename(merchantName),
-        renderOptions,
-        () => {}
-      );
-      toast.success("QR dimuat turun.");
-      handleConfigOpenChange(false);
-      maybeOpenRatingPrompt();
+        renderOptions
+      ).then((result) => {
+        if (result === "shared" || result === "downloaded") {
+          handleConfigOpenChange(false);
+          maybeOpenRatingPrompt();
+        }
+      });
     } else {
       copyQrImageToClipboard(svg, renderOptions)
         .then(() => {
