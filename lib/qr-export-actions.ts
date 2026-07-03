@@ -20,7 +20,6 @@ export async function runQrExportAction(
 
   if (action === "download") {
     await downloadQrAsPng(svg, filename, renderOptions);
-    toast.success(`QR dimuat turun: ${filename}`);
     return;
   }
 

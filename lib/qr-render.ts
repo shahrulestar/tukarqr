@@ -1,6 +1,12 @@
 import JSZip from "jszip";
 import { toast } from "sonner";
 
+import {
+  exportPngDataUrl,
+  exportZipBlob,
+  type ExportResult,
+} from "@/lib/share-qr";
+
 export function formatShortFilename(merchantName: string | null): string {
   const now = new Date();
   const date = now.toISOString().slice(2, 10).replace(/-/g, "");
@@ -256,26 +262,35 @@ export function renderSvgToPng(
   });
 }
 
+export async function exportQrAsPng(
+  svgElement: SVGSVGElement,
+  filename: string,
+  options: QrRenderOptions
+): Promise<ExportResult> {
+  try {
+    const dataUrl = await renderSvgToPng(svgElement, options);
+    return exportPngDataUrl(dataUrl, filename);
+  } catch {
+    toast.error("Gagal menjana QR. Sila cuba lagi.");
+    return "failed";
+  }
+}
+
 export function downloadQrAsPng(
   svgElement: SVGSVGElement,
   filename: string,
   options: QrRenderOptions,
   onError?: () => void
 ): Promise<void> {
-  return renderSvgToPng(svgElement, options)
-    .then((dataUrl) => {
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    })
-    .catch(() => {
-      toast.error("Gagal menjana QR. Sila cuba lagi.");
+  return exportQrAsPng(svgElement, filename, options).then((result) => {
+    if (result === "failed") {
       onError?.();
       throw new Error("Failed to download QR");
-    });
+    }
+    if (result === "cancelled") {
+      throw new DOMException("Aborted", "AbortError");
+    }
+  });
 }
 
 export interface DownloadAllItem {
@@ -347,17 +362,8 @@ export async function downloadAllQrsAsZip(
     }
 
     const blob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = zipFilename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    toast.success(`${succeeded.length} QR dimuat turun sebagai ZIP.`);
-    return true;
+    const result = await exportZipBlob(blob, zipFilename, succeeded.length);
+    return result === "shared" || result === "downloaded";
   } catch {
     toast.error("Gagal menjana ZIP. Sila cuba lagi.");
     return false;

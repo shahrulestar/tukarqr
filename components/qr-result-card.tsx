@@ -155,7 +155,10 @@ export function QrResultList({
               onClick={handleDownloadAll}
               disabled={disabled}
             >
-              Muat turun semua ({results.length})
+              <span className="md:hidden">Kongsi semua ({results.length})</span>
+              <span className="hidden md:inline">
+                Muat turun semua ({results.length})
+              </span>
             </Button>
           )}
         </CardContent>
