@@ -363,7 +363,7 @@ export async function downloadAllQrsAsZip(
 
     const blob = await zip.generateAsync({ type: "blob" });
     const result = await exportZipBlob(blob, zipFilename, succeeded.length);
-    return result === "shared" || result === "downloaded";
+    return result === "downloaded";
   } catch {
     toast.error("Gagal menjana ZIP. Sila cuba lagi.");
     return false;

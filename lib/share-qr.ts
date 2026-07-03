@@ -21,23 +21,6 @@ export function isAndroidDevice(): boolean {
   return /Android/i.test(navigator.userAgent);
 }
 
-export function isMobileOrTabletViewport(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(max-width: 1023px)").matches;
-}
-
-export function shouldUseNativeFileShare(): boolean {
-  if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
-    return false;
-  }
-  const isTouchDevice =
-    navigator.maxTouchPoints > 0 ||
-    ("ontouchstart" in (typeof window !== "undefined" ? window : {}));
-  if (!isTouchDevice) return false;
-  if (!isIosDevice() && !isAndroidDevice()) return false;
-  return isMobileOrTabletViewport();
-}
-
 export function dataUrlToFile(dataUrl: string, filename: string): File {
   const arr = dataUrl.split(",");
   const mime = arr[0].match(/:(.*?);/)?.[1] ?? "image/png";
@@ -117,18 +100,6 @@ export async function exportPngDataUrl(
   filename: string
 ): Promise<ExportResult> {
   try {
-    if (shouldUseNativeFileShare()) {
-      const file = dataUrlToFile(dataUrl, filename);
-      if (canShareFile(file)) {
-        const shared = await shareFile(file);
-        if (shared) {
-          toast.success("QR dikongsi.");
-          return "shared";
-        }
-        return "cancelled";
-      }
-    }
-
     triggerDataUrlDownload(dataUrl, filename);
     toast.success("QR dimuat turun.");
     return "downloaded";
@@ -147,18 +118,6 @@ export async function exportZipBlob(
   count: number
 ): Promise<ExportResult> {
   try {
-    if (shouldUseNativeFileShare()) {
-      const file = new File([blob], filename, { type: "application/zip" });
-      if (canShareFile(file)) {
-        const shared = await shareFile(file, { title: SHARE_TITLE });
-        if (shared) {
-          toast.success(`${count} QR dikongsi.`);
-          return "shared";
-        }
-        return "cancelled";
-      }
-    }
-
     triggerBlobDownload(blob, filename);
     toast.success(`${count} QR dimuat turun sebagai ZIP.`);
     return "downloaded";

@@ -56,7 +56,7 @@ export function QrExportConfigForm({
               className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onExportLayoutChange("duitnow")}
             >
-              <span className="font-medium text-xs sm:text-sm">DuitNow</span>
+              <span className="font-medium text-sm">DuitNow</span>
             </Button>
           </motion.div>
           <motion.div
@@ -70,7 +70,7 @@ export function QrExportConfigForm({
               className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onExportLayoutChange("plain")}
             >
-              <span className="font-medium text-xs sm:text-sm">QR Sahaja</span>
+              <span className="font-medium text-sm">QR Sahaja</span>
             </Button>
           </motion.div>
         </div>
@@ -95,7 +95,7 @@ export function QrExportConfigForm({
               className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onQrStyleChange("classic")}
             >
-              <span className="font-medium text-xs sm:text-sm">Petak</span>
+              <span className="font-medium text-sm">Petak</span>
             </Button>
           </motion.div>
           <motion.div
@@ -109,7 +109,7 @@ export function QrExportConfigForm({
               className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onQrStyleChange("rounded")}
             >
-              <span className="font-medium text-xs sm:text-sm">Bulat</span>
+              <span className="font-medium text-sm">Bulat</span>
             </Button>
           </motion.div>
         </div>

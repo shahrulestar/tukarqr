@@ -95,7 +95,6 @@ export function QrExportActionBar({
   layout = "compact",
 }: QrExportActionBarProps) {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const isMobile = useMediaQuery("(max-width: 639px)");
   const showShare = !isDesktop;
   const isBusy = disabled || isLoading;
 
@@ -134,21 +133,36 @@ export function QrExportActionBar({
     );
   }
 
-  const stackOnMobile = isMobile;
-  const columnCount = showShare ? 3 : 2;
+  if (showShare) {
+    return (
+      <div className={cn("flex w-full min-w-0 flex-col gap-2", className)}>
+        <LabelButton
+          label="Muat turun"
+          onClick={onDownload}
+          isActive={loadingAction === "download"}
+          disabled={isBusy}
+          variant="default"
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <LabelButton
+            label="Salin"
+            onClick={onCopy}
+            isActive={loadingAction === "copy"}
+            disabled={isBusy}
+          />
+          <LabelButton
+            label="Kongsi"
+            onClick={onShare}
+            isActive={loadingAction === "share"}
+            disabled={isBusy}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={cn(
-        "w-full min-w-0 gap-2",
-        stackOnMobile
-          ? "flex flex-col"
-          : columnCount === 2
-            ? "grid grid-cols-2"
-            : "grid grid-cols-3",
-        className
-      )}
-    >
+    <div className={cn("grid w-full min-w-0 grid-cols-2 gap-2", className)}>
       <LabelButton
         label="Muat turun"
         onClick={onDownload}
@@ -162,14 +176,6 @@ export function QrExportActionBar({
         isActive={loadingAction === "copy"}
         disabled={isBusy}
       />
-      {showShare && (
-        <LabelButton
-          label="Kongsi"
-          onClick={onShare}
-          isActive={loadingAction === "share"}
-          disabled={isBusy}
-        />
-      )}
     </div>
   );
 }
