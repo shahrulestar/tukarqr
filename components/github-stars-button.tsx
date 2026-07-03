@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Icon, StarIcon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 
 const GITHUB_REPO = "shahrulestar/tukarqr";
@@ -33,7 +33,7 @@ export async function GithubStarsButton() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <Star />
+        <Icon icon={StarIcon} size={16} className="size-4" />
         stars
         {starCount !== null ? (
           <span className="font-semibold tabular-nums">{starCount}</span>

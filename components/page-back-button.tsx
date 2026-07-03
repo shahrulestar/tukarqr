@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ArrowLeft01Icon, Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 
 interface PageBackButtonProps {
@@ -46,7 +46,7 @@ export function PageBackButton({
       aria-label="Kembali"
       className={className}
     >
-      <ChevronLeft />
+      <Icon icon={ArrowLeft01Icon} size={16} className="size-4" />
     </Button>
   );
 }

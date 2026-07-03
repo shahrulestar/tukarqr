@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { Cancel01Icon, Icon, Settings01Icon } from "@/components/ui/icon";
 import { QrStyledSvg, type QrModuleStyle } from "@/components/qr-styled-svg";
 import { Button } from "@/components/ui/button";
+import { QrExportActionBar } from "@/components/qr-export-action-bar";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 import {
   Card,
@@ -23,6 +24,7 @@ import {
   parseEmvCoBankName,
   parseEmvCoAmount,
 } from "@/lib/emvco";
+import type { QrExportAction } from "@/lib/qr-export-actions";
 
 interface QrResultCardSingleProps {
   resultCardRef: React.RefObject<HTMLDivElement | null>;
@@ -37,6 +39,10 @@ interface QrResultCardSingleProps {
   onDismissAlert: () => void;
   onDownload: () => void;
   onCopy: () => void;
+  onShare: () => void;
+  onConfigOpen: () => void;
+  isLoading?: boolean;
+  loadingAction?: QrExportAction | null;
   svgRefCallback?: (el: SVGSVGElement | null) => void;
   disabled?: boolean;
 }
@@ -54,6 +60,10 @@ export function QrResultCardSingle({
   onDismissAlert,
   onDownload,
   onCopy,
+  onShare,
+  onConfigOpen,
+  isLoading = false,
+  loadingAction = null,
   svgRefCallback,
   disabled = false,
 }: QrResultCardSingleProps) {
@@ -107,18 +117,31 @@ export function QrResultCardSingle({
       aria-label="Keputusan QR"
       aria-live="polite"
       tabIndex={-1}
-      className="[transform:translateZ(0)] [contain:layout_style_paint]"
+      className="[transform:translateZ(0)]"
     >
-      <Card>
+      <Card className="overflow-visible">
         <CardHeader>
-          <CardTitle className="text-[16px] md:text-[18px]">
-            QR siap digunakan
-          </CardTitle>
-          <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-            Imbas dengan app bank untuk bayar
-          </CardDescription>
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <CardTitle className="text-[16px] md:text-[18px]">
+                QR siap digunakan
+              </CardTitle>
+              <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
+                Imbas dengan app bank untuk bayar
+              </CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={onConfigOpen}
+              disabled={disabled || isLoading}
+              aria-label="Tetapan eksport"
+            >
+              <Icon icon={Settings01Icon} size={16} className="size-4" />
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 overflow-visible">
           {!alertDismissed && (
             <div
               role="alert"
@@ -130,7 +153,7 @@ export function QrResultCardSingle({
                 aria-label="Sembunyikan peringatan"
                 className="absolute right-2 top-2 rounded p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
               >
-                <X className="size-4" />
+                <Icon icon={Cancel01Icon} size={16} className="size-4" />
               </button>
               <p className="font-medium">Pastikan sebelum imbasan:</p>
               <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
@@ -210,23 +233,15 @@ export function QrResultCardSingle({
             </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button
-              onClick={onDownload}
-              className="w-full sm:flex-1 sm:min-w-0"
-              disabled={disabled}
-            >
-              Muat turun
-            </Button>
-            <Button
-              onClick={onCopy}
-              variant="outline"
-              className="w-full sm:flex-1 sm:min-w-0"
-              disabled={disabled}
-            >
-              Salin imej
-            </Button>
-          </div>
+          <QrExportActionBar
+            layout="main"
+            onDownload={onDownload}
+            onCopy={onCopy}
+            onShare={onShare}
+            isLoading={isLoading}
+            loadingAction={loadingAction}
+            disabled={disabled}
+          />
         </CardContent>
       </Card>
       <ImagePreviewDialog

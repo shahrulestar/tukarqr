@@ -2,20 +2,20 @@
 
 import { useRef, useCallback, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Download, Copy } from "lucide-react";
 
 import { QrStyledSvg, type QrModuleStyle } from "@/components/qr-styled-svg";
-import { Button } from "@/components/ui/button";
+import { QrExportActionBar } from "@/components/qr-export-action-bar";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 import {
-  formatShortFilename,
   renderSvgToPng,
-  downloadQrAsPng,
   buildPlainRenderOptions,
   buildDuitnowRenderOptions,
   type QrExportLayout,
 } from "@/lib/qr-render";
-import { copyQrImageToClipboard } from "@/lib/clipboard-utils";
+import {
+  runQrExportAction,
+  type QrExportAction,
+} from "@/lib/qr-export-actions";
 import { cn } from "@/lib/utils";
 import { parseEmvCoMerchantName, parseEmvCoBankName } from "@/lib/emvco";
 
@@ -49,6 +49,9 @@ export function QrResultItem({
   onExportSuccess,
 }: QrResultItemProps) {
   const qrSvgRef = useRef<SVGSVGElement>(null);
+  const [loadingAction, setLoadingAction] = useState<QrExportAction | null>(
+    null
+  );
 
   const setRef = useCallback(
     (el: SVGSVGElement | null) => {
@@ -73,26 +76,28 @@ export function QrResultItem({
         );
   }
 
-  function handleDownload() {
+  async function handleExportAction(action: QrExportAction) {
     const svg = qrSvgRef.current;
-    if (!svg) return;
-    const filename = formatShortFilename(merchantName);
-    downloadQrAsPng(svg, filename, getRenderOptions(), () => {});
-    toast.success("QR dimuat turun.");
-    onExportSuccess?.();
-  }
+    if (!svg || loadingAction) return;
 
-  async function handleCopy() {
-    const svg = qrSvgRef.current;
-    if (!svg) return;
+    setLoadingAction(action);
+
     try {
-      await copyQrImageToClipboard(svg, getRenderOptions());
-      toast.success("QR disalin ke papan keratan.");
+      await runQrExportAction(action, svg, getRenderOptions(), merchantName);
       onExportSuccess?.();
-    } catch {
-      toast.error("Gagal salin", {
-        description: "Sila gunakan muat turun sebagai alternatif.",
-      });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      if (action === "copy") {
+        toast.error("Gagal salin", {
+          description: "Sila gunakan muat turun sebagai alternatif.",
+        });
+      } else if (action === "share") {
+        toast.error("Gagal kongsi", {
+          description: "Sila gunakan muat turun sebagai alternatif.",
+        });
+      }
+    } finally {
+      setLoadingAction(null);
     }
   }
 
@@ -181,30 +186,15 @@ export function QrResultItem({
               )}
             </div>
           </div>
-          <div
-            className="flex w-full shrink-0 gap-2 md:w-auto md:ml-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Button
-              size="icon-sm"
-              variant="ghost"
-              className="flex-1 md:flex-none"
-              onClick={handleDownload}
+          <div onClick={(e) => e.stopPropagation()}>
+            <QrExportActionBar
+              onDownload={() => handleExportAction("download")}
+              onCopy={() => handleExportAction("copy")}
+              onShare={() => handleExportAction("share")}
+              isLoading={loadingAction !== null}
+              loadingAction={loadingAction}
               disabled={disabled}
-              aria-label="Muat turun"
-            >
-              <Download className="size-4" />
-            </Button>
-            <Button
-              size="icon-sm"
-              variant="ghost"
-              className="flex-1 md:flex-none"
-              onClick={handleCopy}
-              disabled={disabled}
-              aria-label="Salin"
-            >
-              <Copy className="size-4" />
-            </Button>
+            />
           </div>
         </div>
         <div className="sr-only" aria-hidden>

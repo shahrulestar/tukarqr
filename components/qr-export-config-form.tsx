@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-import { Button } from "@/components/ui/button";
+import { Button, actionButtonClassName } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import type { QrExportLayout } from "@/lib/qr-render";
 import { cn } from "@/lib/utils";
@@ -18,9 +18,6 @@ interface QrExportConfigFormProps {
   onOuterBgChange: (bg: "white" | "transparent") => void;
   exportRatio: "1:1" | "3:4";
   onExportRatioChange: (ratio: "1:1" | "3:4") => void;
-  drawerAction?: "download" | "copy" | null;
-  onExecuteExport?: () => void;
-  compact?: boolean;
   showBankNameId?: string;
 }
 
@@ -35,12 +32,12 @@ export function QrExportConfigForm({
   onOuterBgChange,
   exportRatio,
   onExportRatioChange,
-  drawerAction,
-  onExecuteExport,
-  compact = false,
   showBankNameId = "show-bank-name",
 }: QrExportConfigFormProps) {
-  const gridBtnHeight = compact ? "h-[48px]" : "h-[64px]";
+  const gridButtonClassName = cn(
+    actionButtonClassName,
+    "flex flex-col items-center justify-center gap-0.5"
+  );
   const isPlain = exportLayout === "plain";
 
   return (
@@ -54,11 +51,9 @@ export function QrExportConfigForm({
             className="min-w-0"
           >
             <Button
+              size="lg"
               variant={exportLayout === "duitnow" ? "default" : "outline"}
-              className={cn(
-                "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-2 py-3",
-                gridBtnHeight
-              )}
+              className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onExportLayoutChange("duitnow")}
             >
               <span className="font-medium text-xs sm:text-sm">DuitNow</span>
@@ -70,11 +65,9 @@ export function QrExportConfigForm({
             className="min-w-0"
           >
             <Button
+              size="lg"
               variant={exportLayout === "plain" ? "default" : "outline"}
-              className={cn(
-                "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-2 py-3",
-                gridBtnHeight
-              )}
+              className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onExportLayoutChange("plain")}
             >
               <span className="font-medium text-xs sm:text-sm">QR Sahaja</span>
@@ -97,11 +90,9 @@ export function QrExportConfigForm({
             className="min-w-0"
           >
             <Button
+              size="lg"
               variant={qrStyle === "classic" ? "default" : "outline"}
-              className={cn(
-                "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-2 py-3",
-                gridBtnHeight
-              )}
+              className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onQrStyleChange("classic")}
             >
               <span className="font-medium text-xs sm:text-sm">Petak</span>
@@ -113,11 +104,9 @@ export function QrExportConfigForm({
             className="min-w-0"
           >
             <Button
+              size="lg"
               variant={qrStyle === "rounded" ? "default" : "outline"}
-              className={cn(
-                "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-2 py-3",
-                gridBtnHeight
-              )}
+              className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onQrStyleChange("rounded")}
             >
               <span className="font-medium text-xs sm:text-sm">Bulat</span>
@@ -150,11 +139,9 @@ export function QrExportConfigForm({
                 className="min-w-0"
               >
                 <Button
+                  size="lg"
                   variant={outerBg === "white" ? "default" : "outline"}
-                  className={cn(
-                    "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-2 py-3",
-                    gridBtnHeight
-                  )}
+                  className={cn("w-full min-w-0", gridButtonClassName)}
                   onClick={() => onOuterBgChange("white")}
                 >
                   <span className="font-medium">Putih</span>
@@ -166,11 +153,9 @@ export function QrExportConfigForm({
                 className="min-w-0"
               >
                 <Button
+                  size="lg"
                   variant={outerBg === "transparent" ? "default" : "outline"}
-                  className={cn(
-                    "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-2 py-3",
-                    gridBtnHeight
-                  )}
+                  className={cn("w-full min-w-0", gridButtonClassName)}
                   onClick={() => onOuterBgChange("transparent")}
                 >
                   <span className="font-medium">Lutsinar</span>
@@ -187,11 +172,9 @@ export function QrExportConfigForm({
                 className="min-w-0"
               >
                 <Button
+                  size="lg"
                   variant={exportRatio === "1:1" ? "default" : "outline"}
-                  className={cn(
-                    "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-2 py-3",
-                    gridBtnHeight
-                  )}
+                  className={cn("w-full min-w-0", gridButtonClassName)}
                   onClick={() => onExportRatioChange("1:1")}
                 >
                   <span className="font-medium">1:1</span>
@@ -203,11 +186,9 @@ export function QrExportConfigForm({
                 className="min-w-0"
               >
                 <Button
+                  size="lg"
                   variant={exportRatio === "3:4" ? "default" : "outline"}
-                  className={cn(
-                    "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-2 py-3",
-                    gridBtnHeight
-                  )}
+                  className={cn("w-full min-w-0", gridButtonClassName)}
                   onClick={() => onExportRatioChange("3:4")}
                 >
                   <span className="font-medium">3:4</span>
@@ -216,17 +197,6 @@ export function QrExportConfigForm({
             </div>
           </div>
         </>
-      )}
-
-      {drawerAction && onExecuteExport && (
-        <div className={cn("flex flex-col sm:flex-row gap-2", !compact && "pt-2")}>
-          <Button
-            onClick={onExecuteExport}
-            className="w-full sm:flex-1 sm:min-w-0"
-          >
-            {drawerAction === "download" ? "Muat turun" : "Salin imej"}
-          </Button>
-        </div>
       )}
     </div>
   );

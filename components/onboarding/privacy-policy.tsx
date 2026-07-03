@@ -1,7 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Shield } from "lucide-react";
+import { Button, actionButtonClassName } from "@/components/ui/button";
+import { Icon, Shield01Icon } from "@/components/ui/icon";
+import { cn } from "@/lib/utils";
 
 interface PrivacyPolicyProps {
   onDone: () => void;
@@ -18,7 +19,7 @@ export function PrivacyPolicy({ onDone }: PrivacyPolicyProps) {
     <div className="space-y-6">
       <div className="flex gap-3">
         <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
-          <Shield className="size-4 text-primary" />
+          <Icon icon={Shield01Icon} size={16} className="size-4 text-primary" />
         </div>
         <div className="space-y-2">
           {points.map((point, index) => (
@@ -31,7 +32,15 @@ export function PrivacyPolicy({ onDone }: PrivacyPolicyProps) {
           ))}
         </div>
       </div>
-      <Button onClick={onDone} className="w-full focus:outline-none focus-visible:outline-none focus-visible:ring-0" tabIndex={-1}>
+      <Button
+        size="lg"
+        onClick={onDone}
+        className={cn(
+          actionButtonClassName,
+          "focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+        )}
+        tabIndex={-1}
+      >
         Faham
       </Button>
     </div>

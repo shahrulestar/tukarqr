@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { X, Settings } from "lucide-react";
+import { Cancel01Icon, Icon, Settings01Icon } from "@/components/ui/icon";
 import type { QrModuleStyle } from "@/components/qr-styled-svg";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { QrResultItem } from "@/components/qr-result-item";
+import { exportActionButtonClassName } from "@/components/qr-export-action-bar";
 import type { UploadItem } from "@/components/qr-upload-zone";
 import {
   downloadAllQrsAsZip,
@@ -79,9 +80,9 @@ export function QrResultList({
       aria-label="Keputusan QR"
       aria-live="polite"
       tabIndex={-1}
-      className="[transform:translateZ(0)] [contain:layout_style_paint]"
+      className="[transform:translateZ(0)]"
     >
-      <Card>
+      <Card className="overflow-visible">
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
             <div>
@@ -98,11 +99,11 @@ export function QrResultList({
               onClick={onConfigOpen}
               aria-label="Tetapkan reka bentuk QR"
             >
-              <Settings className="size-4" />
+              <Icon icon={Settings01Icon} size={16} className="size-4" />
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 overflow-visible">
           {!alertDismissed && (
             <div
               role="alert"
@@ -114,7 +115,7 @@ export function QrResultList({
                 aria-label="Sembunyikan peringatan"
                 className="absolute right-2 top-2 rounded p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
               >
-                <X className="size-4" />
+                <Icon icon={Cancel01Icon} size={16} className="size-4" />
               </button>
               <p className="font-medium">Pastikan sebelum imbasan:</p>
               <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
@@ -149,7 +150,8 @@ export function QrResultList({
           {results.length > 1 && (
             <Button
               variant="default"
-              className="w-full"
+              size="lg"
+              className={exportActionButtonClassName}
               onClick={handleDownloadAll}
               disabled={disabled}
             >

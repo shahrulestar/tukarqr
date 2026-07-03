@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowDown01Icon, ArrowUp01Icon, Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -66,12 +66,12 @@ export function AcquirersTable({ acquirers }: AcquirersTableProps) {
             {expanded ? (
               <>
                 Tunjuk kurang
-                <ChevronUp className="size-4" />
+                <Icon icon={ArrowUp01Icon} size={16} className="size-4" />
               </>
             ) : (
               <>
                 Tunjuk semua ({acquirers.length})
-                <ChevronDown className="size-4" />
+                <Icon icon={ArrowDown01Icon} size={16} className="size-4" />
               </>
             )}
           </Button>

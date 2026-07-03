@@ -56,13 +56,18 @@ import {
 } from "@/lib/emvco";
 import {
   getPrimaryColor,
-  downloadQrAsPng,
-  formatShortFilename,
   buildPlainRenderOptions,
   buildDuitnowRenderOptions,
   type QrExportLayout,
 } from "@/lib/qr-render";
-import { copyQrImageToClipboard } from "@/lib/clipboard-utils";
+import {
+  loadExportSettings,
+  saveExportSettings,
+} from "@/lib/export-settings";
+import {
+  runQrExportAction,
+  type QrExportAction,
+} from "@/lib/qr-export-actions";
 
 const MAX_BATCH_SIZE = 10;
 const CONCURRENCY_LIMIT_DESKTOP = 2;
@@ -146,11 +151,10 @@ export function QrApp() {
   const [qrStyle, setQrStyle] = useState<"classic" | "rounded">("classic");
   const [showBankName, setShowBankName] = useState(true);
   const [outerBg, setOuterBg] = useState<"white" | "transparent">("white");
-  const [drawerAction, setDrawerAction] = useState<
-    "download" | "copy" | null
-  >(null);
   const [exportRatio, setExportRatio] = useState<"1:1" | "3:4">("1:1");
   const [exportLayout, setExportLayout] = useState<QrExportLayout>("duitnow");
+  const [exportLoadingAction, setExportLoadingAction] =
+    useState<QrExportAction | null>(null);
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -161,9 +165,31 @@ export function QrApp() {
   const singleQrSvgRef = useRef<SVGSVGElement | null>(null);
   const processingRef = useRef(false);
   const successBaselineRef = useRef(0);
+  const skipSettingsSaveRef = useRef(true);
+
   useEffect(() => {
     setQrFgColor(getPrimaryColor());
+    const settings = loadExportSettings();
+    setExportLayout(settings.exportLayout);
+    setQrStyle(settings.qrStyle);
+    setShowBankName(settings.showBankName);
+    setOuterBg(settings.outerBg);
+    setExportRatio(settings.exportRatio);
   }, []);
+
+  useEffect(() => {
+    if (skipSettingsSaveRef.current) {
+      skipSettingsSaveRef.current = false;
+      return;
+    }
+    saveExportSettings({
+      exportLayout,
+      qrStyle,
+      showBankName,
+      outerBg,
+      exportRatio,
+    });
+  }, [exportLayout, qrStyle, showBankName, outerBg, exportRatio]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -194,7 +220,6 @@ export function QrApp() {
 
   function handleConfigOpenChange(open: boolean) {
     setConfigOpen(open);
-    if (!open) setDrawerAction(null);
   }
 
   function handleExportLayoutChange(layout: QrExportLayout) {
@@ -211,9 +236,10 @@ export function QrApp() {
     }
   }
 
-  function executeSingleExport(action: "download" | "copy") {
+  async function handleSingleExportAction(action: QrExportAction) {
     const svg = singleQrSvgRef.current;
-    if (!svg || !singleResult) return;
+    if (!svg || !singleResult || exportLoadingAction) return;
+
     const merchantName = parseEmvCoMerchantName(singleResult.payload);
     const bankName = parseEmvCoBankName(singleResult.payload);
     const renderOptions =
@@ -226,30 +252,25 @@ export function QrApp() {
             exportRatio,
             outerBg
           );
-    if (action === "download") {
-      downloadQrAsPng(
-        svg,
-        formatShortFilename(merchantName),
-        renderOptions,
-        () => {}
-      );
-      toast.success("QR dimuat turun.");
-      handleConfigOpenChange(false);
+
+    setExportLoadingAction(action);
+
+    try {
+      await runQrExportAction(action, svg, renderOptions, merchantName);
       maybeOpenRatingPrompt();
-    } else {
-      copyQrImageToClipboard(svg, renderOptions)
-        .then(() => {
-          toast.success("QR disalin ke papan keratan.");
-          maybeOpenRatingPrompt();
-        })
-        .catch(() => {
-          toast.error("Gagal salin", {
-            description: "Sila gunakan muat turun sebagai alternatif.",
-          });
-        })
-        .finally(() => {
-          handleConfigOpenChange(false);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      if (action === "copy") {
+        toast.error("Gagal salin", {
+          description: "Sila gunakan muat turun sebagai alternatif.",
         });
+      } else if (action === "share") {
+        toast.error("Gagal kongsi", {
+          description: "Sila gunakan muat turun sebagai alternatif.",
+        });
+      }
+    } finally {
+      setExportLoadingAction(null);
     }
   }
 
@@ -745,14 +766,12 @@ export function QrApp() {
               exportLayout={exportLayout}
               alertDismissed={alertDismissed}
               onDismissAlert={dismissAlert}
-              onDownload={() => {
-                setDrawerAction("download");
-                setConfigOpen(true);
-              }}
-              onCopy={() => {
-                setDrawerAction("copy");
-                setConfigOpen(true);
-              }}
+              onDownload={() => handleSingleExportAction("download")}
+              onCopy={() => handleSingleExportAction("copy")}
+              onShare={() => handleSingleExportAction("share")}
+              onConfigOpen={() => setConfigOpen(true)}
+              isLoading={exportLoadingAction !== null}
+              loadingAction={exportLoadingAction}
               svgRefCallback={(el) => {
                 singleQrSvgRef.current = el;
               }}
@@ -817,10 +836,6 @@ export function QrApp() {
                 onOuterBgChange={setOuterBg}
                 exportRatio={exportRatio}
                 onExportRatioChange={setExportRatio}
-                drawerAction={drawerAction}
-                onExecuteExport={() =>
-                  drawerAction && executeSingleExport(drawerAction)
-                }
               />
             </DialogContent>
           </Dialog>
@@ -846,11 +861,6 @@ export function QrApp() {
                   onOuterBgChange={setOuterBg}
                   exportRatio={exportRatio}
                   onExportRatioChange={setExportRatio}
-                  drawerAction={drawerAction}
-                  onExecuteExport={() =>
-                    drawerAction && executeSingleExport(drawerAction)
-                  }
-                  compact
                   showBankNameId="show-bank-name-drawer"
                 />
                 </div>
@@ -882,6 +892,7 @@ export function QrApp() {
           onOpenChange={setRatingOpen}
           title="Bagaimana pengalaman anda?"
           description="Berikan penilaian supaya kami boleh terus memperbaiki Tukar QR."
+          keyboardAware
         >
           <ExportRatingPrompt onClose={() => setRatingOpen(false)} />
         </ResponsiveModal>

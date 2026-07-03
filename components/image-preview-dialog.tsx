@@ -1,6 +1,6 @@
 "use client";
 
-import { XIcon, Loader2 } from "lucide-react";
+import { Cancel01Icon, Icon, LoaderIcon } from "@/components/ui/icon";
 import { Dialog as DialogPrimitive } from "radix-ui";
 
 import {
@@ -59,18 +59,18 @@ export function ImagePreviewDialog({
               className={cn(
                 "data-[state=open]:animate-in data-[state=closed]:animate-out",
                 "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-                "duration-300 image-preview-scale flex cursor-default items-center justify-center w-fit h-fit max-w-[90vw] max-h-[90vh]"
+                "duration-300 image-preview-scale flex cursor-default items-center justify-center w-fit h-fit max-w-[min(75vw,560px)] max-h-[min(75vh,560px)]"
               )}
             >
               {isLoading ? (
                 <div className="flex size-32 items-center justify-center">
-                  <Loader2 className="size-10 animate-spin text-white" />
+                  <LoaderIcon size={40} className="size-10 text-white" />
                 </div>
               ) : src ? (
                 <img
                   src={src}
                   alt={alt}
-                  className="max-h-[90vh] max-w-[90vw] w-auto h-auto object-contain rounded-lg [-webkit-touch-callout:default] [-webkit-user-select:auto] [user-select:auto]"
+                  className="max-h-[min(75vh,560px)] max-w-[min(75vw,560px)] w-auto h-auto object-contain rounded-md [-webkit-touch-callout:default] [-webkit-user-select:auto] [user-select:auto]"
                   loading="eager"
                 />
               ) : null}
@@ -81,7 +81,7 @@ export function ImagePreviewDialog({
             className="absolute right-6 top-6 cursor-pointer rounded-full bg-primary p-2.5 text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none disabled:pointer-events-none [&_svg]:size-5"
             aria-label="Tutup pratonton"
           >
-            <XIcon />
+            <Icon icon={Cancel01Icon} size={20} className="size-5" />
           </DialogPrimitive.Close>
         </DialogPrimitive.Content>
       </DialogPortal>

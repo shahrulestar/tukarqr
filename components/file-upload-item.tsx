@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckIcon, FileImage, FileWarningIcon, X } from "lucide-react";
+import {
+  AlertCircleIcon,
+  Cancel01Icon,
+  CheckmarkCircle01Icon,
+  FileImageIcon,
+  Icon,
+} from "@/components/ui/icon";
 
 import {
   Attachment,
@@ -105,11 +111,11 @@ function AttachmentMediaContent({
       {state === "uploading" || state === "processing" ? (
         <Spinner />
       ) : state === "error" ? (
-        <FileWarningIcon />
+        <Icon icon={AlertCircleIcon} size={16} className="size-4" />
       ) : state === "done" ? (
-        <CheckIcon />
+        <Icon icon={CheckmarkCircle01Icon} size={16} className="size-4" />
       ) : (
-        <FileImage />
+        <Icon icon={FileImageIcon} size={16} className="size-4" />
       )}
     </AttachmentMedia>
   );
@@ -171,7 +177,7 @@ export function FileUploadItem({
                 onRemove();
               }}
             >
-              <X />
+              <Icon icon={Cancel01Icon} size={16} className="size-4" />
             </AttachmentAction>
           </AttachmentActions>
         )}

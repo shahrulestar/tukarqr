@@ -1,6 +1,6 @@
 "use client";
 
-import { GripVertical } from "lucide-react";
+import { DragDropVerticalIcon, Icon } from "@/components/ui/icon";
 import {
   useCallback,
   useEffect,
@@ -125,7 +125,7 @@ export function ComparisonSlider({
                 isDragging && "scale-105"
               )}
             >
-              <GripVertical className="text-white" />
+              <Icon icon={DragDropVerticalIcon} size={20} className="text-white" />
             </div>
           </div>
         </div>

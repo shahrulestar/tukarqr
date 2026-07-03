@@ -1,6 +1,6 @@
 "use client";
 
-import { Star } from "lucide-react";
+import { Icon, StarIcon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 
 interface StarRatingProps {
@@ -38,9 +38,10 @@ export function StarRating({
               isFilled ? "text-primary" : "text-muted-foreground hover:text-primary"
             )}
           >
-            <Star
-              className="size-8"
-              fill={isFilled ? "currentColor" : "none"}
+            <Icon
+              icon={StarIcon}
+              size={32}
+              className={cn("size-8", isFilled && "fill-current")}
             />
           </button>
         );

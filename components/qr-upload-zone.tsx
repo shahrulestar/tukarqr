@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import {
-  ImageIcon,
-  Scan,
-  ChevronDown,
-  ChevronUp,
-  Trash,
-  ClipboardPaste,
-  Loader2,
-} from "lucide-react";
+  ArrowDown01Icon,
+  ArrowUp01Icon,
+  ClipboardPasteIcon,
+  Delete02Icon,
+  Icon,
+  Image01Icon,
+  LoaderIcon,
+  ScanIcon,
+} from "@/components/ui/icon";
 import { toast } from "sonner";
 import {
   Card,
@@ -218,7 +219,7 @@ export function QrUploadZone({
             >
               <>
                 <div className="rounded-full bg-muted/50 p-3">
-                  <ImageIcon className="size-6 text-muted-foreground" />
+                  <Icon icon={Image01Icon} size={24} className="size-6 text-muted-foreground" />
                 </div>
                 <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
                   Letak imej DuitNow QR di sini
@@ -249,9 +250,9 @@ export function QrUploadZone({
                     }}
                   >
                     {isPasting ? (
-                      <Loader2 className="size-4 animate-spin" aria-hidden />
+                      <LoaderIcon size={16} className="size-4" aria-hidden />
                     ) : (
-                      <ClipboardPaste className="size-4" aria-hidden />
+                      <Icon icon={ClipboardPasteIcon} size={16} className="size-4" aria-hidden />
                     )}
                     Tampal imej
                   </Button>
@@ -290,12 +291,12 @@ export function QrUploadZone({
                         {expanded ? (
                           <>
                             Sembunyikan
-                            <ChevronUp className="size-3.5" />
+                            <Icon icon={ArrowUp01Icon} size={14} className="size-3.5" />
                           </>
                         ) : (
                           <>
                             Tunjuk
-                            <ChevronDown className="size-3.5" />
+                            <Icon icon={ArrowDown01Icon} size={14} className="size-3.5" />
                           </>
                         )}
                       </Button>
@@ -309,7 +310,7 @@ export function QrUploadZone({
                       }}
                       aria-label="Buang Semua"
                     >
-                      <Trash className="size-4" />
+                      <Icon icon={Delete02Icon} size={16} className="size-4" />
                     </Button>
                   </div>
                 </div>
@@ -394,7 +395,7 @@ export function QrUploadZone({
               className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50 min-h-[220px]"
             >
               <div className="rounded-full bg-muted/50 p-3">
-                <Scan className="size-6 text-muted-foreground" />
+                <Icon icon={ScanIcon} size={24} className="size-6 text-muted-foreground" />
               </div>
               <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
                 Buka kamera dan imbas DuitNow QR

@@ -261,8 +261,8 @@ export function downloadQrAsPng(
   filename: string,
   options: QrRenderOptions,
   onError?: () => void
-) {
-  renderSvgToPng(svgElement, options)
+): Promise<void> {
+  return renderSvgToPng(svgElement, options)
     .then((dataUrl) => {
       const a = document.createElement("a");
       a.href = dataUrl;
@@ -274,6 +274,7 @@ export function downloadQrAsPng(
     .catch(() => {
       toast.error("Gagal menjana QR. Sila cuba lagi.");
       onError?.();
+      throw new Error("Failed to download QR");
     });
 }
 
