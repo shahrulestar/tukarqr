@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button, actionButtonClassName } from "@/components/ui/button";
 import { StarRating } from "@/components/ui/star-rating";
@@ -29,11 +29,17 @@ function getRatingSubmitErrorMessage(error: unknown): string {
   return "Sila cuba lagi sebentar.";
 }
 
+export type RatingContentPhase = "initial" | "feedback" | "complete";
+
 interface ExportRatingPromptProps {
   onClose: () => void;
+  onContentPhaseChange?: (phase: RatingContentPhase) => void;
 }
 
-export function ExportRatingPrompt({ onClose }: ExportRatingPromptProps) {
+export function ExportRatingPrompt({
+  onClose,
+  onContentPhaseChange,
+}: ExportRatingPromptProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [rating, setRating] = useState<number | null>(() => getSavedRating());
   const [feedback, setFeedback] = useState("");
@@ -46,6 +52,20 @@ export function ExportRatingPrompt({ onClose }: ExportRatingPromptProps) {
     rating !== null && needsRatingFeedback(rating) && !isComplete;
   const canSubmitFeedback =
     awaitingFeedback && isValidRatingFeedback(feedback) && !isSubmitting;
+
+  const contentPhase: RatingContentPhase = isComplete
+    ? "complete"
+    : awaitingFeedback
+      ? "feedback"
+      : "initial";
+
+  useEffect(() => {
+    onContentPhaseChange?.(contentPhase);
+  }, [contentPhase, onContentPhaseChange]);
+
+  useEffect(() => {
+    if (isComplete) textareaRef.current?.blur();
+  }, [isComplete]);
 
   async function handleRatingChange(value: number) {
     if (isComplete) return;
@@ -89,15 +109,6 @@ export function ExportRatingPrompt({ onClose }: ExportRatingPromptProps) {
     }
   }
 
-  function handleTextareaFocus() {
-    requestAnimationFrame(() => {
-      textareaRef.current?.scrollIntoView({
-        block: "nearest",
-        behavior: "smooth",
-      });
-    });
-  }
-
   async function handleShare() {
     try {
       await shareApp();
@@ -135,7 +146,6 @@ export function ExportRatingPrompt({ onClose }: ExportRatingPromptProps) {
                 setShowFeedbackError(false);
               }
             }}
-            onFocus={handleTextareaFocus}
             placeholder="Ceritakan masalah atau cadangan anda..."
             minLength={MIN_RATING_FEEDBACK_LENGTH}
             aria-invalid={showFeedbackError}
