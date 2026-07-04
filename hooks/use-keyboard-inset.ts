@@ -16,28 +16,45 @@ const CLOSED_INSET: KeyboardInset = {
   isKeyboardOpen: false,
 };
 
-function getKeyboardInset(): KeyboardInset {
+let cachedSnapshot: KeyboardInset = CLOSED_INSET;
+let cachedSnapshotKey = "";
+
+function readKeyboardInset(): KeyboardInset {
   if (typeof window === "undefined") return CLOSED_INSET;
 
   const viewport = window.visualViewport;
   if (!viewport) {
-    return {
+    const snapshotKey = `novp:${window.innerHeight}`;
+    if (cachedSnapshotKey === snapshotKey) return cachedSnapshot;
+
+    cachedSnapshotKey = snapshotKey;
+    cachedSnapshot = {
       bottom: 0,
       visibleHeight: window.innerHeight,
       isKeyboardOpen: false,
     };
+    return cachedSnapshot;
   }
 
   const bottom = Math.max(
     0,
     window.innerHeight - viewport.height - viewport.offsetTop
   );
+  const snapshotKey = `${bottom}:${viewport.height}`;
 
-  return {
+  if (cachedSnapshotKey === snapshotKey) return cachedSnapshot;
+
+  cachedSnapshotKey = snapshotKey;
+  cachedSnapshot = {
     bottom,
     visibleHeight: viewport.height,
     isKeyboardOpen: bottom > KEYBOARD_OPEN_THRESHOLD_PX,
   };
+  return cachedSnapshot;
+}
+
+function getKeyboardInset(): KeyboardInset {
+  return readKeyboardInset();
 }
 
 function subscribeToKeyboardInset(onStoreChange: () => void) {
@@ -61,10 +78,10 @@ function getServerSnapshot(): KeyboardInset {
 
 export function useKeyboardInset(enabled: boolean): KeyboardInset {
   const inset = useSyncExternalStore(
-    enabled ? subscribeToKeyboardInset : () => () => {},
-    enabled ? getKeyboardInset : () => CLOSED_INSET,
+    subscribeToKeyboardInset,
+    getKeyboardInset,
     getServerSnapshot
   );
 
-  return inset;
+  return enabled ? inset : CLOSED_INSET;
 }
