@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const KEYBOARD_OPEN_THRESHOLD_PX = 60;
 
@@ -16,49 +16,55 @@ const CLOSED_INSET: KeyboardInset = {
   isKeyboardOpen: false,
 };
 
-export function useKeyboardInset(enabled: boolean): KeyboardInset {
-  const [inset, setInset] = useState<KeyboardInset>(CLOSED_INSET);
+function getKeyboardInset(): KeyboardInset {
+  if (typeof window === "undefined") return CLOSED_INSET;
 
-  useEffect(() => {
-    if (!enabled || typeof window === "undefined") {
-      setInset(CLOSED_INSET);
-      return;
-    }
-
-    const viewport = window.visualViewport;
-    if (!viewport) {
-      setInset({
-        bottom: 0,
-        visibleHeight: window.innerHeight,
-        isKeyboardOpen: false,
-      });
-      return;
-    }
-
-    function update() {
-      const bottom = Math.max(
-        0,
-        window.innerHeight - viewport.height - viewport.offsetTop
-      );
-
-      setInset({
-        bottom,
-        visibleHeight: viewport.height,
-        isKeyboardOpen: bottom > KEYBOARD_OPEN_THRESHOLD_PX,
-      });
-    }
-
-    update();
-    viewport.addEventListener("resize", update);
-    viewport.addEventListener("scroll", update);
-    window.addEventListener("orientationchange", update);
-
-    return () => {
-      viewport.removeEventListener("resize", update);
-      viewport.removeEventListener("scroll", update);
-      window.removeEventListener("orientationchange", update);
+  const viewport = window.visualViewport;
+  if (!viewport) {
+    return {
+      bottom: 0,
+      visibleHeight: window.innerHeight,
+      isKeyboardOpen: false,
     };
-  }, [enabled]);
+  }
+
+  const bottom = Math.max(
+    0,
+    window.innerHeight - viewport.height - viewport.offsetTop
+  );
+
+  return {
+    bottom,
+    visibleHeight: viewport.height,
+    isKeyboardOpen: bottom > KEYBOARD_OPEN_THRESHOLD_PX,
+  };
+}
+
+function subscribeToKeyboardInset(onStoreChange: () => void) {
+  const viewport = window.visualViewport;
+  if (!viewport) return () => {};
+
+  viewport.addEventListener("resize", onStoreChange);
+  viewport.addEventListener("scroll", onStoreChange);
+  window.addEventListener("orientationchange", onStoreChange);
+
+  return () => {
+    viewport.removeEventListener("resize", onStoreChange);
+    viewport.removeEventListener("scroll", onStoreChange);
+    window.removeEventListener("orientationchange", onStoreChange);
+  };
+}
+
+function getServerSnapshot(): KeyboardInset {
+  return CLOSED_INSET;
+}
+
+export function useKeyboardInset(enabled: boolean): KeyboardInset {
+  const inset = useSyncExternalStore(
+    enabled ? subscribeToKeyboardInset : () => () => {},
+    enabled ? getKeyboardInset : () => CLOSED_INSET,
+    getServerSnapshot
+  );
 
   return inset;
 }
