@@ -902,7 +902,6 @@ export function QrApp() {
           description="Berikan penilaian supaya kami boleh terus memperbaiki Tukar QR."
           keyboardAware={ratingContentPhase === "feedback"}
           fitContent={ratingContentPhase !== "feedback"}
-          contentKey={ratingContentPhase}
         >
           <ExportRatingPrompt
             onClose={() => handleRatingOpenChange(false)}

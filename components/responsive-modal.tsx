@@ -27,7 +27,6 @@ interface ResponsiveModalProps {
   className?: string;
   keyboardAware?: boolean;
   fitContent?: boolean;
-  contentKey?: string;
 }
 
 export function ResponsiveModal({
@@ -39,7 +38,6 @@ export function ResponsiveModal({
   className,
   keyboardAware = false,
   fitContent = false,
-  contentKey,
 }: ResponsiveModalProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -73,7 +71,6 @@ export function ResponsiveModal({
         )}
       >
         <div
-          key={contentKey}
           className={cn(
             "mx-auto w-full max-w-sm",
             keyboardAware &&
