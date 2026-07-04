@@ -32,6 +32,7 @@ interface QrResultItemProps {
   svgRefCallback?: (el: SVGSVGElement | null) => void;
   disabled?: boolean;
   onExportSuccess?: () => void;
+  onConfigOpen?: () => void;
 }
 
 export function QrResultItem({
@@ -47,6 +48,7 @@ export function QrResultItem({
   svgRefCallback,
   disabled = false,
   onExportSuccess,
+  onConfigOpen,
 }: QrResultItemProps) {
   const qrSvgRef = useRef<SVGSVGElement>(null);
   const [loadingAction, setLoadingAction] = useState<QrExportAction | null>(
@@ -191,6 +193,7 @@ export function QrResultItem({
               onDownload={() => handleExportAction("download")}
               onCopy={() => handleExportAction("copy")}
               onShare={() => handleExportAction("share")}
+              onConfigOpen={onConfigOpen}
               isLoading={loadingAction !== null}
               loadingAction={loadingAction}
               disabled={disabled}

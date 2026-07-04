@@ -238,6 +238,7 @@ export function QrResultCardSingle({
             onDownload={onDownload}
             onCopy={onCopy}
             onShare={onShare}
+            onConfigOpen={onConfigOpen}
             isLoading={isLoading}
             loadingAction={loadingAction}
             disabled={disabled}

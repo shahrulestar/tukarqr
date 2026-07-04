@@ -1,13 +1,14 @@
 "use client";
 
+import { useState } from "react";
+
 import { Button, actionButtonClassName } from "@/components/ui/button";
 import {
-  Copy01Icon,
   Download01Icon,
   Icon,
-  Share01Icon,
 } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
+import { QrExportActionSheet } from "@/components/qr-export-action-sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import type { QrExportAction } from "@/lib/qr-export-actions";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ interface QrExportActionBarProps {
   onDownload: () => void;
   onCopy: () => void;
   onShare: () => void;
+  onConfigOpen?: () => void;
   isLoading?: boolean;
   loadingAction?: QrExportAction | null;
   disabled?: boolean;
@@ -88,94 +90,69 @@ export function QrExportActionBar({
   onDownload,
   onCopy,
   onShare,
+  onConfigOpen,
   isLoading = false,
   loadingAction = null,
   disabled = false,
   className,
   layout = "compact",
 }: QrExportActionBarProps) {
+  const [sheetOpen, setSheetOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const showShare = !isDesktop;
   const isBusy = disabled || isLoading;
 
-  if (layout === "compact") {
-    return (
-      <div
-        className={cn(
-          "flex w-full shrink-0 gap-2 md:w-auto md:ml-auto",
-          className
-        )}
-      >
-        <IconGhostButton
-          icon={Download01Icon}
-          label="Muat turun"
-          onClick={onDownload}
-          isActive={loadingAction === "download"}
-          disabled={isBusy}
-        />
-        <IconGhostButton
-          icon={Copy01Icon}
-          label="Salin"
-          onClick={onCopy}
-          isActive={loadingAction === "copy"}
-          disabled={isBusy}
-        />
-        {showShare && (
-          <IconGhostButton
-            icon={Share01Icon}
-            label="Kongsi"
-            onClick={onShare}
-            isActive={loadingAction === "share"}
-            disabled={isBusy}
-          />
-        )}
-      </div>
-    );
+  function openSheet() {
+    if (!isBusy) setSheetOpen(true);
   }
 
-  if (showShare) {
+  const actionSheet = (
+    <QrExportActionSheet
+      open={sheetOpen}
+      onOpenChange={setSheetOpen}
+      onDownload={onDownload}
+      onCopy={onCopy}
+      onShare={onShare}
+      onConfigOpen={onConfigOpen}
+      disabled={disabled}
+      showShare={showShare}
+    />
+  );
+
+  if (layout === "compact") {
     return (
-      <div className={cn("flex w-full min-w-0 flex-col gap-2", className)}>
-        <LabelButton
-          label="Muat turun"
-          onClick={onDownload}
-          isActive={loadingAction === "download"}
-          disabled={isBusy}
-          variant="default"
-        />
-        <div className="grid grid-cols-2 gap-2">
-          <LabelButton
-            label="Salin"
-            onClick={onCopy}
-            isActive={loadingAction === "copy"}
-            disabled={isBusy}
-          />
-          <LabelButton
-            label="Kongsi"
-            onClick={onShare}
-            isActive={loadingAction === "share"}
+      <>
+        <div
+          className={cn(
+            "flex w-full shrink-0 md:w-auto md:ml-auto",
+            className
+          )}
+        >
+          <IconGhostButton
+            icon={Download01Icon}
+            label="Muat turun"
+            onClick={openSheet}
+            isActive={false}
             disabled={isBusy}
           />
         </div>
-      </div>
+        {actionSheet}
+      </>
     );
   }
 
   return (
-    <div className={cn("grid w-full min-w-0 grid-cols-2 gap-2", className)}>
-      <LabelButton
-        label="Muat turun"
-        onClick={onDownload}
-        isActive={loadingAction === "download"}
-        disabled={isBusy}
-        variant="default"
-      />
-      <LabelButton
-        label="Salin"
-        onClick={onCopy}
-        isActive={loadingAction === "copy"}
-        disabled={isBusy}
-      />
-    </div>
+    <>
+      <div className={cn("w-full min-w-0", className)}>
+        <LabelButton
+          label="Muat turun"
+          onClick={openSheet}
+          isActive={false}
+          disabled={isBusy}
+          variant="default"
+        />
+      </div>
+      {actionSheet}
+    </>
   );
 }

@@ -144,6 +144,7 @@ export function QrResultList({
                 }}
                 disabled={disabled}
                 onExportSuccess={onExportSuccess}
+                onConfigOpen={onConfigOpen}
               />
             ))}
           </div>
