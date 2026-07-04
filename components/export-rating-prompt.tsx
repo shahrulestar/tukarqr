@@ -47,15 +47,15 @@ export function ExportRatingPrompt({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(() => hasSubmittedRating());
 
-  const isComplete = submitted;
-  const awaitingFeedback =
-    rating !== null && needsRatingFeedback(rating) && !isComplete;
+  const showFeedbackForm =
+    rating !== null && needsRatingFeedback(rating) && !submitted;
+  const showShareStep = submitted;
   const canSubmitFeedback =
-    awaitingFeedback && isValidRatingFeedback(feedback) && !isSubmitting;
+    showFeedbackForm && isValidRatingFeedback(feedback) && !isSubmitting;
 
-  const contentPhase: RatingContentPhase = isComplete
+  const contentPhase: RatingContentPhase = showShareStep
     ? "complete"
-    : awaitingFeedback
+    : showFeedbackForm
       ? "feedback"
       : "initial";
 
@@ -64,31 +64,33 @@ export function ExportRatingPrompt({
   }, [contentPhase, onContentPhaseChange]);
 
   useEffect(() => {
-    if (isComplete) textareaRef.current?.blur();
-  }, [isComplete]);
+    if (showShareStep) textareaRef.current?.blur();
+  }, [showShareStep]);
 
   async function handleRatingChange(value: number) {
-    if (isComplete) return;
+    if (submitted) return;
 
     setRating(value);
     setShowFeedbackError(false);
+    setFeedback("");
 
-    if (!needsRatingFeedback(value)) {
-      try {
-        await submitRatingToDiscord(value);
-        saveRating(value);
-        setSubmitted(true);
-      } catch (error) {
-        setRating(null);
-        toast.error("Gagal menghantar penilaian", {
-          description: getRatingSubmitErrorMessage(error),
-        });
-      }
+    if (needsRatingFeedback(value)) return;
+
+    setSubmitted(true);
+    try {
+      await submitRatingToDiscord(value);
+      saveRating(value);
+    } catch (error) {
+      setSubmitted(false);
+      setRating(null);
+      toast.error("Gagal menghantar penilaian", {
+        description: getRatingSubmitErrorMessage(error),
+      });
     }
   }
 
   async function handleFeedbackSubmit() {
-    if (!rating || !awaitingFeedback || isSubmitting) return;
+    if (!rating || !showFeedbackForm || isSubmitting) return;
 
     if (!isValidRatingFeedback(feedback)) {
       setShowFeedbackError(true);
@@ -124,11 +126,11 @@ export function ExportRatingPrompt({
       <StarRating
         value={rating}
         onChange={handleRatingChange}
-        disabled={isComplete}
+        disabled={submitted}
         aria-label="Berikan penilaian anda"
       />
 
-      {awaitingFeedback && (
+      {showFeedbackForm && (
         <div className="flex flex-col gap-2">
           <label
             htmlFor="rating-feedback"
@@ -142,7 +144,10 @@ export function ExportRatingPrompt({
             value={feedback}
             onChange={(event) => {
               setFeedback(event.target.value);
-              if (showFeedbackError && isValidRatingFeedback(event.target.value)) {
+              if (
+                showFeedbackError &&
+                isValidRatingFeedback(event.target.value)
+              ) {
                 setShowFeedbackError(false);
               }
             }}
@@ -177,23 +182,22 @@ export function ExportRatingPrompt({
         </div>
       )}
 
-      {isComplete && (
-        <p className="text-center text-[13px] text-muted-foreground">
-          Terima kasih atas maklum balas anda!
-        </p>
-      )}
-
-      {isComplete && (
-        <Button
-          size="lg"
-          onClick={handleShare}
-          className={cn(
-            actionButtonClassName,
-            "focus:outline-none focus-visible:outline-none focus-visible:ring-0"
-          )}
-        >
-          Kongsi dengan rakan
-        </Button>
+      {showShareStep && (
+        <>
+          <p className="text-center text-[13px] text-muted-foreground">
+            Terima kasih atas maklum balas anda!
+          </p>
+          <Button
+            size="lg"
+            onClick={handleShare}
+            className={cn(
+              actionButtonClassName,
+              "focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+            )}
+          >
+            Kongsi dengan rakan
+          </Button>
+        </>
       )}
     </div>
   );
