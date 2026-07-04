@@ -29,7 +29,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HowToStart } from "@/components/onboarding/how-to-start";
 import { PrivacyPolicy } from "@/components/onboarding/privacy-policy";
-import { ExportRatingPrompt } from "@/components/export-rating-prompt";
+import { ExportRatingPrompt, type RatingContentPhase } from "@/components/export-rating-prompt";
 import { hasSubmittedRating } from "@/lib/export-rating";
 import {
   QrUploadZone,
@@ -148,6 +148,8 @@ export function QrApp() {
   const [howToStartOpen, setHowToStartOpen] = useState(false);
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
   const [ratingOpen, setRatingOpen] = useState(false);
+  const [ratingContentPhase, setRatingContentPhase] =
+    useState<RatingContentPhase>("initial");
   const [qrStyle, setQrStyle] = useState<"classic" | "rounded">("classic");
   const [showBankName, setShowBankName] = useState(true);
   const [outerBg, setOuterBg] = useState<"white" | "transparent">("white");
@@ -232,8 +234,14 @@ export function QrApp() {
 
   function maybeOpenRatingPrompt() {
     if (!hasSubmittedRating()) {
+      setRatingContentPhase("initial");
       setRatingOpen(true);
     }
+  }
+
+  function handleRatingOpenChange(open: boolean) {
+    setRatingOpen(open);
+    if (!open) setRatingContentPhase("initial");
   }
 
   async function handleSingleExportAction(action: QrExportAction) {
@@ -889,12 +897,17 @@ export function QrApp() {
 
         <ResponsiveModal
           open={ratingOpen}
-          onOpenChange={setRatingOpen}
+          onOpenChange={handleRatingOpenChange}
           title="Bagaimana pengalaman anda?"
           description="Berikan penilaian supaya kami boleh terus memperbaiki Tukar QR."
-          keyboardAware
+          keyboardAware={ratingContentPhase === "feedback"}
+          fitContent={ratingContentPhase !== "feedback"}
+          contentKey={ratingContentPhase}
         >
-          <ExportRatingPrompt onClose={() => setRatingOpen(false)} />
+          <ExportRatingPrompt
+            onClose={() => handleRatingOpenChange(false)}
+            onContentPhaseChange={setRatingContentPhase}
+          />
         </ResponsiveModal>
 
         {isHomeRoute && results.length === 0 && (

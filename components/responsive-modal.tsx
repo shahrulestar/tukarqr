@@ -26,6 +26,8 @@ interface ResponsiveModalProps {
   children: React.ReactNode;
   className?: string;
   keyboardAware?: boolean;
+  fitContent?: boolean;
+  contentKey?: string;
 }
 
 export function ResponsiveModal({
@@ -36,6 +38,8 @@ export function ResponsiveModal({
   children,
   className,
   keyboardAware = false,
+  fitContent = false,
+  contentKey,
 }: ResponsiveModalProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -59,16 +63,21 @@ export function ResponsiveModal({
     <Drawer
       open={open}
       onOpenChange={onOpenChange}
-      repositionInputs={keyboardAware}
+      repositionInputs={false}
       fixed={keyboardAware}
     >
       <DrawerContent
-        className={cn(keyboardAware && "max-h-[90dvh]")}
+        className={cn(
+          fitContent && "h-auto !max-h-none",
+          keyboardAware && "max-h-[85dvh]"
+        )}
       >
         <div
+          key={contentKey}
           className={cn(
             "mx-auto w-full max-w-sm",
-            keyboardAware && "overflow-y-auto overscroll-contain"
+            keyboardAware &&
+              "max-h-[calc(85dvh-5rem)] overflow-y-auto overscroll-contain"
           )}
         >
           <DrawerHeader>
