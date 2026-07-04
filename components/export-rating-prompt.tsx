@@ -158,6 +158,14 @@ export function ExportRatingPrompt({
               showFeedbackError ? "rating-feedback-error" : undefined
             }
             disabled={isSubmitting}
+            onFocus={() => {
+              requestAnimationFrame(() => {
+                textareaRef.current?.scrollIntoView({
+                  block: "nearest",
+                  inline: "nearest",
+                });
+              });
+            }}
           />
           {showFeedbackError && (
             <p

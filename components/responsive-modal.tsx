@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { useKeyboardInset } from "@/hooks/use-keyboard-inset";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ export function ResponsiveModal({
   fitContent = false,
 }: ResponsiveModalProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const keyboardInset = useKeyboardInset(keyboardAware && open);
 
   if (isDesktop) {
     return (
@@ -58,24 +60,35 @@ export function ResponsiveModal({
   }
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={onOpenChange}
-      repositionInputs={false}
-      fixed={keyboardAware}
-    >
+    <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <DrawerContent
         className={cn(
           fitContent && "h-auto !max-h-none",
-          keyboardAware && "max-h-[85dvh]"
+          keyboardAware &&
+            "h-auto !max-h-none transition-[bottom,max-height] duration-150 ease-out"
         )}
+        style={
+          keyboardInset.isKeyboardOpen
+            ? {
+                bottom: keyboardInset.bottom,
+                maxHeight: Math.max(240, keyboardInset.visibleHeight - 12),
+              }
+            : undefined
+        }
       >
         <div
           className={cn(
             "mx-auto w-full max-w-sm",
-            keyboardAware &&
-              "max-h-[calc(85dvh-5rem)] overflow-y-auto overscroll-contain"
+            keyboardInset.isKeyboardOpen &&
+              "overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]"
           )}
+          style={
+            keyboardInset.isKeyboardOpen
+              ? {
+                  maxHeight: Math.max(200, keyboardInset.visibleHeight - 96),
+                }
+              : undefined
+          }
         >
           <DrawerHeader>
             <DrawerTitle>{title}</DrawerTitle>
