@@ -168,6 +168,8 @@ export function QrApp() {
   const processingRef = useRef(false);
   const successBaselineRef = useRef(0);
   const skipSettingsSaveRef = useRef(true);
+  const prevPathnameRef = useRef(pathname);
+  const skipDownloadNavRef = useRef(false);
 
   useEffect(() => {
     setQrFgColor(getPrimaryColor());
@@ -721,6 +723,19 @@ export function QrApp() {
   );
 
   useEffect(() => {
+    const prevPathname = prevPathnameRef.current;
+    prevPathnameRef.current = pathname;
+    if (prevPathname === "/download" && pathname === "/" && results.length > 0) {
+      skipDownloadNavRef.current = true;
+      handleReset();
+    }
+  }, [pathname, results.length]);
+
+  useEffect(() => {
+    if (skipDownloadNavRef.current) {
+      skipDownloadNavRef.current = false;
+      return;
+    }
     if (
       isHomeRoute &&
       isProcessingComplete &&

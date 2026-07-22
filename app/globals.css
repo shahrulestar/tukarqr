@@ -134,7 +134,7 @@
   }
 }
 
-/* Sonner toast theme - matches globals.css colors */
+/* Sonner toast theme - neutral default for all toast types */
 [data-sonner-toaster] {
   --normal-bg: var(--popover);
   --normal-text: var(--popover-foreground);
@@ -142,46 +142,10 @@
   --border-radius: var(--radius);
 }
 
-[data-sonner-toaster][data-sonner-theme="light"] {
-  --normal-bg: var(--popover);
-  --normal-border: var(--border);
-  --normal-text: var(--popover-foreground);
-  --success-bg: oklch(0.97 0.02 350);
-  --success-border: oklch(0.92 0.06 350);
-  --success-text: var(--primary);
-  --error-bg: oklch(0.97 0.02 27);
-  --error-border: oklch(0.92 0.06 27);
-  --error-text: var(--destructive);
-  --info-bg: oklch(0.97 0.01 250);
-  --info-border: oklch(0.92 0.03 250);
-  --info-text: oklch(0.45 0.15 250);
-  --warning-bg: oklch(0.97 0.02 85);
-  --warning-border: oklch(0.92 0.06 85);
-  --warning-text: oklch(0.55 0.15 85);
-}
-
 /* Image preview dialog - smooth scale in/out */
 .image-preview-scale {
   animation-duration: 300ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-sonner-toaster][data-sonner-theme="dark"] {
-  --normal-bg: var(--popover);
-  --normal-border: var(--border);
-  --normal-text: var(--popover-foreground);
-  --success-bg: oklch(0.2 0.04 350);
-  --success-border: oklch(0.3 0.06 350);
-  --success-text: var(--primary);
-  --error-bg: oklch(0.2 0.04 27);
-  --error-border: oklch(0.3 0.06 27);
-  --error-text: var(--destructive);
-  --info-bg: oklch(0.2 0.03 250);
-  --info-border: oklch(0.3 0.05 250);
-  --info-text: oklch(0.7 0.12 250);
-  --warning-bg: oklch(0.2 0.04 85);
-  --warning-border: oklch(0.3 0.06 85);
-  --warning-text: oklch(0.75 0.12 85);
 }
 
 /* GPU compositing layer - promotes element to own layer for smoother mobile scroll */
