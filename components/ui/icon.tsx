@@ -10,7 +10,7 @@ import {
   ClipboardPasteIcon,
   Copy01Icon,
   Delete02Icon,
-  Download01Icon,
+  DownloadCircle01Icon,
   DragDropVerticalIcon,
   FileImageIcon,
   Image01Icon,
@@ -23,6 +23,7 @@ import {
   Share01Icon,
   Shield01Icon,
   StarIcon,
+  Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import type { ComponentProps } from "react";
 
@@ -81,7 +82,7 @@ export {
   ClipboardPasteIcon,
   Copy01Icon,
   Delete02Icon,
-  Download01Icon,
+  DownloadCircle01Icon,
   DragDropVerticalIcon,
   FileImageIcon,
   Image01Icon,
@@ -94,4 +95,5 @@ export {
   Share01Icon,
   Shield01Icon,
   StarIcon,
+  Tick02Icon,
 };

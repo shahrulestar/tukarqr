@@ -13,7 +13,7 @@ export default function NotFound() {
         href="/"
         className="mt-6 inline-flex items-center justify-center rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
       >
-        Kembali ke Tukar QR
+        Kembali Ke Tukar QR
       </Link>
     </main>
   );

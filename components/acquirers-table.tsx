@@ -65,12 +65,12 @@ export function AcquirersTable({ acquirers }: AcquirersTableProps) {
           >
             {expanded ? (
               <>
-                Tunjuk kurang
+                Tunjuk Kurang
                 <Icon icon={ArrowUp01Icon} size={16} className="size-4" />
               </>
             ) : (
               <>
-                Tunjuk semua ({acquirers.length})
+                Tunjuk Semua ({acquirers.length})
                 <Icon icon={ArrowDown01Icon} size={16} className="size-4" />
               </>
             )}

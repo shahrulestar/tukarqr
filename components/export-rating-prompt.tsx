@@ -127,7 +127,7 @@ export function ExportRatingPrompt({
         value={rating}
         onChange={handleRatingChange}
         disabled={submitted}
-        aria-label="Berikan penilaian anda"
+        aria-label="Berikan Penilaian Anda"
       />
 
       {showFeedbackForm && (
@@ -185,7 +185,7 @@ export function ExportRatingPrompt({
               "focus:outline-none focus-visible:outline-none focus-visible:ring-0"
             )}
           >
-            {isSubmitting ? "Menghantar..." : "Hantar maklum balas"}
+            {isSubmitting ? "Menghantar..." : "Hantar Maklum Balas"}
           </Button>
         </div>
       )}
@@ -203,7 +203,7 @@ export function ExportRatingPrompt({
               "focus:outline-none focus-visible:outline-none focus-visible:ring-0"
             )}
           >
-            Kongsi dengan rakan
+            Kongsi Dengan Rakan
           </Button>
         </>
       )}

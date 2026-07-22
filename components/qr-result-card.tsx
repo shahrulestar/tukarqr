@@ -33,6 +33,10 @@ interface QrResultListProps {
   alertDismissed: boolean;
   onDismissAlert: () => void;
   onConfigOpen: () => void;
+  onRequestExport?: (target: string) => void;
+  exportSheetTarget?: string | "single" | null;
+  exportSheetOpen?: boolean;
+  onExportSheetOpenChange?: (open: boolean) => void;
   disabled?: boolean;
   onExportSuccess?: () => void;
 }
@@ -49,6 +53,10 @@ export function QrResultList({
   alertDismissed,
   onDismissAlert,
   onConfigOpen,
+  onRequestExport,
+  exportSheetTarget = null,
+  exportSheetOpen = false,
+  onExportSheetOpenChange,
   disabled = false,
   onExportSuccess,
 }: QrResultListProps) {
@@ -97,7 +105,7 @@ export function QrResultList({
               variant="ghost"
               size="icon-sm"
               onClick={onConfigOpen}
-              aria-label="Tetapkan reka bentuk QR"
+              aria-label="Tetapkan Reka Bentuk QR"
             >
               <Icon icon={Settings01Icon} size={16} className="size-4" />
             </Button>
@@ -112,8 +120,8 @@ export function QrResultList({
               <button
                 type="button"
                 onClick={onDismissAlert}
-                aria-label="Sembunyikan peringatan"
-                className="absolute right-2 top-2 rounded p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
+                aria-label="Sembunyikan Peringatan"
+                className="absolute right-2 top-2 rounded-sm p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
               >
                 <Icon icon={Cancel01Icon} size={16} className="size-4" />
               </button>
@@ -145,6 +153,15 @@ export function QrResultList({
                 disabled={disabled}
                 onExportSuccess={onExportSuccess}
                 onConfigOpen={onConfigOpen}
+                onRequestExport={
+                  onRequestExport
+                    ? () => onRequestExport(item.id)
+                    : undefined
+                }
+                exportSheetOpen={
+                  exportSheetTarget === item.id && exportSheetOpen
+                }
+                onExportSheetOpenChange={onExportSheetOpenChange}
               />
             ))}
           </div>
@@ -156,7 +173,7 @@ export function QrResultList({
               onClick={handleDownloadAll}
               disabled={disabled}
             >
-              Muat turun ({results.length})
+              Muat Turun ({results.length})
             </Button>
           )}
         </CardContent>

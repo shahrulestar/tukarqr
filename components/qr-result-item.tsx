@@ -33,6 +33,9 @@ interface QrResultItemProps {
   disabled?: boolean;
   onExportSuccess?: () => void;
   onConfigOpen?: () => void;
+  onRequestExport?: () => void;
+  exportSheetOpen?: boolean;
+  onExportSheetOpenChange?: (open: boolean) => void;
 }
 
 export function QrResultItem({
@@ -49,6 +52,9 @@ export function QrResultItem({
   disabled = false,
   onExportSuccess,
   onConfigOpen,
+  onRequestExport,
+  exportSheetOpen,
+  onExportSheetOpenChange,
 }: QrResultItemProps) {
   const qrSvgRef = useRef<SVGSVGElement>(null);
   const [loadingAction, setLoadingAction] = useState<QrExportAction | null>(
@@ -150,16 +156,16 @@ export function QrResultItem({
         onClick={handlePreviewClick}
         onKeyDown={handlePreviewKeyDown}
         className={cn(
-          "flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3 cursor-pointer min-h-[120px] md:min-h-0",
+          "flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3 cursor-pointer",
           disabled && "cursor-not-allowed opacity-70"
         )}
         aria-label={`Pratonton QR - ${displayName}`}
       >
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex flex-row items-center gap-3">
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <div
               className={cn(
-                "flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-white p-1",
+                "flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xs border border-border bg-white p-1",
                 disabled && "opacity-50"
               )}
             >
@@ -188,12 +194,15 @@ export function QrResultItem({
               )}
             </div>
           </div>
-          <div onClick={(e) => e.stopPropagation()}>
+          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
             <QrExportActionBar
               onDownload={() => handleExportAction("download")}
               onCopy={() => handleExportAction("copy")}
               onShare={() => handleExportAction("share")}
               onConfigOpen={onConfigOpen}
+              onRequestExport={onRequestExport}
+              sheetOpen={exportSheetOpen}
+              onSheetOpenChange={onExportSheetOpenChange}
               isLoading={loadingAction !== null}
               loadingAction={loadingAction}
               disabled={disabled}

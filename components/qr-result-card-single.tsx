@@ -41,6 +41,9 @@ interface QrResultCardSingleProps {
   onCopy: () => void;
   onShare: () => void;
   onConfigOpen: () => void;
+  onRequestExport?: () => void;
+  exportSheetOpen?: boolean;
+  onExportSheetOpenChange?: (open: boolean) => void;
   isLoading?: boolean;
   loadingAction?: QrExportAction | null;
   svgRefCallback?: (el: SVGSVGElement | null) => void;
@@ -62,6 +65,9 @@ export function QrResultCardSingle({
   onCopy,
   onShare,
   onConfigOpen,
+  onRequestExport,
+  exportSheetOpen,
+  onExportSheetOpenChange,
   isLoading = false,
   loadingAction = null,
   svgRefCallback,
@@ -135,7 +141,7 @@ export function QrResultCardSingle({
               size="icon-sm"
               onClick={onConfigOpen}
               disabled={disabled || isLoading}
-              aria-label="Tetapan eksport"
+              aria-label="Tetapan Eksport"
             >
               <Icon icon={Settings01Icon} size={16} className="size-4" />
             </Button>
@@ -150,8 +156,8 @@ export function QrResultCardSingle({
               <button
                 type="button"
                 onClick={onDismissAlert}
-                aria-label="Sembunyikan peringatan"
-                className="absolute right-2 top-2 rounded p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
+                aria-label="Sembunyikan Peringatan"
+                className="absolute right-2 top-2 rounded-sm p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
               >
                 <Icon icon={Cancel01Icon} size={16} className="size-4" />
               </button>
@@ -229,7 +235,7 @@ export function QrResultCardSingle({
               </p>
             )}
             <span className="block w-full text-center text-balance text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
-              Muat turun, salin, atau tekan & tahan QR di atas untuk simpan
+              Simpan, kongsi, atau tekan & tahan QR di atas untuk simpan
             </span>
           </div>
 
@@ -239,6 +245,9 @@ export function QrResultCardSingle({
             onCopy={onCopy}
             onShare={onShare}
             onConfigOpen={onConfigOpen}
+            onRequestExport={onRequestExport}
+            sheetOpen={exportSheetOpen}
+            onSheetOpenChange={onExportSheetOpenChange}
             isLoading={isLoading}
             loadingAction={loadingAction}
             disabled={disabled}

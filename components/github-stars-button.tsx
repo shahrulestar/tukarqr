@@ -34,7 +34,7 @@ export async function GithubStarsButton() {
         rel="noopener noreferrer"
       >
         <Icon icon={StarIcon} size={16} className="size-4" />
-        stars
+        Stars
         {starCount !== null ? (
           <span className="font-semibold tabular-nums">{starCount}</span>
         ) : null}

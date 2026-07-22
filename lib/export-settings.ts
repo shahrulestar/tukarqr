@@ -46,3 +46,16 @@ export function saveExportSettings(settings: ExportSettings): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 }
+
+const SKIP_PROMPT_KEY = "tukarqr-skip-export-settings-prompt";
+
+export function loadSkipExportSettingsPrompt(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem(SKIP_PROMPT_KEY) === "true";
+}
+
+export function saveSkipExportSettingsPrompt(skip: boolean): void {
+  if (typeof window === "undefined") return;
+  if (skip) localStorage.setItem(SKIP_PROMPT_KEY, "true");
+  else localStorage.removeItem(SKIP_PROMPT_KEY);
+}

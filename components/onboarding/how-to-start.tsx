@@ -2,7 +2,7 @@
 
 import { Button, actionButtonClassName } from "@/components/ui/button";
 import {
-  Download01Icon,
+  DownloadCircle01Icon,
   Icon,
   Image01Icon,
   ScanIcon,
@@ -32,7 +32,7 @@ const steps: {
       "Sistem akan dekod dan sahkan bahawa ia ialah DuitNow QR pembayaran Malaysia.",
   },
   {
-    icon: Download01Icon,
+    icon: DownloadCircle01Icon,
     title: "Muat turun atau salin",
     description: "Muat turun imej QR yang jelas atau salin ke papan keratan.",
   },

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "next-themes";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { ThemeKeyboardShortcut } from "@/components/theme-keyboard-shortcut";
@@ -7,20 +8,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { SITE_URL, DEFAULT_OG_IMAGE, SITE_ICONS } from "@/lib/site-config";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -136,7 +123,7 @@ export default function RootLayout({
     <html
       lang="ms"
       suppressHydrationWarning
-      className={cn(geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
+      className={cn(GeistSans.variable, GeistMono.variable, "font-sans")}
     >
       <head>
         <link rel="preload" href={SITE_ICONS.favicon} as="image" />
@@ -144,7 +131,7 @@ export default function RootLayout({
         <link rel="preload" href={SITE_ICONS.appleTouch} as="image" />
       </head>
       <body
-        className={`antialiased ${geistSans.className}`}
+        className={`antialiased ${GeistSans.className}`}
         suppressHydrationWarning
       >
         <GoogleAnalytics />

@@ -7,7 +7,6 @@ import {
   useState,
   startTransition,
 } from "react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -15,6 +14,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -22,9 +22,12 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
+  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import { Button, actionButtonClassName } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HowToStart } from "@/components/onboarding/how-to-start";
@@ -63,7 +66,10 @@ import {
 import {
   loadExportSettings,
   saveExportSettings,
+  loadSkipExportSettingsPrompt,
+  saveSkipExportSettingsPrompt,
 } from "@/lib/export-settings";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   runQrExportAction,
   type QrExportAction,
@@ -144,6 +150,12 @@ export function QrApp() {
   >([]);
   const [qrFgColor, setQrFgColor] = useState("#000000");
   const [configOpen, setConfigOpen] = useState(false);
+  const [configMode, setConfigMode] = useState<"manual" | "export">("manual");
+  const [skipExportPromptChecked, setSkipExportPromptChecked] = useState(false);
+  const [exportSheetOpen, setExportSheetOpen] = useState(false);
+  const [exportSheetTarget, setExportSheetTarget] = useState<
+    "single" | string | null
+  >(null);
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [howToStartOpen, setHowToStartOpen] = useState(false);
   const [privacyPolicyOpen, setPrivacyPolicyOpen] = useState(false);
@@ -222,8 +234,41 @@ export function QrApp() {
     }
   }
 
+  function openManualConfig() {
+    setConfigMode("manual");
+    setConfigOpen(true);
+  }
+
+  function openExportConfig(target: "single" | string) {
+    setExportSheetTarget(target);
+    if (loadSkipExportSettingsPrompt()) {
+      setExportSheetOpen(true);
+      return;
+    }
+    setConfigMode("export");
+    setSkipExportPromptChecked(false);
+    setConfigOpen(true);
+  }
+
   function handleConfigOpenChange(open: boolean) {
     setConfigOpen(open);
+    if (!open) {
+      setConfigMode("manual");
+      setSkipExportPromptChecked(false);
+    }
+  }
+
+  function handleConfigNext() {
+    if (skipExportPromptChecked) saveSkipExportSettingsPrompt(true);
+    setConfigOpen(false);
+    setConfigMode("manual");
+    setSkipExportPromptChecked(false);
+    setExportSheetOpen(true);
+  }
+
+  function handleExportSheetOpenChange(open: boolean) {
+    setExportSheetOpen(open);
+    if (!open) setExportSheetTarget(null);
   }
 
   function handleExportLayoutChange(layout: QrExportLayout) {
@@ -792,7 +837,12 @@ export function QrApp() {
               onDownload={() => handleSingleExportAction("download")}
               onCopy={() => handleSingleExportAction("copy")}
               onShare={() => handleSingleExportAction("share")}
-              onConfigOpen={() => setConfigOpen(true)}
+              onConfigOpen={openManualConfig}
+              onRequestExport={() => openExportConfig("single")}
+              exportSheetOpen={
+                exportSheetTarget === "single" && exportSheetOpen
+              }
+              onExportSheetOpenChange={handleExportSheetOpenChange}
               isLoading={exportLoadingAction !== null}
               loadingAction={exportLoadingAction}
               svgRefCallback={(el) => {
@@ -814,7 +864,11 @@ export function QrApp() {
               exportLayout={exportLayout}
               alertDismissed={alertDismissed}
               onDismissAlert={dismissAlert}
-              onConfigOpen={() => setConfigOpen(true)}
+              onConfigOpen={openManualConfig}
+              onRequestExport={openExportConfig}
+              exportSheetTarget={exportSheetTarget}
+              exportSheetOpen={exportSheetOpen}
+              onExportSheetOpenChange={handleExportSheetOpenChange}
               disabled={isDecoding}
               onExportSuccess={maybeOpenRatingPrompt}
             />
@@ -860,6 +914,33 @@ export function QrApp() {
                 exportRatio={exportRatio}
                 onExportRatioChange={setExportRatio}
               />
+              {configMode === "export" && (
+                <DialogFooter className="flex-col gap-3 sm:flex-col">
+                  <label
+                    htmlFor="skip-export-settings-dialog"
+                    className="flex w-full cursor-pointer items-center gap-2 text-sm text-foreground"
+                  >
+                    <Checkbox
+                      id="skip-export-settings-dialog"
+                      checked={skipExportPromptChecked}
+                      onCheckedChange={(checked) =>
+                        setSkipExportPromptChecked(checked === true)
+                      }
+                    />
+                    Jangan tunjuk lagi
+                  </label>
+                  <Button
+                    size="lg"
+                    onClick={handleConfigNext}
+                    className={cn(
+                      actionButtonClassName,
+                      "w-full focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                    )}
+                  >
+                    Seterusnya
+                  </Button>
+                </DialogFooter>
+              )}
             </DialogContent>
           </Dialog>
         ) : (
@@ -887,6 +968,33 @@ export function QrApp() {
                   showBankNameId="show-bank-name-drawer"
                 />
                 </div>
+                {configMode === "export" && (
+                  <DrawerFooter>
+                    <label
+                      htmlFor="skip-export-settings-drawer"
+                      className="flex w-full cursor-pointer items-center gap-2 text-sm text-foreground"
+                    >
+                      <Checkbox
+                        id="skip-export-settings-drawer"
+                        checked={skipExportPromptChecked}
+                        onCheckedChange={(checked) =>
+                          setSkipExportPromptChecked(checked === true)
+                        }
+                      />
+                      Jangan tunjuk lagi
+                    </label>
+                    <Button
+                      size="lg"
+                      onClick={handleConfigNext}
+                      className={cn(
+                        actionButtonClassName,
+                        "w-full focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                      )}
+                    >
+                      Seterusnya
+                    </Button>
+                  </DrawerFooter>
+                )}
               </div>
             </DrawerContent>
           </Drawer>
@@ -923,33 +1031,6 @@ export function QrApp() {
             onContentPhaseChange={setRatingContentPhase}
           />
         </ResponsiveModal>
-
-        {isHomeRoute && results.length === 0 && (
-          <footer className="mt-auto shrink-0 pt-6 text-center text-[13px] text-muted-foreground">
-            <nav className="flex items-center justify-center gap-6">
-              <Link
-                href="/about"
-                className="hover:text-foreground transition-colors underline-offset-4 hover:underline"
-              >
-                Tentang
-              </Link>
-              <Link
-                href="/list"
-                className="hover:text-foreground transition-colors underline-offset-4 hover:underline"
-              >
-                Senarai bank
-              </Link>
-              <a
-                href="https://bilauitmcuti.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground transition-colors underline-offset-4 hover:underline"
-              >
-                Bila UiTM Cuti
-              </a>
-            </nav>
-          </footer>
-        )}
 
       </div>
     </main>

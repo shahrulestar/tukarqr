@@ -256,7 +256,7 @@ export function QrUploadZone({
               <>
                 {successItems.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    <p className="text-[11px] font-medium text-foreground uppercase tracking-wider">
                       Selesai ({successItems.length})
                     </p>
                     {successItems.map((item) => (
@@ -278,8 +278,8 @@ export function QrUploadZone({
                 )}
                 {failedItems.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                      Ralat ({failedItems.length})
+                    <p className="text-[11px] font-medium text-foreground uppercase tracking-wider">
+                      Gagal ({failedItems.length})
                     </p>
                     {failedItems.map((item) => (
                       <FileUploadItem
@@ -319,7 +319,7 @@ export function QrUploadZone({
       <CardContent>
         <Tabs value={activeTab} onValueChange={onTabChange}>
           <TabsList className="w-full sm:w-fit lg:hidden">
-            <TabsTrigger value="upload">Muat naik</TabsTrigger>
+            <TabsTrigger value="upload">Muat Naik</TabsTrigger>
             <TabsTrigger value="camera">Kamera</TabsTrigger>
           </TabsList>
 
@@ -345,7 +345,7 @@ export function QrUploadZone({
                   <Icon icon={Image01Icon} size={24} className="size-6 text-muted-foreground" />
                 </div>
                 <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
-                  Letak imej DuitNow QR di sini
+                  Muat naik imej DuitNow QR di sini
                 </p>
                 <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center flex flex-wrap items-center justify-center gap-1">
                   {isLargeDesktop ? (
@@ -377,7 +377,7 @@ export function QrUploadZone({
                     ) : (
                       <Icon icon={ClipboardPasteIcon} size={16} className="size-4" aria-hidden />
                     )}
-                    Tampal imej
+                    Tampal Imej
                   </Button>
                 )}
               </>
@@ -386,7 +386,7 @@ export function QrUploadZone({
                 type="file"
                 accept={IMAGE_ACCEPT}
                 multiple
-                aria-label="Muat naik imej QR"
+                aria-label="Muat Naik Imej QR"
                 className="hidden"
                 onChange={handleFileInputChange}
               />
@@ -404,7 +404,7 @@ export function QrUploadZone({
                 <Icon icon={ScanIcon} size={24} className="size-6 text-muted-foreground" />
               </div>
               <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
-                Buka kamera dan imbas DuitNow QR
+                Buka kamera untuk ambil imej DuitNow QR
               </p>
               <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center">
                 Gambar akan digunakan untuk dekod QR
@@ -414,7 +414,7 @@ export function QrUploadZone({
                 type="file"
                 accept="image/*"
                 capture="environment"
-                aria-label="Ambil gambar QR"
+                aria-label="Ambil Gambar QR"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];

@@ -1,6 +1,6 @@
 "use client";
 
-import { Cancel01Icon, Icon, LoaderIcon } from "@/components/ui/icon";
+import { LoaderIcon } from "@/components/ui/icon";
 import { Dialog as DialogPrimitive } from "radix-ui";
 
 import {
@@ -76,13 +76,6 @@ export function ImagePreviewDialog({
               ) : null}
             </div>
           )}
-          <DialogPrimitive.Close
-            onClick={(e) => e.stopPropagation()}
-            className="absolute right-6 top-6 cursor-pointer rounded-full bg-primary p-2.5 text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none disabled:pointer-events-none [&_svg]:size-5"
-            aria-label="Tutup pratonton"
-          >
-            <Icon icon={Cancel01Icon} size={20} className="size-5" />
-          </DialogPrimitive.Close>
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>

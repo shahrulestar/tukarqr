@@ -171,7 +171,7 @@ export function FileUploadItem({
         {onRemove && (
           <AttachmentActions>
             <AttachmentAction
-              aria-label="Buang fail"
+              aria-label="Buang Fail"
               onClick={(e) => {
                 e.stopPropagation();
                 onRemove();

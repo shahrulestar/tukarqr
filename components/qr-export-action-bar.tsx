@@ -4,12 +4,11 @@ import { useState } from "react";
 
 import { Button, actionButtonClassName } from "@/components/ui/button";
 import {
-  Download01Icon,
+  DownloadCircle01Icon,
   Icon,
 } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
 import { QrExportActionSheet } from "@/components/qr-export-action-sheet";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import type { QrExportAction } from "@/lib/qr-export-actions";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +19,9 @@ interface QrExportActionBarProps {
   onCopy: () => void;
   onShare: () => void;
   onConfigOpen?: () => void;
+  onRequestExport?: () => void;
+  sheetOpen?: boolean;
+  onSheetOpenChange?: (open: boolean) => void;
   isLoading?: boolean;
   loadingAction?: QrExportAction | null;
   disabled?: boolean;
@@ -33,19 +35,21 @@ function LabelButton({
   isActive,
   disabled,
   variant = "outline",
+  className,
 }: {
   label: string;
   onClick: () => void;
   isActive: boolean;
   disabled?: boolean;
   variant?: "default" | "outline";
+  className?: string;
 }) {
   return (
     <Button
       type="button"
       variant={variant}
       size="lg"
-      className={exportActionButtonClassName}
+      className={cn(exportActionButtonClassName, className)}
       onClick={onClick}
       disabled={disabled}
     >
@@ -72,7 +76,7 @@ function IconGhostButton({
       type="button"
       size="icon-sm"
       variant="ghost"
-      className="flex-1 md:flex-none"
+      className="shrink-0"
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
@@ -88,22 +92,30 @@ function IconGhostButton({
 
 export function QrExportActionBar({
   onDownload,
-  onCopy,
   onShare,
-  onConfigOpen,
+  onRequestExport,
+  sheetOpen: sheetOpenProp,
+  onSheetOpenChange,
   isLoading = false,
-  loadingAction = null,
   disabled = false,
   className,
   layout = "compact",
 }: QrExportActionBarProps) {
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const showShare = !isDesktop;
+  const [internalSheetOpen, setInternalSheetOpen] = useState(false);
+  const isControlled = sheetOpenProp !== undefined;
+  const sheetOpen = isControlled ? sheetOpenProp : internalSheetOpen;
+
+  function setSheetOpen(open: boolean) {
+    if (isControlled) onSheetOpenChange?.(open);
+    else setInternalSheetOpen(open);
+  }
+
   const isBusy = disabled || isLoading;
 
-  function openSheet() {
-    if (!isBusy) setSheetOpen(true);
+  function handleDownloadClick() {
+    if (isBusy) return;
+    if (onRequestExport) onRequestExport();
+    else setSheetOpen(true);
   }
 
   const actionSheet = (
@@ -111,11 +123,8 @@ export function QrExportActionBar({
       open={sheetOpen}
       onOpenChange={setSheetOpen}
       onDownload={onDownload}
-      onCopy={onCopy}
       onShare={onShare}
-      onConfigOpen={onConfigOpen}
       disabled={disabled}
-      showShare={showShare}
     />
   );
 
@@ -124,14 +133,14 @@ export function QrExportActionBar({
       <>
         <div
           className={cn(
-            "flex w-full shrink-0 md:w-auto md:ml-auto",
+            "flex w-auto shrink-0 ml-auto",
             className
           )}
         >
           <IconGhostButton
-            icon={Download01Icon}
-            label="Muat turun"
-            onClick={openSheet}
+            icon={DownloadCircle01Icon}
+            label="Muat Turun"
+            onClick={handleDownloadClick}
             isActive={false}
             disabled={isBusy}
           />
@@ -143,13 +152,14 @@ export function QrExportActionBar({
 
   return (
     <>
-      <div className={cn("w-full min-w-0", className)}>
+      <div className={cn("w-full min-w-0 md:w-auto md:self-start", className)}>
         <LabelButton
-          label="Muat turun"
-          onClick={openSheet}
+          label="Muat Turun"
+          onClick={handleDownloadClick}
           isActive={false}
           disabled={isBusy}
           variant="default"
+          className="md:w-auto md:min-w-0 md:px-4"
         />
       </div>
       {actionSheet}

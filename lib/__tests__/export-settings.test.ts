@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   loadExportSettings,
   saveExportSettings,
+  loadSkipExportSettingsPrompt,
+  saveSkipExportSettingsPrompt,
 } from "../export-settings";
 
 const STORAGE_KEY = "tukarqr-export-settings";
@@ -60,5 +62,13 @@ describe("export-settings", () => {
   it("returns defaults when stored JSON is invalid", () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ exportLayout: "bad" }));
     expect(loadExportSettings().exportLayout).toBe("duitnow");
+  });
+
+  it("persists skip export settings prompt preference", () => {
+    expect(loadSkipExportSettingsPrompt()).toBe(false);
+    saveSkipExportSettingsPrompt(true);
+    expect(loadSkipExportSettingsPrompt()).toBe(true);
+    saveSkipExportSettingsPrompt(false);
+    expect(loadSkipExportSettingsPrompt()).toBe(false);
   });
 });
