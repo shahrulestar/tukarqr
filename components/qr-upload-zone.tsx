@@ -183,6 +183,126 @@ export function QrUploadZone({
     ? "Muat naik imej QR. Letak imej di sini atau tekan Ctrl+V untuk tampal."
     : "Muat naik imej QR dari galeri, atau ketik Tampal imej.";
 
+  const attachmentList =
+    items.length > 0 ? (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col gap-0.5">
+            <p className="text-[13px] font-medium text-muted-foreground">
+              {successItems.length}/10 imej
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            {showCollapsed && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setExpanded((v) => !v);
+                }}
+                aria-expanded={expanded}
+              >
+                {expanded ? (
+                  <>
+                    Sembunyikan
+                    <Icon icon={ArrowUp01Icon} size={14} className="size-3.5" />
+                  </>
+                ) : (
+                  <>
+                    Tunjuk
+                    <Icon icon={ArrowDown01Icon} size={14} className="size-3.5" />
+                  </>
+                )}
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReset();
+              }}
+              aria-label="Buang Semua"
+            >
+              <Icon icon={Delete02Icon} size={16} className="size-4" />
+            </Button>
+          </div>
+        </div>
+        {expanded && (
+          <div className="space-y-3">
+            {processingItems.length > 0 ? (
+              <div className="space-y-2">
+                {items.map((item) => (
+                  <FileUploadItem
+                    key={item.id}
+                    fileName={item.file.name}
+                    status={item.status}
+                    error={item.error}
+                    file={item.file}
+                    showLoadingForPending
+                    allowPreview={false}
+                    onRemove={
+                      onRemoveItem
+                        ? () => onRemoveItem(item.id)
+                        : undefined
+                    }
+                  />
+                ))}
+              </div>
+            ) : (
+              <>
+                {successItems.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                      Selesai ({successItems.length})
+                    </p>
+                    {successItems.map((item) => (
+                      <FileUploadItem
+                        key={item.id}
+                        fileName={item.file.name}
+                        status={item.status}
+                        error={item.error}
+                        file={item.file}
+                        allowPreview={isProcessingComplete}
+                        onRemove={
+                          onRemoveItem
+                            ? () => onRemoveItem(item.id)
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+                {failedItems.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                      Ralat ({failedItems.length})
+                    </p>
+                    {failedItems.map((item) => (
+                      <FileUploadItem
+                        key={item.id}
+                        fileName={item.file.name}
+                        status={item.status}
+                        error={item.error}
+                        file={item.file}
+                        allowPreview={isProcessingComplete}
+                        onRemove={
+                          onRemoveItem
+                            ? () => onRemoveItem(item.id)
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    ) : null;
+
   return (
     <Card className="[transform:translateZ(0)] [contain:layout_style_paint]">
       <CardHeader>
@@ -269,127 +389,10 @@ export function QrUploadZone({
               />
             </div>
 
-            {items.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex flex-col gap-0.5">
-                    <p className="text-[13px] font-medium text-muted-foreground">
-                      {successItems.length}/10 imej
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {showCollapsed && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExpanded((v) => !v);
-                        }}
-                        aria-expanded={expanded}
-                      >
-                        {expanded ? (
-                          <>
-                            Sembunyikan
-                            <Icon icon={ArrowUp01Icon} size={14} className="size-3.5" />
-                          </>
-                        ) : (
-                          <>
-                            Tunjuk
-                            <Icon icon={ArrowDown01Icon} size={14} className="size-3.5" />
-                          </>
-                        )}
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onReset();
-                      }}
-                      aria-label="Buang Semua"
-                    >
-                      <Icon icon={Delete02Icon} size={16} className="size-4" />
-                    </Button>
-                  </div>
-                </div>
-                {expanded && (
-                  <div className="space-y-3">
-                    {processingItems.length > 0 ? (
-                      <div className="space-y-2">
-                        {items.map((item) => (
-                          <FileUploadItem
-                            key={item.id}
-                            fileName={item.file.name}
-                            status={item.status}
-                            error={item.error}
-                            file={item.file}
-                            showLoadingForPending
-                            allowPreview={false}
-                            onRemove={
-                              onRemoveItem
-                                ? () => onRemoveItem(item.id)
-                                : undefined
-                            }
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <>
-                        {successItems.length > 0 && (
-                          <div className="space-y-2">
-                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                              Selesai ({successItems.length})
-                            </p>
-                            {successItems.map((item) => (
-                              <FileUploadItem
-                                key={item.id}
-                                fileName={item.file.name}
-                                status={item.status}
-                                error={item.error}
-                                file={item.file}
-                                allowPreview={isProcessingComplete}
-                                onRemove={
-                                  onRemoveItem
-                                    ? () => onRemoveItem(item.id)
-                                    : undefined
-                                }
-                              />
-                            ))}
-                          </div>
-                        )}
-                        {failedItems.length > 0 && (
-                          <div className="space-y-2">
-                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                              Ralat ({failedItems.length})
-                            </p>
-                            {failedItems.map((item) => (
-                              <FileUploadItem
-                                key={item.id}
-                                fileName={item.file.name}
-                                status={item.status}
-                                error={item.error}
-                                file={item.file}
-                                allowPreview={isProcessingComplete}
-                                onRemove={
-                                  onRemoveItem
-                                    ? () => onRemoveItem(item.id)
-                                    : undefined
-                                }
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+            {attachmentList}
           </TabsContent>
 
-          <TabsContent value="camera" className="mt-4">
+          <TabsContent value="camera" className="mt-4 space-y-4">
             <div
               onClick={() => cameraInputRef.current?.click()}
               className="group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/30 p-8 transition-colors hover:border-primary/50 hover:bg-muted/50 min-h-[220px]"
@@ -413,9 +416,12 @@ export function QrUploadZone({
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) onFilesSelect([file]);
+                  e.target.value = "";
                 }}
               />
             </div>
+
+            {attachmentList}
           </TabsContent>
         </Tabs>
       </CardContent>

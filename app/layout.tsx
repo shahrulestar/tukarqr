@@ -168,7 +168,7 @@ export default function RootLayout({
           />
           <ThemeKeyboardShortcut />
           {children}
-          <Toaster richColors position="top-center" visibleToasts={2} />
+          <Toaster position="top-center" visibleToasts={2} />
         </ThemeProvider>
       </body>
     </html>
