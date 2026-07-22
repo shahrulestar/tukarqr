@@ -183,8 +183,10 @@ export function QrUploadZone({
     ? "Muat naik imej QR. Letak imej di sini atau tekan Ctrl+V untuk tampal."
     : "Muat naik imej QR dari galeri, atau ketik Tampal imej.";
 
-  const attachmentList =
-    items.length > 0 ? (
+  function renderAttachmentList() {
+    if (items.length === 0) return null;
+
+    return (
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-col gap-0.5">
@@ -301,7 +303,8 @@ export function QrUploadZone({
           </div>
         )}
       </div>
-    ) : null;
+    );
+  }
 
   return (
     <Card className="[transform:translateZ(0)] [contain:layout_style_paint]">
@@ -389,7 +392,7 @@ export function QrUploadZone({
               />
             </div>
 
-            {attachmentList}
+            {renderAttachmentList()}
           </TabsContent>
 
           <TabsContent value="camera" className="mt-4 space-y-4">
@@ -421,7 +424,7 @@ export function QrUploadZone({
               />
             </div>
 
-            {attachmentList}
+            {renderAttachmentList()}
           </TabsContent>
         </Tabs>
       </CardContent>
