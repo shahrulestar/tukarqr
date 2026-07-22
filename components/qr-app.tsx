@@ -945,31 +945,31 @@ export function QrApp() {
           </Dialog>
         ) : (
           <Drawer open={configOpen} onOpenChange={handleConfigOpenChange}>
-            <DrawerContent>
-              <div className="mx-auto w-full max-w-sm">
+            <DrawerContent className="h-auto overflow-hidden !max-h-[min(92dvh,100%)] data-[vaul-drawer-direction=bottom]:!max-h-[min(92dvh,100%)]">
+              <div className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
                 <DrawerHeader>
                   <DrawerTitle>Tetapan eksport</DrawerTitle>
                   <DrawerDescription>
                     Tetapkan reka bentuk dan resolusi imej QR
                   </DrawerDescription>
                 </DrawerHeader>
-                <div className="p-4">
-                <QrExportConfigForm
-                  exportLayout={exportLayout}
-                  onExportLayoutChange={handleExportLayoutChange}
-                  qrStyle={qrStyle}
-                  onQrStyleChange={setQrStyle}
-                  showBankName={showBankName}
-                  onShowBankNameChange={setShowBankName}
-                  outerBg={outerBg}
-                  onOuterBgChange={setOuterBg}
-                  exportRatio={exportRatio}
-                  onExportRatioChange={setExportRatio}
-                  showBankNameId="show-bank-name-drawer"
-                />
+                <div className="px-4 pb-2">
+                  <QrExportConfigForm
+                    exportLayout={exportLayout}
+                    onExportLayoutChange={handleExportLayoutChange}
+                    qrStyle={qrStyle}
+                    onQrStyleChange={setQrStyle}
+                    showBankName={showBankName}
+                    onShowBankNameChange={setShowBankName}
+                    outerBg={outerBg}
+                    onOuterBgChange={setOuterBg}
+                    exportRatio={exportRatio}
+                    onExportRatioChange={setExportRatio}
+                    showBankNameId="show-bank-name-drawer"
+                  />
                 </div>
                 {configMode === "export" && (
-                  <DrawerFooter>
+                  <DrawerFooter className="gap-3 pt-2">
                     <label
                       htmlFor="skip-export-settings-drawer"
                       className="flex w-full cursor-pointer items-center gap-2 text-sm text-foreground"
