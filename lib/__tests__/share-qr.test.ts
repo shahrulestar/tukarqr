@@ -105,6 +105,8 @@ describe("exportPngDataUrl", () => {
       createElement: () => ({
         href: "",
         download: "",
+        rel: "",
+        style: { display: "" },
         click: clickSpy,
       }),
       body: {
@@ -132,7 +134,7 @@ describe("exportPngDataUrl", () => {
     expect(clickSpy).toHaveBeenCalled();
   });
 
-  it("shares via native API on iOS when save is requested", async () => {
+  it("downloads via blob anchor on iOS mobile", async () => {
     const shareMock = vi.fn().mockResolvedValue(undefined);
     const canShareMock = vi.fn().mockReturnValue(true);
 
@@ -150,9 +152,9 @@ describe("exportPngDataUrl", () => {
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
     const result = await exportPngDataUrl(dataUrl, "qr.png");
 
-    expect(result).toBe("shared");
-    expect(shareMock).toHaveBeenCalled();
-    expect(clickSpy).not.toHaveBeenCalled();
+    expect(result).toBe("downloaded");
+    expect(clickSpy).toHaveBeenCalled();
+    expect(shareMock).not.toHaveBeenCalled();
   });
 
   it("downloads via blob anchor on Android mobile", async () => {
