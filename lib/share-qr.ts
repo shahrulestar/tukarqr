@@ -100,7 +100,18 @@ export async function exportPngDataUrl(
   filename: string
 ): Promise<ExportResult> {
   try {
-    triggerDataUrlDownload(dataUrl, filename);
+    const file = dataUrlToFile(dataUrl, filename);
+
+    if (isIosDevice() && canShareFile(file)) {
+      const shared = await shareFile(file);
+      if (shared) {
+        toast.success("Pilih 'Simpan Imej' untuk menyimpan QR.");
+        return "shared";
+      }
+      return "cancelled";
+    }
+
+    triggerBlobDownload(file, filename);
     toast.success("QR dimuat turun.");
     return "downloaded";
   } catch (error) {

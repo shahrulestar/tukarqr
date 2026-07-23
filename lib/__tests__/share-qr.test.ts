@@ -112,10 +112,14 @@ describe("exportPngDataUrl", () => {
         removeChild: removeChildSpy,
       },
     });
+    vi.stubGlobal("URL", {
+      createObjectURL: vi.fn().mockReturnValue("blob:mock-url"),
+      revokeObjectURL: vi.fn(),
+    });
     return clickSpy;
   }
 
-  it("downloads via anchor on desktop", async () => {
+  it("downloads via blob anchor on desktop", async () => {
     stubNavigator({ maxTouchPoints: 0, userAgent: "Chrome" });
     stubMatchMedia(false);
     const clickSpy = stubDownloadDom();
@@ -128,7 +132,7 @@ describe("exportPngDataUrl", () => {
     expect(clickSpy).toHaveBeenCalled();
   });
 
-  it("downloads via anchor on mobile even when native share is available", async () => {
+  it("shares via native API on iOS when save is requested", async () => {
     const shareMock = vi.fn().mockResolvedValue(undefined);
     const canShareMock = vi.fn().mockReturnValue(true);
 
@@ -138,6 +142,29 @@ describe("exportPngDataUrl", () => {
       maxTouchPoints: 5,
       userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
       platform: "iPhone",
+    });
+    stubMatchMedia(true);
+    const clickSpy = stubDownloadDom();
+
+    const dataUrl =
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
+    const result = await exportPngDataUrl(dataUrl, "qr.png");
+
+    expect(result).toBe("shared");
+    expect(shareMock).toHaveBeenCalled();
+    expect(clickSpy).not.toHaveBeenCalled();
+  });
+
+  it("downloads via blob anchor on Android mobile", async () => {
+    const shareMock = vi.fn().mockResolvedValue(undefined);
+    const canShareMock = vi.fn().mockReturnValue(true);
+
+    stubNavigator({
+      share: shareMock,
+      canShare: canShareMock,
+      maxTouchPoints: 5,
+      userAgent: "Mozilla/5.0 (Linux; Android 14; Pixel 8)",
+      platform: "Linux armv8l",
     });
     stubMatchMedia(true);
     const clickSpy = stubDownloadDom();
