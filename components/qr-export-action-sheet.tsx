@@ -23,10 +23,10 @@ export function QrExportActionSheet({
   function handleAction(action: Extract<QrExportAction, "download" | "share">) {
     if (disabled) return;
 
-    onOpenChange(false);
-
     if (action === "download") onDownload();
     else onShare();
+
+    onOpenChange(false);
   }
 
   return (

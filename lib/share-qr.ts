@@ -55,15 +55,26 @@ export function canShareQrFiles(): boolean {
   }
 }
 
-export function triggerBlobDownload(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
+export function triggerBlobDownload(
+  blob: Blob,
+  filename: string,
+  options?: { forceDownload?: boolean }
+): void {
+  const downloadBlob = options?.forceDownload
+    ? new Blob([blob], { type: "application/octet-stream" })
+    : blob;
+  const url = URL.createObjectURL(downloadBlob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  a.rel = "noopener";
+  a.style.display = "none";
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 250);
 }
 
 export function triggerDataUrlDownload(dataUrl: string, filename: string): void {
@@ -101,17 +112,9 @@ export async function exportPngDataUrl(
 ): Promise<ExportResult> {
   try {
     const file = dataUrlToFile(dataUrl, filename);
+    const forceDownload = isIosDevice() || isAndroidDevice();
 
-    if (isIosDevice() && canShareFile(file)) {
-      const shared = await shareFile(file);
-      if (shared) {
-        toast.success("Pilih 'Simpan Imej' untuk menyimpan QR.");
-        return "shared";
-      }
-      return "cancelled";
-    }
-
-    triggerBlobDownload(file, filename);
+    triggerBlobDownload(file, filename, { forceDownload });
     toast.success("QR dimuat turun.");
     return "downloaded";
   } catch (error) {
