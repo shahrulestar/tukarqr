@@ -1,5 +1,6 @@
 import { Icon, StarIcon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
+import { t } from "@/lib/i18n";
 
 const GITHUB_REPO = "shahrulestar/tukarqr";
 
@@ -34,7 +35,7 @@ export async function GithubStarsButton() {
         rel="noopener noreferrer"
       >
         <Icon icon={StarIcon} size={16} className="size-4" />
-        Stars
+        {t("about.openSource.stars")}
         {starCount !== null ? (
           <span className="font-semibold tabular-nums">{starCount}</span>
         ) : null}

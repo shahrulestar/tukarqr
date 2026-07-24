@@ -9,105 +9,25 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import accordionContent from "@/lib/accordion-content.json";
+import { useT } from "@/lib/i18n";
 
-interface AccordionAudienceItem {
-  title: string;
-  text: string;
-}
-
-type AccordionBlock =
-  | { type: "paragraph"; text: string }
-  | { type: "heading"; text: string }
-  | { type: "list"; ordered?: boolean; items: string[] }
-  | {
-      type: "audiences";
-      items: AccordionAudienceItem[];
-    }
-  | {
-      type: "link";
-      href: string;
-      label: string;
-      variant?: "button";
-    };
-
-interface AccordionContentItem {
-  value: string;
-  title: string;
-  noBorder?: boolean;
-  blocks: AccordionBlock[];
-}
-
-const content = accordionContent as {
-  defaultOpen: string[];
-  feedback: { textBefore: string; email: string };
-  items: AccordionContentItem[];
-};
+const FEEDBACK_EMAIL = "hello@shahrulestar.com";
+const DEFAULT_OPEN = ["bagaimana"];
 
 const contentClassName =
   "text-[14px] leading-relaxed text-muted-foreground [&_[data-slot=button]]:no-underline [&_[data-slot=button]:hover]:no-underline";
 
-function AccordionBlockRenderer({ block }: { block: AccordionBlock }) {
-  switch (block.type) {
-    case "paragraph":
-      return <p>{block.text}</p>;
-    case "heading":
-      return (
-        <h3 className="text-[14px] font-semibold text-foreground">
-          {block.text}
-        </h3>
-      );
-    case "list":
-      return (
-        <ol
-          className={
-            block.ordered
-              ? "list-decimal list-inside space-y-1"
-              : "list-disc list-inside space-y-1"
-          }
-        >
-          {block.items.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ol>
-      );
-    case "audiences":
-      return (
-        <ol className="flex list-decimal list-inside flex-col gap-3">
-          {block.items.map((item) => (
-            <li key={item.title}>
-              <span className="font-semibold text-foreground">{item.title}</span>
-              <p className="mt-1">{item.text}</p>
-            </li>
-          ))}
-        </ol>
-      );
-    case "link":
-      if (block.variant === "button") {
-        return (
-          <Button asChild className="mt-1 !no-underline hover:!no-underline">
-            <Link href={block.href}>{block.label}</Link>
-          </Button>
-        );
-      }
-      return (
-        <Link
-          href={block.href}
-          className="text-foreground underline-offset-3 hover:underline"
-        >
-          {block.label}
-        </Link>
-      );
-    default:
-      return null;
-  }
-}
-
 export function AccordionAbout() {
-  const [openSections, setOpenSections] = useState<string[]>(
-    content.defaultOpen
-  );
+  const t = useT();
+  const [openSections, setOpenSections] = useState<string[]>(DEFAULT_OPEN);
+
+  const audiences = [
+    "personal",
+    "business",
+    "seller",
+    "designer",
+    "anyone",
+  ] as const;
 
   return (
     <div className="space-y-4">
@@ -115,39 +35,100 @@ export function AccordionAbout() {
         type="multiple"
         value={openSections}
         onValueChange={setOpenSections}
-        className="rounded-xl border border-border bg-muted/30 px-4 sm:px-5"
+        className="rounded-xl border border-border bg-muted/30"
       >
-        {content.items.map((item) => (
-          <AccordionItem
-            key={item.value}
-            value={item.value}
-            className={cn(
-              "data-open:bg-transparent",
-              item.noBorder && "border-b-0"
-            )}
-          >
-            <AccordionTrigger className="text-base font-semibold">
-              {item.title}
-            </AccordionTrigger>
-            <AccordionContent className={contentClassName}>
-              {item.blocks.map((block, index) => (
-                <AccordionBlockRenderer
-                  key={`${item.value}-${index}`}
-                  block={block}
-                />
+        <AccordionItem value="bagaimana" className="data-open:bg-transparent">
+          <AccordionTrigger className="text-base font-semibold">
+            {t("accordion.howItWorks.title")}
+          </AccordionTrigger>
+          <AccordionContent className={contentClassName}>
+            <p>{t("accordion.howItWorks.p1")}</p>
+            <p>{t("accordion.howItWorks.p2")}</p>
+            <ol className="list-decimal list-inside space-y-1">
+              <li>{t("accordion.howItWorks.step1")}</li>
+              <li>{t("accordion.howItWorks.step2")}</li>
+              <li>{t("accordion.howItWorks.step3")}</li>
+            </ol>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="keselamatan" className="data-open:bg-transparent">
+          <AccordionTrigger className="text-base font-semibold">
+            {t("accordion.security.title")}
+          </AccordionTrigger>
+          <AccordionContent className={contentClassName}>
+            <p>{t("accordion.security.body")}</p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="pengesahan" className="data-open:bg-transparent">
+          <AccordionTrigger className="text-base font-semibold">
+            {t("accordion.validation.title")}
+          </AccordionTrigger>
+          <AccordionContent className={contentClassName}>
+            <p>{t("accordion.validation.body")}</p>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="kenapa" className="data-open:bg-transparent">
+          <AccordionTrigger className="text-base font-semibold">
+            {t("accordion.why.title")}
+          </AccordionTrigger>
+          <AccordionContent className={contentClassName}>
+            <p>{t("accordion.why.p1")}</p>
+            <p>{t("accordion.why.p2")}</p>
+            <h3 className="text-[14px] font-semibold text-foreground">
+              {t("accordion.why.suitableHeading")}
+            </h3>
+            <ol className="flex list-decimal list-inside flex-col gap-3">
+              {audiences.map((key) => (
+                <li key={key}>
+                  <span className="font-semibold text-foreground">
+                    {t(`accordion.why.audience.${key}.title`)}
+                  </span>
+                  <p className="mt-1">
+                    {t(`accordion.why.audience.${key}.text`)}
+                  </p>
+                </li>
               ))}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+            </ol>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="senarai-bank" className="data-open:bg-transparent">
+          <AccordionTrigger className="text-base font-semibold">
+            {t("accordion.banks.title")}
+          </AccordionTrigger>
+          <AccordionContent className={contentClassName}>
+            <p>{t("accordion.banks.body")}</p>
+            <Button asChild className="mt-1 !no-underline hover:!no-underline">
+              <Link href="/list">{t("accordion.banks.cta")}</Link>
+            </Button>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem
+          value="penafian"
+          className="data-open:bg-transparent border-b-0"
+        >
+          <AccordionTrigger className="text-base font-semibold">
+            {t("accordion.disclaimer.title")}
+          </AccordionTrigger>
+          <AccordionContent className={contentClassName}>
+            <p>{t("accordion.disclaimer.p1")}</p>
+            <p>{t("accordion.disclaimer.p2")}</p>
+            <p>{t("accordion.disclaimer.p3")}</p>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
 
       <span className="block text-center text-[14px] leading-relaxed text-muted-foreground">
-        {content.feedback.textBefore}{" "}
+        {t("accordion.feedback.before")}{" "}
         <a
-          href={`mailto:${content.feedback.email}`}
+          href={`mailto:${FEEDBACK_EMAIL}`}
           className="text-foreground underline-offset-3 hover:underline"
         >
-          {content.feedback.email}
+          {FEEDBACK_EMAIL}
         </a>
       </span>
     </div>

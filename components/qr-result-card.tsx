@@ -20,6 +20,7 @@ import {
   type QrExportLayout,
 } from "@/lib/qr-render";
 import { parseEmvCoMerchantName, parseEmvCoBankName } from "@/lib/emvco";
+import { useT } from "@/lib/i18n";
 
 interface QrResultListProps {
   resultCardRef: React.RefObject<HTMLDivElement | null>;
@@ -60,6 +61,7 @@ export function QrResultList({
   disabled = false,
   onExportSuccess,
 }: QrResultListProps) {
+  const t = useT();
   const svgRefsMap = useRef<Map<string, SVGSVGElement>>(new Map());
 
   function getDownloadItems(): DownloadAllItem[] {
@@ -85,7 +87,7 @@ export function QrResultList({
     <div
       ref={resultCardRef}
       role="region"
-      aria-label="Keputusan QR"
+      aria-label={t("result.region.aria")}
       aria-live="polite"
       tabIndex={-1}
       className="[transform:translateZ(0)]"
@@ -95,17 +97,17 @@ export function QrResultList({
           <div className="flex items-start justify-between gap-2">
             <div>
               <CardTitle className="text-[16px] md:text-[18px]">
-                QR siap digunakan
+                {t("result.title")}
               </CardTitle>
               <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-                Imbas dengan app bank untuk bayar
+                {t("result.description")}
               </CardDescription>
             </div>
             <Button
               variant="ghost"
               size="icon-sm"
               onClick={onConfigOpen}
-              aria-label="Tetapkan Reka Bentuk QR"
+              aria-label={t("result.config.aria")}
             >
               <Icon icon={Settings01Icon} size={16} className="size-4" />
             </Button>
@@ -120,16 +122,16 @@ export function QrResultList({
               <button
                 type="button"
                 onClick={onDismissAlert}
-                aria-label="Sembunyikan Peringatan"
+                aria-label={t("result.alert.dismiss.aria")}
                 className="absolute right-2 top-2 rounded-sm p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
               >
                 <Icon icon={Cancel01Icon} size={16} className="size-4" />
               </button>
-              <p className="font-medium">Pastikan sebelum imbasan:</p>
+              <p className="font-medium">{t("result.alert.title")}</p>
               <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
-                <li>Sahkan nama penerima betul</li>
-                <li>Semak jumlah bayaran jika ada</li>
-                <li>Jangan imbas QR dari sumber yang tidak dipercayai</li>
+                <li>{t("result.alert.item.verifyName")}</li>
+                <li>{t("result.alert.item.checkAmount")}</li>
+                <li>{t("result.alert.item.untrustedSource")}</li>
               </ul>
             </div>
           )}
@@ -173,7 +175,7 @@ export function QrResultList({
               onClick={handleDownloadAll}
               disabled={disabled}
             >
-              Muat Turun ({results.length})
+              {t("result.downloadAll", { n: results.length })}
             </Button>
           )}
         </CardContent>

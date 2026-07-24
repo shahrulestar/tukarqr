@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-
+import { t } from "@/lib/i18n";
 import { copyQrImageToClipboard } from "@/lib/clipboard-utils";
 import {
   downloadQrAsPng,
@@ -25,10 +25,10 @@ export async function runQrExportAction(
 
   if (action === "copy") {
     await copyQrImageToClipboard(svg, renderOptions);
-    toast.success("QR disalin ke papan keratan.");
+    toast.success(t("export.toast.copied"));
     return;
   }
 
   await shareQrImage(svg, renderOptions, filename, merchantName);
-  toast.success("QR dikongsi.");
+  toast.success(t("export.toast.shared"));
 }

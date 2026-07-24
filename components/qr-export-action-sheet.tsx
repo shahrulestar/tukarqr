@@ -3,6 +3,7 @@
 import { Button, actionButtonClassName } from "@/components/ui/button";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import type { QrExportAction } from "@/lib/qr-export-actions";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface QrExportActionSheetProps {
@@ -20,6 +21,8 @@ export function QrExportActionSheet({
   onShare,
   disabled = false,
 }: QrExportActionSheetProps) {
+  const t = useT();
+
   function handleAction(action: Extract<QrExportAction, "download" | "share">) {
     if (disabled) return;
 
@@ -33,8 +36,8 @@ export function QrExportActionSheet({
     <ResponsiveModal
       open={open}
       onOpenChange={onOpenChange}
-      title="Simpan QR"
-      description="Simpan atau kongsi QR anda"
+      title={t("export.sheet.title")}
+      description={t("export.sheet.description")}
     >
       <div className="grid grid-cols-2 gap-2">
         <Button
@@ -45,7 +48,7 @@ export function QrExportActionSheet({
           onClick={() => handleAction("download")}
           disabled={disabled}
         >
-          Simpan
+          {t("export.sheet.save")}
         </Button>
         <Button
           type="button"
@@ -55,7 +58,7 @@ export function QrExportActionSheet({
           onClick={() => handleAction("share")}
           disabled={disabled}
         >
-          Kongsi
+          {t("export.sheet.share")}
         </Button>
       </div>
     </ResponsiveModal>

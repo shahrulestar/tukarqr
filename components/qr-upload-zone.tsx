@@ -30,6 +30,7 @@ import {
 } from "@/components/file-upload-item";
 import { Button } from "@/components/ui/button";
 import { readImageFromClipboard } from "@/lib/clipboard-utils";
+import { useT } from "@/lib/i18n";
 
 export interface UploadItem {
   id: string;
@@ -75,6 +76,7 @@ export function QrUploadZone({
   defaultCollapsed = false,
   isSingleMode = false,
 }: QrUploadZoneProps) {
+  const t = useT();
   const isLargeDesktop = useMediaQuery("(min-width: 1024px)");
   const isMac = useIsMac();
   const [expanded, setExpanded] = useState(!defaultCollapsed);
@@ -143,7 +145,7 @@ export function QrUploadZone({
     if (imageFiles.length) {
       onFilesSelect(imageFiles);
     } else if (e.dataTransfer.files?.length) {
-      toast.error("Sila seret fail imej sahaja (JPG, PNG, HEIC, dll.).");
+      toast.error(t("upload.toast.dragImagesOnly"));
     }
   }
 
@@ -158,21 +160,19 @@ export function QrUploadZone({
       }
 
       if (result.reason === "no-image") {
-        toast.error("Tiada imej dalam papan keratan");
+        toast.error(t("upload.toast.noClipboardImage"));
         return;
       }
 
       if (result.reason === "denied") {
-        toast.error("Kebenaran ditolak", {
-          description:
-            "Benarkan akses papan keratan, atau pilih imej dari galeri.",
+        toast.error(t("upload.toast.clipboardDenied.title"), {
+          description: t("upload.toast.clipboardDenied.description"),
         });
         return;
       }
 
-      toast.error("Tampal imej tidak disokong", {
-        description:
-          "Pelayar ini mungkin tidak menyokong tampal imej. Sila pilih dari galeri.",
+      toast.error(t("upload.toast.pasteUnsupported.title"), {
+        description: t("upload.toast.pasteUnsupported.description"),
       });
     } finally {
       setIsPasting(false);
@@ -180,8 +180,12 @@ export function QrUploadZone({
   }
 
   const uploadZoneAriaLabel = isLargeDesktop
-    ? "Muat naik imej QR. Letak imej di sini atau tekan Ctrl+V untuk tampal."
-    : "Muat naik imej QR dari galeri, atau ketik Tampal imej.";
+    ? t("upload.dropzone.aria.desktop")
+    : t("upload.dropzone.aria.mobile");
+
+  const [pasteHintBefore, pasteHintAfter] = t(
+    "upload.dropzone.hint.desktop"
+  ).split("{mod}+V");
 
   function renderAttachmentList() {
     if (items.length === 0) return null;
@@ -191,7 +195,7 @@ export function QrUploadZone({
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-col gap-0.5">
             <p className="text-[13px] font-medium text-muted-foreground">
-              {successItems.length}/10 imej
+              {t("upload.list.count", { n: successItems.length })}
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -207,12 +211,12 @@ export function QrUploadZone({
               >
                 {expanded ? (
                   <>
-                    Sembunyikan
+                    {t("upload.list.hide")}
                     <Icon icon={ArrowUp01Icon} size={14} className="size-3.5" />
                   </>
                 ) : (
                   <>
-                    Tunjuk
+                    {t("upload.list.show")}
                     <Icon icon={ArrowDown01Icon} size={14} className="size-3.5" />
                   </>
                 )}
@@ -225,7 +229,7 @@ export function QrUploadZone({
                 e.stopPropagation();
                 onReset();
               }}
-              aria-label="Buang Semua"
+              aria-label={t("upload.list.clearAll.aria")}
             >
               <Icon icon={Delete02Icon} size={16} className="size-4" />
             </Button>
@@ -257,7 +261,7 @@ export function QrUploadZone({
                 {successItems.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-[11px] font-medium text-foreground uppercase tracking-wider">
-                      Selesai ({successItems.length})
+                      {t("upload.list.section.done", { n: successItems.length })}
                     </p>
                     {successItems.map((item) => (
                       <FileUploadItem
@@ -279,7 +283,7 @@ export function QrUploadZone({
                 {failedItems.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-[11px] font-medium text-foreground uppercase tracking-wider">
-                      Gagal ({failedItems.length})
+                      {t("upload.list.section.failed", { n: failedItems.length })}
                     </p>
                     {failedItems.map((item) => (
                       <FileUploadItem
@@ -310,17 +314,17 @@ export function QrUploadZone({
     <Card className="[transform:translateZ(0)] [contain:layout_style_paint]">
       <CardHeader>
         <CardTitle className="text-[16px] md:text-[18px]">
-          Muat naik DuitNow QR
+          {t("upload.title")}
         </CardTitle>
         <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-          Tukar gambar kabur kepada QR digital yang jelas
+          {t("upload.description")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={onTabChange}>
           <TabsList className="w-full sm:w-fit lg:hidden">
-            <TabsTrigger value="upload">Muat Naik</TabsTrigger>
-            <TabsTrigger value="camera">Kamera</TabsTrigger>
+            <TabsTrigger value="upload">{t("upload.tab.upload")}</TabsTrigger>
+            <TabsTrigger value="camera">{t("upload.tab.camera")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upload" className="mt-4 space-y-4">
@@ -345,20 +349,20 @@ export function QrUploadZone({
                   <Icon icon={Image01Icon} size={24} className="size-6 text-muted-foreground" />
                 </div>
                 <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
-                  Muat naik imej DuitNow QR di sini
+                  {t("upload.dropzone.title")}
                 </p>
                 <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center flex flex-wrap items-center justify-center gap-1">
                   {isLargeDesktop ? (
                     <>
-                      atau tekan{" "}
+                      {pasteHintBefore}
                       <KbdGroup className="inline-flex">
                         <Kbd>{isMac ? "⌘" : "Ctrl"}</Kbd>
                         <Kbd>V</Kbd>
-                      </KbdGroup>{" "}
-                      untuk tampal
+                      </KbdGroup>
+                      {pasteHintAfter}
                     </>
                   ) : (
-                    "atau pilih dari galeri"
+                    t("upload.dropzone.hint.mobile")
                   )}
                 </p>
                 {!isLargeDesktop && (
@@ -377,7 +381,7 @@ export function QrUploadZone({
                     ) : (
                       <Icon icon={ClipboardPasteIcon} size={16} className="size-4" aria-hidden />
                     )}
-                    Tampal Imej
+                    {t("upload.dropzone.pasteButton")}
                   </Button>
                 )}
               </>
@@ -386,7 +390,7 @@ export function QrUploadZone({
                 type="file"
                 accept={IMAGE_ACCEPT}
                 multiple
-                aria-label="Muat Naik Imej QR"
+                aria-label={t("upload.input.aria")}
                 className="hidden"
                 onChange={handleFileInputChange}
               />
@@ -404,17 +408,17 @@ export function QrUploadZone({
                 <Icon icon={ScanIcon} size={24} className="size-6 text-muted-foreground" />
               </div>
               <p className="text-[12px] md:text-[13px] font-medium tracking-[0.01em] text-foreground text-center">
-                Buka kamera untuk ambil imej DuitNow QR
+                {t("upload.camera.title")}
               </p>
               <p className="text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground text-center">
-                Gambar akan digunakan untuk dekod QR
+                {t("upload.camera.hint")}
               </p>
               <input
                 ref={cameraInputRef}
                 type="file"
                 accept="image/*"
                 capture="environment"
-                aria-label="Ambil Gambar QR"
+                aria-label={t("upload.camera.input.aria")}
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];

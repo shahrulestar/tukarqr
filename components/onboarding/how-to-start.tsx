@@ -8,37 +8,36 @@ import {
   ScanIcon,
 } from "@/components/ui/icon";
 import type { ComponentProps } from "react";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface HowToStartProps {
   onNext: () => void;
 }
 
-const steps: {
-  icon: ComponentProps<typeof Icon>["icon"];
-  title: string;
-  description: string;
-}[] = [
-  {
-    icon: Image01Icon,
-    title: "Muat naik atau ambil gambar",
-    description:
-      "Muat naik foto DuitNow QR atau ambil gambar menggunakan kamera peranti anda.",
-  },
-  {
-    icon: ScanIcon,
-    title: "Dekod dan sahkan",
-    description:
-      "Sistem akan dekod dan sahkan bahawa ia ialah DuitNow QR pembayaran Malaysia.",
-  },
-  {
-    icon: DownloadCircle01Icon,
-    title: "Muat turun atau salin",
-    description: "Muat turun imej QR yang jelas atau salin ke papan keratan.",
-  },
-];
-
 export function HowToStart({ onNext }: HowToStartProps) {
+  const t = useT();
+  const steps: {
+    icon: ComponentProps<typeof Icon>["icon"];
+    title: string;
+    description: string;
+  }[] = [
+    {
+      icon: Image01Icon,
+      title: t("onboarding.howTo.step1.title"),
+      description: t("onboarding.howTo.step1.description"),
+    },
+    {
+      icon: ScanIcon,
+      title: t("onboarding.howTo.step2.title"),
+      description: t("onboarding.howTo.step2.description"),
+    },
+    {
+      icon: DownloadCircle01Icon,
+      title: t("onboarding.howTo.step3.title"),
+      description: t("onboarding.howTo.step3.description"),
+    },
+  ];
   return (
     <div className="space-y-6">
       <ol className="space-y-4">
@@ -71,7 +70,7 @@ export function HowToStart({ onNext }: HowToStartProps) {
         )}
         tabIndex={-1}
       >
-        Seterusnya
+        {t("onboarding.howTo.next")}
       </Button>
     </div>
   );

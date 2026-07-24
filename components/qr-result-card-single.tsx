@@ -25,6 +25,7 @@ import {
   parseEmvCoAmount,
 } from "@/lib/emvco";
 import type { QrExportAction } from "@/lib/qr-export-actions";
+import { useT } from "@/lib/i18n";
 
 interface QrResultCardSingleProps {
   resultCardRef: React.RefObject<HTMLDivElement | null>;
@@ -73,6 +74,7 @@ export function QrResultCardSingle({
   svgRefCallback,
   disabled = false,
 }: QrResultCardSingleProps) {
+  const t = useT();
   const qrSvgRef = useRef<SVGSVGElement>(null);
   const [pngPreviewUrl, setPngPreviewUrl] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -120,7 +122,7 @@ export function QrResultCardSingle({
     <div
       ref={resultCardRef}
       role="region"
-      aria-label="Keputusan QR"
+      aria-label={t("result.region.aria")}
       aria-live="polite"
       tabIndex={-1}
       className="[transform:translateZ(0)]"
@@ -130,10 +132,10 @@ export function QrResultCardSingle({
           <div className="flex items-start justify-between gap-2">
             <div>
               <CardTitle className="text-[16px] md:text-[18px]">
-                QR siap digunakan
+                {t("result.title")}
               </CardTitle>
               <CardDescription className="text-[13px] md:text-[14px] leading-[1.55]">
-                Imbas dengan app bank untuk bayar
+                {t("result.description")}
               </CardDescription>
             </div>
             <Button
@@ -141,7 +143,7 @@ export function QrResultCardSingle({
               size="icon-sm"
               onClick={onConfigOpen}
               disabled={disabled || isLoading}
-              aria-label="Tetapan Eksport"
+              aria-label={t("result.config.ariaSingle")}
             >
               <Icon icon={Settings01Icon} size={16} className="size-4" />
             </Button>
@@ -156,16 +158,16 @@ export function QrResultCardSingle({
               <button
                 type="button"
                 onClick={onDismissAlert}
-                aria-label="Sembunyikan Peringatan"
+                aria-label={t("result.alert.dismiss.aria")}
                 className="absolute right-2 top-2 rounded-sm p-1 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400 dark:hover:bg-amber-500/20"
               >
                 <Icon icon={Cancel01Icon} size={16} className="size-4" />
               </button>
-              <p className="font-medium">Pastikan sebelum imbasan:</p>
+              <p className="font-medium">{t("result.alert.title")}</p>
               <ul className="mt-1 list-inside list-disc space-y-0.5 text-muted-foreground">
-                <li>Sahkan nama penerima betul</li>
-                <li>Semak jumlah bayaran jika ada</li>
-                <li>Jangan imbas QR dari sumber yang tidak dipercayai</li>
+                <li>{t("result.alert.item.verifyName")}</li>
+                <li>{t("result.alert.item.checkAmount")}</li>
+                <li>{t("result.alert.item.untrustedSource")}</li>
               </ul>
             </div>
           )}
@@ -185,7 +187,7 @@ export function QrResultCardSingle({
                   setPreviewOpen(true);
                 }
               }}
-              aria-label="Pratonton QR"
+              aria-label={t("result.preview.aria")}
               className="relative inline-block w-[280px] h-[280px] min-w-[280px] min-h-[280px] cursor-pointer rounded-lg transition-opacity hover:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-default disabled:opacity-100"
             >
               <QrStyledSvg
@@ -197,14 +199,14 @@ export function QrResultCardSingle({
                 marginSize={2}
                 fgColor={qrFgColor}
                 bgColor="#ffffff"
-                title="DuitNow QR - Imbas untuk bayar"
+                title={t("result.qr.title")}
                 className={pngPreviewUrl ? "sr-only" : undefined}
                 aria-hidden={!!pngPreviewUrl}
               />
               {pngPreviewUrl ? (
                 <img
                   src={pngPreviewUrl}
-                  alt="DuitNow QR - Imbas untuk bayar"
+                  alt={t("result.qr.alt")}
                   className="absolute inset-0 w-full h-full object-contain [-webkit-touch-callout:default] [-webkit-user-select:auto] [user-select:auto]"
                   loading="lazy"
                 />
@@ -235,7 +237,7 @@ export function QrResultCardSingle({
               </p>
             )}
             <span className="block w-full text-center text-balance text-[12px] leading-[1.45] tracking-[0.02em] text-muted-foreground">
-              Simpan, kongsi, atau tekan & tahan QR di atas untuk simpan
+              {t("result.hint.saveHold")}
             </span>
           </div>
 
@@ -258,7 +260,11 @@ export function QrResultCardSingle({
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         src={pngPreviewUrl}
-        alt={`DuitNow QR - ${merchantName || "Imbas untuk bayar"}`}
+        alt={
+          merchantName
+            ? t("result.qr.altNamed", { name: merchantName })
+            : t("result.qr.altFallbackName")
+        }
       />
     </div>
   );

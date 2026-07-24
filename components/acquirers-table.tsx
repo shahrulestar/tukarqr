@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useT } from "@/lib/i18n";
 
 const INITIAL_VISIBLE = 20;
 
@@ -24,6 +25,7 @@ interface AcquirersTableProps {
 }
 
 export function AcquirersTable({ acquirers }: AcquirersTableProps) {
+  const t = useT();
   const [expanded, setExpanded] = useState(false);
   const hasMore = acquirers.length > INITIAL_VISIBLE;
   const visible = expanded
@@ -36,8 +38,8 @@ export function AcquirersTable({ acquirers }: AcquirersTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[80px]">No</TableHead>
-              <TableHead>Nama</TableHead>
+              <TableHead className="w-[80px]">{t("list.table.no")}</TableHead>
+              <TableHead>{t("list.table.name")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -65,12 +67,12 @@ export function AcquirersTable({ acquirers }: AcquirersTableProps) {
           >
             {expanded ? (
               <>
-                Tunjuk Kurang
+                {t("list.showLess")}
                 <Icon icon={ArrowUp01Icon} size={16} className="size-4" />
               </>
             ) : (
               <>
-                Tunjuk Semua ({acquirers.length})
+                {t("list.showAll", { n: acquirers.length })}
                 <Icon icon={ArrowDown01Icon} size={16} className="size-4" />
               </>
             )}

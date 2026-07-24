@@ -1,4 +1,5 @@
 import { renderSvgToPng, type QrExportLayout } from "@/lib/qr-render";
+import { t } from "@/lib/i18n";
 
 export type ClipboardImageReadResult =
   | { ok: true; file: File }
@@ -90,7 +91,7 @@ export async function copyQrImageToClipboard(
   options: CopyQrImageOptions
 ): Promise<void> {
   if (!navigator.clipboard?.write) {
-    throw new Error("Salin imej tidak disokong. Cuba muat turun imej.");
+    throw new Error(t("export.error.copyUnsupported"));
   }
 
   const renderOptions = {

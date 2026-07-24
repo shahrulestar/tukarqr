@@ -18,6 +18,7 @@ import {
 } from "@/lib/qr-export-actions";
 import { cn } from "@/lib/utils";
 import { parseEmvCoMerchantName, parseEmvCoBankName } from "@/lib/emvco";
+import { useT } from "@/lib/i18n";
 
 interface QrResultItemProps {
   id: string;
@@ -56,6 +57,7 @@ export function QrResultItem({
   exportSheetOpen,
   onExportSheetOpenChange,
 }: QrResultItemProps) {
+  const t = useT();
   const qrSvgRef = useRef<SVGSVGElement>(null);
   const [loadingAction, setLoadingAction] = useState<QrExportAction | null>(
     null
@@ -96,12 +98,12 @@ export function QrResultItem({
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
       if (action === "copy") {
-        toast.error("Gagal salin", {
-          description: "Sila gunakan muat turun sebagai alternatif.",
+        toast.error(t("export.toast.copyFail.title"), {
+          description: t("export.toast.copyFail.description"),
         });
       } else if (action === "share") {
-        toast.error("Gagal kongsi", {
-          description: "Sila gunakan muat turun sebagai alternatif.",
+        toast.error(t("export.toast.shareFail.title"), {
+          description: t("export.toast.shareFail.description"),
         });
       }
     } finally {
@@ -159,7 +161,7 @@ export function QrResultItem({
           "flex flex-col gap-3 rounded-lg border border-border bg-muted/30 p-3 cursor-pointer",
           disabled && "cursor-not-allowed opacity-70"
         )}
-        aria-label={`Pratonton QR - ${displayName}`}
+        aria-label={t("result.item.preview.aria", { name: displayName })}
       >
         <div className="flex flex-row items-center gap-3">
           <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -226,7 +228,7 @@ export function QrResultItem({
       open={previewOpen}
       onOpenChange={setPreviewOpen}
       src={previewUrl}
-      alt={`DuitNow QR - ${displayName}`}
+      alt={t("result.qr.altNamed", { name: displayName })}
       isLoading={previewLoading}
     />
     </>

@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface ImagePreviewDialogProps {
@@ -23,9 +24,11 @@ export function ImagePreviewDialog({
   open,
   onOpenChange,
   src,
-  alt = "Pratonton imej",
+  alt,
   isLoading = false,
 }: ImagePreviewDialogProps) {
+  const t = useT();
+  const resolvedAlt = alt ?? t("a11y.imagePreview.defaultAlt");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
@@ -48,9 +51,9 @@ export function ImagePreviewDialog({
             "duration-300 image-preview-scale"
           )}
         >
-          <DialogTitle className="sr-only">{alt}</DialogTitle>
+          <DialogTitle className="sr-only">{resolvedAlt}</DialogTitle>
           <DialogDescription className="sr-only">
-            Klik di luar atau tekan Escape untuk tutup
+            {t("a11y.imagePreview.closeHint")}
           </DialogDescription>
           {open && (
             <div
@@ -69,7 +72,7 @@ export function ImagePreviewDialog({
               ) : src ? (
                 <img
                   src={src}
-                  alt={alt}
+                  alt={resolvedAlt}
                   className="max-h-[min(75vh,560px)] max-w-[min(75vw,560px)] w-auto h-auto object-contain rounded-md [-webkit-touch-callout:default] [-webkit-user-select:auto] [user-select:auto]"
                   loading="eager"
                 />

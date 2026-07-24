@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { ThemeKeyboardShortcut } from "@/components/theme-keyboard-shortcut";
 import { Toaster } from "@/components/ui/sonner";
+import { LocaleProvider } from "@/lib/i18n";
 import { SITE_URL, DEFAULT_OG_IMAGE, SITE_ICONS } from "@/lib/site-config";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -141,21 +142,23 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(jsonLdWebSite),
-            }}
-          />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(jsonLdWebApp),
-            }}
-          />
-          <ThemeKeyboardShortcut />
-          {children}
-          <Toaster position="top-center" visibleToasts={2} />
+          <LocaleProvider>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(jsonLdWebSite),
+              }}
+            />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(jsonLdWebApp),
+              }}
+            />
+            <ThemeKeyboardShortcut />
+            {children}
+            <Toaster position="top-center" visibleToasts={2} />
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>
