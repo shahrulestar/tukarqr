@@ -10,6 +10,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { QrExportActionSheet } from "@/components/qr-export-action-sheet";
 import type { QrExportAction } from "@/lib/qr-export-actions";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export const exportActionButtonClassName = actionButtonClassName;
@@ -101,6 +102,7 @@ export function QrExportActionBar({
   className,
   layout = "compact",
 }: QrExportActionBarProps) {
+  const t = useT();
   const [internalSheetOpen, setInternalSheetOpen] = useState(false);
   const isControlled = sheetOpenProp !== undefined;
   const sheetOpen = isControlled ? sheetOpenProp : internalSheetOpen;
@@ -139,7 +141,7 @@ export function QrExportActionBar({
         >
           <IconGhostButton
             icon={DownloadCircle01Icon}
-            label="Muat Turun"
+            label={t("export.action.download")}
             onClick={handleDownloadClick}
             isActive={false}
             disabled={isBusy}
@@ -154,7 +156,7 @@ export function QrExportActionBar({
     <>
       <div className={cn("w-full min-w-0 md:w-auto md:self-start", className)}>
         <LabelButton
-          label="Muat Turun"
+          label={t("export.action.download")}
           onClick={handleDownloadClick}
           isActive={false}
           disabled={isBusy}

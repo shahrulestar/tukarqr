@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { toast } from "sonner";
+import { t } from "@/lib/i18n";
 
 import {
   exportPngDataUrl,
@@ -35,7 +36,7 @@ const MALAYSIA_QR_BAR_HEIGHT = 100;
 const MALAYSIA_QR_RADIUS = 16;
 const HOLDER_NAME_FONT = "600 44px system-ui, -apple-system, sans-serif";
 const MAX_BANK_NAME_LENGTH = 45;
-const WATERMARK_TEXT = "tukarqr.my";
+const WATERMARK_TEXT = "tukarqr.my"; // brand domain; keep literal
 const PLAIN_CANVAS_SIZE = 1000;
 const PLAIN_PADDING_RATIO = 0.08;
 
@@ -237,7 +238,7 @@ export function renderSvgToPng(
       ctx.textBaseline = "middle";
       ctx.font = HOLDER_NAME_FONT;
       ctx.fillText(
-        "MALAYSIA NATIONAL QR",
+        t("export.canvas.nationalQr"),
         frameX + borderLeft + innerWidth / 2,
         frameY + frameSize - barHeight / 2
       );
@@ -271,7 +272,7 @@ export async function exportQrAsPng(
     const dataUrl = await renderSvgToPng(svgElement, options);
     return exportPngDataUrl(dataUrl, filename);
   } catch {
-    toast.error("Gagal menjana QR. Sila cuba lagi.");
+    toast.error(t("export.toast.renderFail"));
     return "failed";
   }
 }
@@ -307,7 +308,7 @@ export async function downloadAllQrsAsZip(
 ): Promise<boolean> {
   const valid = items.filter((i) => i.svg);
   if (valid.length === 0) {
-    toast.error("Tiada imej QR untuk dimuat turun.");
+    toast.error(t("export.toast.nothingToDownload"));
     return false;
   }
 
@@ -351,7 +352,7 @@ export async function downloadAllQrsAsZip(
 
     const succeeded = results.filter((r) => r.status === "fulfilled" && r.value);
     if (succeeded.length === 0) {
-      toast.error("Gagal menjana QR. Sila cuba lagi.");
+      toast.error(t("export.toast.renderFail"));
       return false;
     }
 
@@ -365,7 +366,7 @@ export async function downloadAllQrsAsZip(
     const result = await exportZipBlob(blob, zipFilename, succeeded.length);
     return result === "downloaded";
   } catch {
-    toast.error("Gagal menjana ZIP. Sila cuba lagi.");
+    toast.error(t("export.toast.zipFail"));
     return false;
   }
 }

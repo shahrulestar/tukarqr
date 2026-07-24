@@ -1,16 +1,21 @@
 import { getBankNameByAcquirerId } from "@/lib/duitnow-acquirer-ids";
+import { t } from "@/lib/i18n";
 
 const DUITNOW_MALAYSIA_AID = "A0000006150001";
 const MAX_PAYLOAD_LENGTH = 5000;
 const EMVCO_ASCII = /^[\x20-\x7E]*$/;
 
 export const DUITNOW_QR_ERRORS = {
-  invalidFormat:
-    "Format DuitNow QR tidak sah. Kod QR mungkin rosak atau bukan DuitNow QR pembayaran.",
-  notDuitNow:
-    "Kod QR ini bukan DuitNow QR pembayaran. Hanya kod DuitNow QR Malaysia disokong.",
-  invalidOrCorrupt: "Kod DuitNow QR tidak sah atau rosak.",
-} as const;
+  get invalidFormat() {
+    return t("errors.duitnow.invalidFormat");
+  },
+  get notDuitNow() {
+    return t("errors.duitnow.notDuitNow");
+  },
+  get invalidOrCorrupt() {
+    return t("errors.duitnow.invalidOrCorrupt");
+  },
+};
 
 export function parseEmvCoTlv(payload: string): Map<string, string> {
   const map = new Map<string, string>();

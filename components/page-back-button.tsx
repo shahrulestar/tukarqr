@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { ArrowLeft01Icon, Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/lib/i18n";
 
 interface PageBackButtonProps {
   fallbackHref?: string;
@@ -26,6 +27,7 @@ export function PageBackButton({
   fallbackHref = "/",
   className,
 }: PageBackButtonProps) {
+  const t = useT();
   const router = useRouter();
 
   function handleBack() {
@@ -43,7 +45,7 @@ export function PageBackButton({
       variant="ghost"
       size="icon-sm"
       onClick={handleBack}
-      aria-label="Kembali"
+      aria-label={t("nav.back.ariaLabel")}
       className={className}
     >
       <Icon icon={ArrowLeft01Icon} size={16} className="size-4" />

@@ -2,19 +2,20 @@
 
 import { Button, actionButtonClassName } from "@/components/ui/button";
 import { Icon, Shield01Icon } from "@/components/ui/icon";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface PrivacyPolicyProps {
   onDone: () => void;
 }
 
-const points = [
-  "Semua pemprosesan QR berlaku dalam pelayar anda. Tiada data atau imej dihantar ke pelayan.",
-  "Alat ini berjalan terus dalam pelayar anda untuk dekod dan penjanaan QR.",
-  "Tiada skrip analitik pihak ketiga diperlukan untuk fungsi utama aplikasi ini.",
-];
-
 export function PrivacyPolicy({ onDone }: PrivacyPolicyProps) {
+  const t = useT();
+  const points = [
+    t("onboarding.privacy.point1"),
+    t("onboarding.privacy.point2"),
+    t("onboarding.privacy.point3"),
+  ];
   return (
     <div className="space-y-6">
       <div className="flex gap-3">
@@ -41,7 +42,7 @@ export function PrivacyPolicy({ onDone }: PrivacyPolicyProps) {
         )}
         tabIndex={-1}
       >
-        Faham
+        {t("onboarding.privacy.done")}
       </Button>
     </div>
   );

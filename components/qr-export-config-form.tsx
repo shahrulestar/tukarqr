@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button, actionButtonClassName } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import type { QrExportLayout } from "@/lib/qr-render";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface QrExportConfigFormProps {
@@ -34,6 +35,7 @@ export function QrExportConfigForm({
   onExportRatioChange,
   showBankNameId = "show-bank-name",
 }: QrExportConfigFormProps) {
+  const t = useT();
   const gridButtonClassName = cn(
     actionButtonClassName,
     "flex flex-col items-center justify-center gap-0.5"
@@ -43,7 +45,7 @@ export function QrExportConfigForm({
   return (
     <div className="flex w-full flex-col gap-5">
       <div className="flex w-full flex-col gap-2">
-        <label className="text-sm font-medium">Format eksport</label>
+        <label className="text-sm font-medium">{t("export.form.layout.label")}</label>
         <div className="grid w-full grid-cols-2 gap-2">
           <motion.div
             whileTap={{ scale: 0.96 }}
@@ -56,7 +58,7 @@ export function QrExportConfigForm({
               className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onExportLayoutChange("duitnow")}
             >
-              <span className="font-medium text-sm">DuitNow</span>
+              <span className="font-medium text-sm">{t("export.form.layout.duitnow")}</span>
             </Button>
           </motion.div>
           <motion.div
@@ -70,19 +72,19 @@ export function QrExportConfigForm({
               className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onExportLayoutChange("plain")}
             >
-              <span className="font-medium text-sm">QR Sahaja</span>
+              <span className="font-medium text-sm">{t("export.form.layout.plain")}</span>
             </Button>
           </motion.div>
         </div>
         {isPlain && (
           <p className="text-xs text-muted-foreground">
-            Tiada nama penerima atau bank pada imej. Latar putih, nisbah 1:1.
+            {t("export.form.layout.plainHint")}
           </p>
         )}
       </div>
 
       <div className="flex w-full flex-col gap-2">
-        <label className="text-sm font-medium">Reka bentuk QR</label>
+        <label className="text-sm font-medium">{t("export.form.style.label")}</label>
         <div className="grid w-full grid-cols-2 gap-2">
           <motion.div
             whileTap={{ scale: 0.96 }}
@@ -95,7 +97,7 @@ export function QrExportConfigForm({
               className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onQrStyleChange("classic")}
             >
-              <span className="font-medium text-sm">Petak</span>
+              <span className="font-medium text-sm">{t("export.form.style.classic")}</span>
             </Button>
           </motion.div>
           <motion.div
@@ -109,7 +111,7 @@ export function QrExportConfigForm({
               className={cn("w-full min-w-0", gridButtonClassName)}
               onClick={() => onQrStyleChange("rounded")}
             >
-              <span className="font-medium text-sm">Bulat</span>
+              <span className="font-medium text-sm">{t("export.form.style.rounded")}</span>
             </Button>
           </motion.div>
         </div>
@@ -122,7 +124,7 @@ export function QrExportConfigForm({
               htmlFor={showBankNameId}
               className="text-sm font-medium shrink-0"
             >
-              Papar nama bank
+              {t("export.form.showBankName")}
             </label>
             <Switch
               id={showBankNameId}
@@ -131,7 +133,7 @@ export function QrExportConfigForm({
             />
           </div>
           <div className="flex w-full flex-col gap-2">
-            <label className="text-sm font-medium">Latar belakang</label>
+            <label className="text-sm font-medium">{t("export.form.bg.label")}</label>
             <div className="grid w-full grid-cols-2 gap-2">
               <motion.div
                 whileTap={{ scale: 0.96 }}
@@ -144,7 +146,7 @@ export function QrExportConfigForm({
                   className={cn("w-full min-w-0", gridButtonClassName)}
                   onClick={() => onOuterBgChange("white")}
                 >
-                  <span className="font-medium">Putih</span>
+                  <span className="font-medium">{t("export.form.bg.white")}</span>
                 </Button>
               </motion.div>
               <motion.div
@@ -158,13 +160,13 @@ export function QrExportConfigForm({
                   className={cn("w-full min-w-0", gridButtonClassName)}
                   onClick={() => onOuterBgChange("transparent")}
                 >
-                  <span className="font-medium">Lutsinar</span>
+                  <span className="font-medium">{t("export.form.bg.transparent")}</span>
                 </Button>
               </motion.div>
             </div>
           </div>
           <div className="flex w-full flex-col gap-2">
-            <label className="text-sm font-medium">Resolusi imej</label>
+            <label className="text-sm font-medium">{t("export.form.ratio.label")}</label>
             <div className="grid w-full grid-cols-2 gap-2">
               <motion.div
                 whileTap={{ scale: 0.96 }}
@@ -177,7 +179,7 @@ export function QrExportConfigForm({
                   className={cn("w-full min-w-0", gridButtonClassName)}
                   onClick={() => onExportRatioChange("1:1")}
                 >
-                  <span className="font-medium">1:1</span>
+                  <span className="font-medium">{t("export.form.ratio.1_1")}</span>
                 </Button>
               </motion.div>
               <motion.div
@@ -191,7 +193,7 @@ export function QrExportConfigForm({
                   className={cn("w-full min-w-0", gridButtonClassName)}
                   onClick={() => onExportRatioChange("3:4")}
                 >
-                  <span className="font-medium">3:4</span>
+                  <span className="font-medium">{t("export.form.ratio.3_4")}</span>
                 </Button>
               </motion.div>
             </div>

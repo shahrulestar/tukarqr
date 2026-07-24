@@ -7,6 +7,7 @@ import {
   useState,
   startTransition,
 } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -29,6 +30,8 @@ import {
 import { Button, actionButtonClassName } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useT } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { ResponsiveModal } from "@/components/responsive-modal";
 import { HowToStart } from "@/components/onboarding/how-to-start";
 import { PrivacyPolicy } from "@/components/onboarding/privacy-policy";
@@ -55,7 +58,6 @@ import {
   isDuitNowQr,
   parseEmvCoMerchantName,
   parseEmvCoBankName,
-  DUITNOW_QR_ERRORS,
 } from "@/lib/emvco";
 import {
   getPrimaryColor,
@@ -108,37 +110,52 @@ function scrollToResultCard(
   });
 }
 
-function mapDecodeErrorToMessage(raw: string): string {
-  if (raw.includes("30MB"))
-    return "Imej terlalu besar. Saiz fail maksimum ialah 30MB.";
-  if (raw.includes("4096px"))
-    return "Imej terlalu besar. Resolusi maksimum ialah 4096px setiap sisi.";
-  if (raw.includes("Format imej tidak disokong"))
-    return "Format imej tidak disokong. Sila gunakan JPG, PNG atau HEIC.";
-  if (raw.includes("Gagal memuatkan imej") || raw.includes("Gagal menukar HEIC"))
-    return "Fail imej rosak atau tidak boleh dibaca. Sila cuba fail lain.";
-  if (raw.includes("Tiada QR dikesan"))
-    return "Tiada kod QR dikesan dalam imej ini. Pastikan imej mengandungi kod QR yang jelas.";
+function mapDecodeErrorToMessage(
+  raw: string,
+  t: (key: string, params?: Record<string, string | number>) => string
+): string {
+  if (raw.includes("30MB")) return t("errors.decode.tooLargeSize");
+  if (raw.includes("4096px")) return t("errors.decode.tooLargeResolution");
+  if (
+    raw.includes("Format imej tidak disokong") ||
+    raw.includes("Unsupported file")
+  )
+    return t("errors.decode.unsupportedFormat");
+  if (
+    raw.includes("Gagal memuatkan imej") ||
+    raw.includes("Gagal menukar HEIC")
+  )
+    return t("errors.decode.corruptFile");
+  if (raw.includes("Tiada QR dikesan")) return t("errors.decode.noQr");
   if (
     raw.includes("bukan DuitNow QR pembayaran") ||
-    raw.includes("Hanya kod DuitNow")
+    raw.includes("Hanya kod DuitNow") ||
+    raw.includes("not a DuitNow")
   )
-    return DUITNOW_QR_ERRORS.notDuitNow;
-  if (raw.includes("Kod DuitNow QR tidak sah atau rosak"))
-    return `${DUITNOW_QR_ERRORS.invalidOrCorrupt} Sila muat naik imej QR yang lebih jelas.`;
-  if (raw.includes("Format DuitNow QR tidak sah"))
-    return `${DUITNOW_QR_ERRORS.invalidFormat} Sila muat naik imej QR yang lebih jelas.`;
+    return t("errors.duitnow.notDuitNow");
+  if (
+    raw.includes("Kod DuitNow QR tidak sah atau rosak") ||
+    raw.includes("invalid or damaged")
+  )
+    return t("errors.duitnow.invalidOrCorruptHint");
+  if (
+    raw.includes("Format DuitNow QR tidak sah") ||
+    raw.includes("Invalid DuitNow QR")
+  )
+    return t("errors.duitnow.invalidFormatHint");
   if (
     raw.includes("tidak jelas") ||
     raw.includes("berkilat") ||
     raw.includes("kabur") ||
-    raw.includes("Ralat semasa dekod")
+    raw.includes("Ralat semasa dekod") ||
+    raw.includes("blurry")
   )
-    return "Imej QR tidak jelas atau kabur. Sila ambil gambar yang lebih jelas.";
+    return t("errors.decode.blurry");
   return raw;
 }
 
 export function QrApp() {
+  const t = useT();
   const pathname = usePathname();
   const router = useRouter();
   const isDownloadRoute = pathname === "/download";
@@ -316,12 +333,12 @@ export function QrApp() {
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
       if (action === "copy") {
-        toast.error("Gagal salin", {
-          description: "Sila gunakan muat turun sebagai alternatif.",
+        toast.error(t("export.toast.copyFail.title"), {
+          description: t("export.toast.copyFail.description"),
         });
       } else if (action === "share") {
-        toast.error("Gagal kongsi", {
-          description: "Sila gunakan muat turun sebagai alternatif.",
+        toast.error(t("export.toast.shareFail.title"), {
+          description: t("export.toast.shareFail.description"),
         });
       }
     } finally {
@@ -365,7 +382,7 @@ export function QrApp() {
         (file.type && SUPPORTED_MIME_TYPES.includes(file.type)) ||
         SUPPORTED_EXTENSIONS.test(file.name);
       if (!isFormatValid) {
-        const err = mapDecodeErrorToMessage("Format imej tidak disokong.");
+        const err = mapDecodeErrorToMessage("Format imej tidak disokong.", t);
         updateItem(id, {
           status: "failed",
           progress: 100,
@@ -376,7 +393,10 @@ export function QrApp() {
       }
 
       if (file.size > MAX_FILE_SIZE_BYTES) {
-        const err = mapDecodeErrorToMessage("Imej terlalu besar (maks 30MB).");
+        const err = mapDecodeErrorToMessage(
+          "Imej terlalu besar (maks 30MB).",
+          t
+        );
         updateItem(id, {
           status: "failed",
           progress: 100,
@@ -403,7 +423,10 @@ export function QrApp() {
           let h = img.height;
 
           if (w > MAX_IMAGE_DIMENSION_HARD || h > MAX_IMAGE_DIMENSION_HARD) {
-            const err = mapDecodeErrorToMessage("Imej terlalu besar (maks 4096px).");
+            const err = mapDecodeErrorToMessage(
+              "Imej terlalu besar (maks 4096px).",
+              t
+            );
             updateItem(id, {
               status: "failed",
               progress: 100,
@@ -482,7 +505,7 @@ export function QrApp() {
               });
               return true;
             }
-            const err = mapDecodeErrorToMessage(validation.reason ?? "");
+            const err = mapDecodeErrorToMessage(validation.reason ?? "", t);
             updateItem(id, {
               status: "failed",
               progress: 100,
@@ -491,7 +514,7 @@ export function QrApp() {
             if (batchSize <= 1) toast.error(err);
             return false;
           }
-          const err = mapDecodeErrorToMessage("Tiada QR dikesan.");
+          const err = mapDecodeErrorToMessage("Tiada QR dikesan.", t);
           updateItem(id, {
             status: "failed",
             progress: 100,
@@ -502,7 +525,7 @@ export function QrApp() {
         } catch {
           if (progressInterval) clearInterval(progressInterval);
           if (!signal.aborted) {
-            const err = mapDecodeErrorToMessage("Ralat semasa dekod.");
+            const err = mapDecodeErrorToMessage("Ralat semasa dekod.", t);
             updateItem(id, {
               status: "failed",
               progress: 100,
@@ -525,7 +548,7 @@ export function QrApp() {
         try {
           blobToUse = await convertHeicToJpeg(file);
         } catch {
-          const err = mapDecodeErrorToMessage("Gagal menukar HEIC.");
+          const err = mapDecodeErrorToMessage("Gagal menukar HEIC.", t);
           updateItem(id, {
             status: "failed",
             progress: 100,
@@ -547,7 +570,7 @@ export function QrApp() {
       return new Promise<boolean>((resolve) => {
         img.onerror = () => {
           cleanup();
-          const err = mapDecodeErrorToMessage("Gagal memuatkan imej.");
+          const err = mapDecodeErrorToMessage("Gagal memuatkan imej.", t);
           updateItem(id, {
             status: "failed",
             progress: 100,
@@ -565,7 +588,7 @@ export function QrApp() {
         img.src = imageUrl;
       });
     },
-    [updateItem]
+    [updateItem, t]
   );
 
   const processQueue = useCallback(
@@ -680,10 +703,10 @@ export function QrApp() {
 
       processingRef.current = false;
       if (successCount > 0) {
-        toast.success(`${successCount} QR dikesan dan diproses.`);
+        toast.success(t("upload.toast.decodeSuccess", { n: successCount }));
       }
     },
-    [processSingleFile]
+    [processSingleFile, t]
   );
 
   useEffect(() => {
@@ -701,14 +724,12 @@ export function QrApp() {
         (f.type && SUPPORTED_MIME_TYPES.includes(f.type)) ||
         SUPPORTED_EXTENSIONS.test(f.name);
       if (!valid) {
-        toast.error(
-          "Format fail tidak disokong. Sila gunakan JPG, PNG atau HEIC."
-        );
+        toast.error(t("upload.toast.unsupportedFormat"));
         return false;
       }
       if (f.size > MAX_FILE_SIZE_BYTES) {
         toast.error(
-          mapDecodeErrorToMessage("Imej terlalu besar (maks 30MB).")
+          mapDecodeErrorToMessage("Imej terlalu besar (maks 30MB).", t)
         );
         return false;
       }
@@ -722,9 +743,7 @@ export function QrApp() {
       .map(createItem);
 
     if (validFiles.length > MAX_BATCH_SIZE) {
-      toast.error(
-        `Had maksimum ${MAX_BATCH_SIZE} fail. Sebahagian fail tidak ditambah.`
-      );
+      toast.error(t("upload.toast.batchLimit", { n: MAX_BATCH_SIZE }));
     }
 
     successBaselineRef.current = results.filter(
@@ -814,10 +833,10 @@ export function QrApp() {
         {!isDownloadRoute && (
           <div className="text-center space-y-2">
             <h1 className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 text-[22px] md:text-[26px] font-semibold leading-[1.25] tracking-[-0.015em] text-primary-foreground">
-              Tukar QR
+              {t("hero.brand")}
             </h1>
             <p className="text-[14px] md:text-[16px] leading-[1.6] text-muted-foreground text-balance">
-              Jadikan imej DuitNow QR kembali seperti asal
+              {t("hero.tagline")}
             </p>
           </div>
         )}
@@ -897,9 +916,9 @@ export function QrApp() {
           <Dialog open={configOpen} onOpenChange={handleConfigOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Tetapan eksport</DialogTitle>
+                <DialogTitle>{t("export.settings.title")}</DialogTitle>
                 <DialogDescription>
-                  Tetapkan reka bentuk dan resolusi imej QR
+                  {t("export.settings.description")}
                 </DialogDescription>
               </DialogHeader>
               <QrExportConfigForm
@@ -927,7 +946,7 @@ export function QrApp() {
                         setSkipExportPromptChecked(checked === true)
                       }
                     />
-                    Jangan tunjuk lagi
+                    {t("export.settings.skipPrompt")}
                   </label>
                   <Button
                     size="lg"
@@ -937,7 +956,7 @@ export function QrApp() {
                       "w-full focus:outline-none focus-visible:outline-none focus-visible:ring-0"
                     )}
                   >
-                    Seterusnya
+                    {t("export.settings.next")}
                   </Button>
                 </DialogFooter>
               )}
@@ -948,9 +967,9 @@ export function QrApp() {
             <DrawerContent className="h-auto overflow-hidden !max-h-[min(92dvh,100%)] data-[vaul-drawer-direction=bottom]:!max-h-[min(92dvh,100%)]">
               <div className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
                 <DrawerHeader>
-                  <DrawerTitle>Tetapan eksport</DrawerTitle>
+                  <DrawerTitle>{t("export.settings.title")}</DrawerTitle>
                   <DrawerDescription>
-                    Tetapkan reka bentuk dan resolusi imej QR
+                    {t("export.settings.description")}
                   </DrawerDescription>
                 </DrawerHeader>
                 <div className="px-4 pb-2">
@@ -981,7 +1000,7 @@ export function QrApp() {
                           setSkipExportPromptChecked(checked === true)
                         }
                       />
-                      Jangan tunjuk lagi
+                      {t("export.settings.skipPrompt")}
                     </label>
                     <Button
                       size="lg"
@@ -991,7 +1010,7 @@ export function QrApp() {
                         "w-full focus:outline-none focus-visible:outline-none focus-visible:ring-0"
                       )}
                     >
-                      Seterusnya
+                      {t("export.settings.next")}
                     </Button>
                   </DrawerFooter>
                 )}
@@ -1003,8 +1022,8 @@ export function QrApp() {
         <ResponsiveModal
           open={howToStartOpen}
           onOpenChange={setHowToStartOpen}
-          title="Cara guna"
-          description="Ikuti langkah mudah untuk menukar DuitNow QR anda"
+          title={t("onboarding.howTo.title")}
+          description={t("onboarding.howTo.description")}
         >
           <HowToStart onNext={handleHowToStartNext} />
         </ResponsiveModal>
@@ -1012,8 +1031,8 @@ export function QrApp() {
         <ResponsiveModal
           open={privacyPolicyOpen}
           onOpenChange={setPrivacyPolicyOpen}
-          title="Dasar privasi"
-          description="Maklumat tentang privasi dan pemprosesan data"
+          title={t("onboarding.privacy.title")}
+          description={t("onboarding.privacy.description")}
         >
           <PrivacyPolicy onDone={handlePrivacyPolicyDone} />
         </ResponsiveModal>
@@ -1021,8 +1040,8 @@ export function QrApp() {
         <ResponsiveModal
           open={ratingOpen}
           onOpenChange={handleRatingOpenChange}
-          title="Bagaimana pengalaman anda?"
-          description="Berikan penilaian supaya kami boleh terus memperbaiki Tukar QR."
+          title={t("rating.modal.title")}
+          description={t("rating.modal.description")}
           keyboardAware={ratingContentPhase === "feedback"}
           fitContent={ratingContentPhase !== "feedback"}
         >
@@ -1033,6 +1052,17 @@ export function QrApp() {
         </ResponsiveModal>
 
       </div>
+
+      {!isDownloadRoute && (
+        <footer className="mx-auto mt-8 flex w-full max-w-[800px] flex-wrap items-center justify-center gap-2">
+          <nav aria-label={t("nav.footer.ariaLabel")} className="flex items-center">
+            <Button variant="ghost" asChild>
+              <Link href="/tentang">{t("nav.footer.about")}</Link>
+            </Button>
+          </nav>
+          <LanguageSwitcher />
+        </footer>
+      )}
     </main>
   );
 }

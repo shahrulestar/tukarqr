@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/attachment";
 import { Spinner } from "@/components/ui/spinner";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
+import { useT } from "@/lib/i18n";
 
 export type FileUploadStatus = "pending" | "decoding" | "success" | "failed";
 
@@ -56,19 +57,11 @@ function getFileSizeLabel(file: File | undefined): string | null {
 function getStateDescription(
   state: AttachmentState,
   fileSize: string | null,
+  t: (key: string) => string,
   error?: string
 ): string {
-  if (state === "error") return error ?? "Dekod gagal.";
-
-  const labels: Record<Exclude<AttachmentState, "error">, string> = {
-    idle: "Sedia",
-    uploading: "Mendekod",
-    processing: "Memproses",
-    done: "Selesai",
-  };
-
-  const label = labels[state];
-  return fileSize ? `${label} · ${fileSize}` : label;
+  if (state === "error") return error ?? t("upload.item.status.errorFallback");
+  return fileSize ?? "";
 }
 
 function toAttachmentState(
@@ -130,6 +123,7 @@ export function FileUploadItem({
   showLoadingForPending = false,
   allowPreview = true,
 }: FileUploadItemProps) {
+  const t = useT();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -138,6 +132,7 @@ export function FileUploadItem({
   const stateDescription = getStateDescription(
     attachmentState,
     fileSize,
+    t,
     error
   );
 
@@ -166,12 +161,14 @@ export function FileUploadItem({
         />
         <AttachmentContent>
           <AttachmentTitle title={fileName}>{fileName}</AttachmentTitle>
-          <AttachmentDescription>{stateDescription}</AttachmentDescription>
+          {stateDescription ? (
+            <AttachmentDescription>{stateDescription}</AttachmentDescription>
+          ) : null}
         </AttachmentContent>
         {onRemove && (
           <AttachmentActions>
             <AttachmentAction
-              aria-label="Buang Fail"
+              aria-label={t("upload.item.remove.aria")}
               onClick={(e) => {
                 e.stopPropagation();
                 onRemove();
@@ -183,7 +180,7 @@ export function FileUploadItem({
         )}
         {canPreview && (
           <AttachmentTrigger
-            aria-label={`Pratonton ${fileName}`}
+            aria-label={t("upload.item.preview.aria", { fileName })}
             onClick={() => setPreviewOpen(true)}
           />
         )}

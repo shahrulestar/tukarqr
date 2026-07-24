@@ -1,9 +1,7 @@
 import { toast } from "sonner";
-
+import { t } from "@/lib/i18n";
 import type { QrRenderOptions } from "@/lib/qr-render";
 import { renderSvgToPng } from "@/lib/qr-render";
-
-const SHARE_TITLE = "DuitNow QR";
 
 export type ExportResult = "shared" | "downloaded" | "cancelled" | "failed";
 
@@ -95,7 +93,7 @@ export async function shareFile(
   try {
     await navigator.share({
       files: [file],
-      title: meta?.title ?? SHARE_TITLE,
+      title: meta?.title ?? t("export.shareQr.title"),
     });
     return true;
   } catch (error) {
@@ -115,13 +113,13 @@ export async function exportPngDataUrl(
     const forceDownload = isIosDevice() || isAndroidDevice();
 
     triggerBlobDownload(file, filename, { forceDownload });
-    toast.success("QR dimuat turun.");
+    toast.success(t("export.toast.downloaded"));
     return "downloaded";
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       return "cancelled";
     }
-    toast.error("Gagal menjana QR. Sila cuba lagi.");
+    toast.error(t("export.toast.renderFail"));
     return "failed";
   }
 }
@@ -133,13 +131,13 @@ export async function exportZipBlob(
 ): Promise<ExportResult> {
   try {
     triggerBlobDownload(blob, filename);
-    toast.success(`${count} QR dimuat turun sebagai ZIP.`);
+    toast.success(t("export.toast.zipDownloaded", { n: count }));
     return "downloaded";
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
       return "cancelled";
     }
-    toast.error("Gagal menjana ZIP. Sila cuba lagi.");
+    toast.error(t("export.toast.zipFail"));
     return "failed";
   }
 }
@@ -151,18 +149,18 @@ export async function shareQrImage(
   title?: string | null
 ): Promise<void> {
   if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
-    throw new Error("Kongsi imej tidak disokong pada peranti ini.");
+    throw new Error(t("export.error.shareUnsupported"));
   }
 
   const dataUrl = await renderSvgToPng(svgElement, options);
   const file = dataUrlToFile(dataUrl, filename);
 
   if (typeof navigator.canShare === "function" && !navigator.canShare({ files: [file] })) {
-    throw new Error("Kongsi imej tidak disokong pada peranti ini.");
+    throw new Error(t("export.error.shareUnsupported"));
   }
 
   await navigator.share({
     files: [file],
-    title: title ?? undefined,
+    title: title ?? t("export.shareQr.title"),
   });
 }

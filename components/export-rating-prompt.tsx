@@ -17,16 +17,20 @@ import {
 } from "@/lib/export-rating";
 import { cn } from "@/lib/utils";
 import { shareApp } from "@/lib/share-app";
+import { useT } from "@/lib/i18n";
 
-function getRatingSubmitErrorMessage(error: unknown): string {
+function getRatingSubmitErrorMessage(
+  error: unknown,
+  t: (key: string) => string
+): string {
   if (
     error instanceof Error &&
     error.message === RATING_WEBHOOK_NOT_CONFIGURED_ERROR
   ) {
-    return "Webhook penilaian belum dikonfigurasi. Semak NEXT_PUBLIC_DISCORD_RATING_WEBHOOK_URL.";
+    return t("rating.toast.webhookMissing");
   }
 
-  return "Sila cuba lagi sebentar.";
+  return t("rating.toast.retry");
 }
 
 export type RatingContentPhase = "initial" | "feedback" | "complete";
@@ -40,6 +44,7 @@ export function ExportRatingPrompt({
   onClose,
   onContentPhaseChange,
 }: ExportRatingPromptProps) {
+  const t = useT();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [rating, setRating] = useState<number | null>(() => getSavedRating());
   const [feedback, setFeedback] = useState("");
@@ -83,8 +88,8 @@ export function ExportRatingPrompt({
     } catch (error) {
       setSubmitted(false);
       setRating(null);
-      toast.error("Gagal menghantar penilaian", {
-        description: getRatingSubmitErrorMessage(error),
+      toast.error(t("rating.toast.submitFail.title"), {
+        description: getRatingSubmitErrorMessage(error, t),
       });
     }
   }
@@ -103,8 +108,8 @@ export function ExportRatingPrompt({
       saveRating(rating);
       setSubmitted(true);
     } catch (error) {
-      toast.error("Gagal menghantar maklum balas", {
-        description: getRatingSubmitErrorMessage(error),
+      toast.error(t("rating.toast.feedbackFail.title"), {
+        description: getRatingSubmitErrorMessage(error, t),
       });
     } finally {
       setIsSubmitting(false);
@@ -127,7 +132,7 @@ export function ExportRatingPrompt({
         value={rating}
         onChange={handleRatingChange}
         disabled={submitted}
-        aria-label="Berikan Penilaian Anda"
+        aria-label={t("rating.stars.aria")}
       />
 
       {showFeedbackForm && (
@@ -136,7 +141,7 @@ export function ExportRatingPrompt({
             htmlFor="rating-feedback"
             className="text-[13px] font-medium text-foreground"
           >
-            Apa yang boleh kami perbaiki?
+            {t("rating.feedback.label")}
           </label>
           <Textarea
             ref={textareaRef}
@@ -151,7 +156,7 @@ export function ExportRatingPrompt({
                 setShowFeedbackError(false);
               }
             }}
-            placeholder="Ceritakan masalah atau cadangan anda..."
+            placeholder={t("rating.feedback.placeholder")}
             minLength={MIN_RATING_FEEDBACK_LENGTH}
             aria-invalid={showFeedbackError}
             aria-describedby={
@@ -172,8 +177,9 @@ export function ExportRatingPrompt({
               id="rating-feedback-error"
               className="text-[12px] text-destructive"
             >
-              Sila masukkan sekurang-kurangnya {MIN_RATING_FEEDBACK_LENGTH}{" "}
-              aksara.
+              {t("rating.feedback.minLength", {
+                n: MIN_RATING_FEEDBACK_LENGTH,
+              })}
             </p>
           )}
           <Button
@@ -185,7 +191,9 @@ export function ExportRatingPrompt({
               "focus:outline-none focus-visible:outline-none focus-visible:ring-0"
             )}
           >
-            {isSubmitting ? "Menghantar..." : "Hantar Maklum Balas"}
+            {isSubmitting
+              ? t("rating.feedback.submitting")
+              : t("rating.feedback.submit")}
           </Button>
         </div>
       )}
@@ -193,7 +201,7 @@ export function ExportRatingPrompt({
       {showShareStep && (
         <>
           <p className="text-center text-[13px] text-muted-foreground">
-            Terima kasih atas maklum balas anda!
+            {t("rating.thanks")}
           </p>
           <Button
             size="lg"
@@ -203,7 +211,7 @@ export function ExportRatingPrompt({
               "focus:outline-none focus-visible:outline-none focus-visible:ring-0"
             )}
           >
-            Kongsi Dengan Rakan
+            {t("rating.share")}
           </Button>
         </>
       )}

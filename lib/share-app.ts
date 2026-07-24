@@ -1,9 +1,6 @@
 import { toast } from "sonner";
+import { t } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site-config";
-
-const SHARE_TITLE = "TukarQR";
-const SHARE_TEXT =
-  "Tukar DuitNow QR kabur kepada imej yang jelas — percuma dan terus dalam pelayar.";
 
 function canUseNativeShare(data: ShareData): boolean {
   if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
@@ -16,9 +13,11 @@ function canUseNativeShare(data: ShareData): boolean {
 }
 
 function getSharePayloads(): ShareData[] {
+  const title = t("share.app.title");
+  const text = t("share.app.text");
   return [
-    { title: SHARE_TITLE, text: SHARE_TEXT, url: SITE_URL },
-    { title: SHARE_TITLE, url: SITE_URL },
+    { title, text, url: SITE_URL },
+    { title, url: SITE_URL },
     { url: SITE_URL },
   ];
 }
@@ -40,7 +39,7 @@ async function copyLinkToClipboard(): Promise<void> {
   document.body.removeChild(textarea);
 
   if (!copied) {
-    throw new Error("Gagal menyalin pautan ke papan keratan.");
+    throw new Error(t("share.app.copyFail"));
   }
 }
 
@@ -59,5 +58,5 @@ export async function shareApp(): Promise<void> {
   }
 
   await copyLinkToClipboard();
-  toast.success("Pautan disalin ke papan keratan.");
+  toast.success(t("share.app.linkCopied"));
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon, StarIcon } from "@/components/ui/icon";
+import { useT } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 interface StarRatingProps {
@@ -14,12 +15,14 @@ export function StarRating({
   value,
   onChange,
   disabled = false,
-  "aria-label": ariaLabel = "Penilaian bintang",
+  "aria-label": ariaLabel,
 }: StarRatingProps) {
+  const t = useT();
+  const resolvedAriaLabel = ariaLabel ?? t("rating.stars.defaultAria");
   return (
     <div
       role="radiogroup"
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       className="flex justify-center gap-1"
     >
       {[1, 2, 3, 4, 5].map((star) => {
@@ -30,7 +33,7 @@ export function StarRating({
             type="button"
             role="radio"
             aria-checked={value === star ? "true" : "false"}
-            aria-label={`${star} bintang`}
+            aria-label={t("rating.stars.starN.aria", { n: star })}
             disabled={disabled}
             onClick={() => onChange(star)}
             className={cn(
