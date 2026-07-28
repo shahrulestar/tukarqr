@@ -21,7 +21,7 @@ export const en: Messages = {
   "upload.dropzone.title": "Drop your DuitNow QR image here",
   "upload.dropzone.hint.desktop": "or press {mod}+V to paste",
   "upload.dropzone.hint.mobile": "or choose from your gallery",
-  "upload.dropzone.pasteButton": "Paste image",
+  "upload.dropzone.pasteButton": "Paste Image",
   "upload.dropzone.aria.desktop":
     "Upload a QR image. Drop it here or press Ctrl+V to paste.",
   "upload.dropzone.aria.mobile":
@@ -33,7 +33,7 @@ export const en: Messages = {
   "upload.list.count": "{n}/10 images",
   "upload.list.hide": "Hide",
   "upload.list.show": "Show",
-  "upload.list.clearAll.aria": "Remove all",
+  "upload.list.clearAll.aria": "Remove All",
   "upload.list.section.done": "Done ({n})",
   "upload.list.section.failed": "Failed ({n})",
   "upload.item.status.idle": "Ready",
@@ -41,7 +41,7 @@ export const en: Messages = {
   "upload.item.status.processing": "Processing",
   "upload.item.status.done": "Done",
   "upload.item.status.errorFallback": "Decode failed.",
-  "upload.item.remove.aria": "Remove file",
+  "upload.item.remove.aria": "Remove File",
   "upload.item.preview.aria": "Preview {fileName}",
   "upload.toast.dragImagesOnly":
     "Drop image files only (JPG, PNG, HEIC, and similar).",
@@ -64,7 +64,7 @@ export const en: Messages = {
   "result.description": "Scan with your bank app to pay",
   "result.config.aria": "Set QR design",
   "result.config.ariaSingle": "Export settings",
-  "result.alert.dismiss.aria": "Hide warning",
+  "result.alert.dismiss.aria": "Hide Warning",
   "result.alert.title": "Before you scan:",
   "result.alert.item.verifyName": "Confirm the recipient name is correct",
   "result.alert.item.checkAmount": "Check the payment amount if shown",
@@ -83,17 +83,17 @@ export const en: Messages = {
   // export
   "export.settings.title": "Export settings",
   "export.settings.description": "Choose the QR design and image size",
-  "export.settings.skipPrompt": "Don't show again",
+  "export.settings.skipPrompt": "Don't Show Again",
   "export.settings.next": "Next",
   "export.form.layout.label": "Export format",
   "export.form.layout.duitnow": "DuitNow",
-  "export.form.layout.plain": "QR only",
+  "export.form.layout.plain": "QR Only",
   "export.form.layout.plainHint":
     "No recipient or bank name on the image. White background, 1:1 ratio.",
   "export.form.style.label": "QR style",
   "export.form.style.classic": "Square",
   "export.form.style.rounded": "Rounded",
-  "export.form.showBankName": "Show bank name",
+  "export.form.showBankName": "Show Bank Name",
   "export.form.bg.label": "Background",
   "export.form.bg.white": "White",
   "export.form.bg.transparent": "Transparent",
@@ -159,10 +159,10 @@ export const en: Messages = {
   "rating.feedback.label": "What can we improve?",
   "rating.feedback.placeholder": "Tell us about a problem or idea...",
   "rating.feedback.minLength": "Enter at least {n} characters.",
-  "rating.feedback.submit": "Send feedback",
+  "rating.feedback.submit": "Send Feedback",
   "rating.feedback.submitting": "Sending...",
   "rating.thanks": "Thanks for your feedback!",
-  "rating.share": "Share with a friend",
+  "rating.share": "Share With A Friend",
   "rating.toast.submitFail.title": "Couldn't send rating",
   "rating.toast.feedbackFail.title": "Couldn't send feedback",
   "rating.toast.webhookMissing":
@@ -223,7 +223,7 @@ export const en: Messages = {
     "Banks and financial institutions that support DuitNow QR",
   "accordion.banks.body":
     "DuitNow QR is supported by many banks and financial institutions in Malaysia. See the full list to check whether your bank is included.",
-  "accordion.banks.cta": "View full list",
+  "accordion.banks.cta": "View Full List",
   "accordion.disclaimer.title": "Disclaimer",
   "accordion.disclaimer.p1":
     "Tukar QR is an independent tool and is not affiliated with, endorsed by, or sponsored by Payments Network Malaysia Sdn Bhd (PayNet), DuitNow, or any financial institution. DuitNow and the DuitNow logo are registered trademarks of PayNet.",
@@ -239,8 +239,8 @@ export const en: Messages = {
     "Banks and financial institutions that support DuitNow QR in Malaysia.",
   "list.table.no": "No",
   "list.table.name": "Name",
-  "list.showAll": "Show all ({n})",
-  "list.showLess": "Show less",
+  "list.showAll": "Show All ({n})",
+  "list.showLess": "Show Less",
   "list.source.label": "Source:",
   "list.source.link": "Paynet",
 
@@ -282,5 +282,5 @@ export const en: Messages = {
   // notFound
   "notFound.code": "404",
   "notFound.message": "Page not found.",
-  "notFound.cta": "Back to Tukar QR",
+  "notFound.cta": "Back To Tukar QR",
 };
