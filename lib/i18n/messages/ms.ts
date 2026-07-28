@@ -84,7 +84,7 @@ export const ms: Messages = {
   "export.settings.title": "Tetapan eksport",
   "export.settings.description":
     "Tetapkan reka bentuk dan resolusi imej QR",
-  "export.settings.skipPrompt": "Jangan tunjuk lagi",
+  "export.settings.skipPrompt": "Jangan Tunjuk Lagi",
   "export.settings.next": "Seterusnya",
   "export.form.layout.label": "Format eksport",
   "export.form.layout.duitnow": "DuitNow",
@@ -180,8 +180,8 @@ export const ms: Messages = {
   "about.openSource.heading": "Sumber terbuka dan telus",
   "about.openSource.body":
     "Kod sumber Tukar QR tersedia di GitHub. Anda boleh menyemak implementasi, membantu meningkatkan projek, atau melaporkan isu. Lencana bintang mencerminkan sokongan komuniti terhadap repositori terbuka ini — bukti bahawa alat ini dibangunkan secara terbuka dan boleh dipercayai.",
-  "about.openSource.stars": "Stars",
-  "about.openSource.sponsor": "Become Sponsor",
+  "about.openSource.stars": "Bintang",
+  "about.openSource.sponsor": "Jadi Sponsor",
   "about.hero.beforeAlt": "QR fizikal asal — kabur dan tidak jelas",
   "about.hero.afterAlt": "QR digital selepas ditukar — jelas dan kemas",
 
