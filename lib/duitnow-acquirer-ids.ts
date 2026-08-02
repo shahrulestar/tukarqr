@@ -1,7 +1,7 @@
 /**
  * PayNet DuitNow Acquirer ID to Bank/E-Wallet name mapping.
  * Source: PayNet Table 9 - List of Acquirer IDs (ID "01")
- * https://docs.developer.paynet.my/docs/duitNow-QR/integration/QR-generation-specification/merchant-presented-mode/qr-data-object#acquirer-id-id-01
+ * https://docs.paynet.my/docs/duitnow-qr/merchant-presented-qr/qr-data-object#acquirer-id-id-01
  */
 export const ACQUIRER_ID_TO_BANK: Record<string, string> = {
   "420709": "Bank Simpanan Nasional",

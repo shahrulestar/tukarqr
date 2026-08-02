@@ -1,6 +1,4 @@
-import { Icon, StarIcon } from "@/components/ui/icon";
-import { Button } from "@/components/ui/button";
-import { t } from "@/lib/i18n";
+import { GithubStarsButtonClient } from "@/components/github-stars-button-client";
 
 const GITHUB_REPO = "shahrulestar/tukarqr";
 
@@ -28,18 +26,9 @@ export async function GithubStarsButton() {
   const starCount = await getGitHubStarCount();
 
   return (
-    <Button variant="secondary" asChild>
-      <a
-        href={`https://github.com/${GITHUB_REPO}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Icon icon={StarIcon} size={16} className="size-4" />
-        {t("about.openSource.stars")}
-        {starCount !== null ? (
-          <span className="font-semibold tabular-nums">{starCount}</span>
-        ) : null}
-      </a>
-    </Button>
+    <GithubStarsButtonClient
+      repo={GITHUB_REPO}
+      starCount={starCount}
+    />
   );
 }
