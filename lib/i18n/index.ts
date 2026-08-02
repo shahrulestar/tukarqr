@@ -7,4 +7,3 @@ export {
 export { getMessage, interpolate } from "./get-message";
 export { getCurrentLocale, setCurrentLocale, t } from "./locale-store";
 export { LocaleProvider, useLocale, useT } from "./locale-provider";
-export { localeInitScript } from "./locale-script";

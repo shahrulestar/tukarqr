@@ -4,12 +4,11 @@ import {
   createContext,
   useCallback,
   useContext,
-  useLayoutEffect,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
-import { flushSync } from "react-dom";
 import { getMessage } from "./get-message";
 import { setCurrentLocale } from "./locale-store";
 import type { Locale, MessageParams } from "./types";
@@ -42,22 +41,18 @@ function readStoredLocale(): Locale {
   return DEFAULT_LOCALE;
 }
 
-function clearLocalePending() {
-  document.documentElement.style.visibility = "";
-  delete document.documentElement.dataset.localePending;
-}
-
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    // Clear any leftover hide from the previous anti-flash script.
+    document.documentElement.style.visibility = "";
+    delete document.documentElement.dataset.localePending;
+
     const stored = readStoredLocale();
-    flushSync(() => {
-      setLocaleState(stored);
-    });
+    setLocaleState(stored);
     setCurrentLocale(stored);
     document.documentElement.lang = stored;
-    clearLocalePending();
   }, []);
 
   const setLocale = useCallback((next: Locale) => {

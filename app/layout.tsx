@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { ThemeKeyboardShortcut } from "@/components/theme-keyboard-shortcut";
 import { Toaster } from "@/components/ui/sonner";
-import { LocaleProvider, localeInitScript } from "@/lib/i18n";
+import { LocaleProvider } from "@/lib/i18n";
 import { SITE_URL, DEFAULT_OG_IMAGE, SITE_ICONS } from "@/lib/site-config";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -127,7 +127,6 @@ export default function RootLayout({
       className={cn(GeistSans.variable, GeistMono.variable, "font-sans")}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: localeInitScript }} />
         <link rel="preload" href={SITE_ICONS.favicon} as="image" />
         <link rel="preload" href={SITE_ICONS.favicon32} as="image" />
         <link rel="preload" href={SITE_ICONS.appleTouch} as="image" />
