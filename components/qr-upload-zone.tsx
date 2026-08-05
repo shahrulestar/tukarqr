@@ -368,7 +368,7 @@ export function QrUploadZone({
                 {!isLargeDesktop && (
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="default"
                     className="w-fit"
                     disabled={isPasting}
                     onClick={(e) => {
