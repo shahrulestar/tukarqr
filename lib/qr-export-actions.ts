@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { notifyExportToDiscord } from "@/lib/export-notify";
 import { t } from "@/lib/i18n";
 import { copyQrImageToClipboard } from "@/lib/clipboard-utils";
 import {
@@ -20,6 +21,7 @@ export async function runQrExportAction(
 
   if (action === "download") {
     await downloadQrAsPng(svg, filename, renderOptions);
+    void notifyExportToDiscord("save");
     return;
   }
 
@@ -31,4 +33,5 @@ export async function runQrExportAction(
 
   await shareQrImage(svg, renderOptions, filename, merchantName);
   toast.success(t("export.toast.shared"));
+  void notifyExportToDiscord("share");
 }

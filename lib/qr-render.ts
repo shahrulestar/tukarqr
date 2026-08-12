@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { toast } from "sonner";
+import { notifyExportToDiscord } from "@/lib/export-notify";
 import { t } from "@/lib/i18n";
 
 import {
@@ -364,6 +365,9 @@ export async function downloadAllQrsAsZip(
 
     const blob = await zip.generateAsync({ type: "blob" });
     const result = await exportZipBlob(blob, zipFilename, succeeded.length);
+    if (result === "downloaded") {
+      void notifyExportToDiscord("save");
+    }
     return result === "downloaded";
   } catch {
     toast.error(t("export.toast.zipFail"));
