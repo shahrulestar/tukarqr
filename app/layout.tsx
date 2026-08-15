@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { ThemeProvider } from "next-themes";
-import { GoogleAnalytics } from "@/components/google-analytics";
 import { ThemeKeyboardShortcut } from "@/components/theme-keyboard-shortcut";
 import { Toaster } from "@/components/ui/sonner";
 import { LocaleProvider } from "@/lib/i18n";
@@ -97,6 +97,8 @@ const jsonLdWebSite = {
   inLanguage: "ms",
 };
 
+const GA_MEASUREMENT_ID = "G-PBGVPSN15D";
+
 const jsonLdWebApp = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -130,12 +132,28 @@ export default function RootLayout({
         <link rel="preload" href={SITE_ICONS.favicon} as="image" />
         <link rel="preload" href={SITE_ICONS.favicon32} as="image" />
         <link rel="preload" href={SITE_ICONS.appleTouch} as="image" />
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <Script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        )}
       </head>
       <body
         className={`antialiased ${GeistSans.className}`}
         suppressHydrationWarning
       >
-        <GoogleAnalytics />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
