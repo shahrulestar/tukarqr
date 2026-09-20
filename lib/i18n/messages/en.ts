@@ -225,6 +225,45 @@ export const en: Messages = {
     "Claude Desktop: paste the endpoint URL above under Settings → Connectors → Add custom connector.",
   "mcp.install.copy": "Copy",
   "mcp.install.copied": "Copied",
+  "mcp.prompts.heading": "Example prompts",
+  "mcp.prompts.body":
+    "Copy a prompt into Cursor or Claude after connecting TukarQR MCP. Payload examples use the about page QR (MASJID AN NUR KG PULAU PA / Bank Islam Malaysia Berhad). Attach comparison-before.png from /about for decode tests.",
+  "mcp.prompts.validateValid.title": "Validate a payload",
+  "mcp.prompts.validateValid.text":
+    "Using TukarQR MCP, validate this DuitNow EMVCo payload from the tukarqr.my about page example and tell me if it is valid:\n{payload}",
+  "mcp.prompts.validateInvalid.title": "Validate — wrong country",
+  "mcp.prompts.validateInvalid.text":
+    "Using TukarQR MCP, validate this payload and explain why it is not a Malaysia DuitNow QR:\n000402025802SG5908Foreign Shop6304ABCD",
+  "mcp.prompts.validateCorrupt.title": "Validate — corrupt payload",
+  "mcp.prompts.validateCorrupt.text":
+    "Using TukarQR MCP, validate this payload and explain what is wrong. Do not invent fields:\n000402025802MY5908Broken",
+  "mcp.prompts.parse.title": "Parse summary",
+  "mcp.prompts.parse.text":
+    "Using TukarQR MCP, parse this DuitNow payload from the about page example and give me the merchant name, bank, amount, and country:\n{payload}",
+  "mcp.prompts.details.title": "Raw EMVCo details",
+  "mcp.prompts.details.text":
+    "Using TukarQR MCP, show the full raw EMVCo details for this about page DuitNow QR (MASJID AN NUR KG PULAU PA) — all TLV tags, payment fields, and nested merchant account data:\n{payload}",
+  "mcp.prompts.decodeImage.title": "Decode one image",
+  "mcp.prompts.decodeImage.text":
+    "Using TukarQR MCP, decode the DuitNow QR from the PNG I attached (comparison-before.png from tukarqr.my/about). Return the EMVCo payload string only. Do not store the image.",
+  "mcp.prompts.decodeBulk.title": "Decode bulk (max 10)",
+  "mcp.prompts.decodeBulk.text":
+    "Using TukarQR MCP, decode up to 10 DuitNow QR images I attached (PNG/JPEG only). Report which decoded successfully and which failed, with per-item errors.",
+  "mcp.prompts.encodeDefault.title": "Export — website defaults",
+  "mcp.prompts.encodeDefault.text":
+    "Using TukarQR MCP, export this about page DuitNow payload as a styled QR matching tukarqr.my defaults (Malaysia National QR frame, classic modules, white background, bank name shown, square 1:1 PNG):\n{payload}",
+  "mcp.prompts.encodeCustom.title": "Export — custom style",
+  "mcp.prompts.encodeCustom.text":
+    "Using TukarQR MCP, export this about page DuitNow payload with: layout plain (QR only), qrStyle rounded, showBankName false, outerBg transparent, format svg:\n{payload}",
+  "mcp.prompts.encodeBulk.title": "Bulk export ZIP",
+  "mcp.prompts.encodeBulk.text":
+    "Using TukarQR MCP, export these DuitNow payloads as one ZIP of styled PNGs (max 10, shared style: duitnow frame, classic, show bank name, white background). Report any failures:\n{payload}\n{payload}",
+  "mcp.prompts.fullWorkflow.title": "Photo → styled QR",
+  "mcp.prompts.fullWorkflow.text":
+    "Using TukarQR MCP, decode my attached blurry DuitNow QR photo (comparison-before.png from tukarqr.my/about), validate it, parse merchant and bank, then export a clean styled QR matching comparison-after.png. Ask for export style if I did not specify.",
+  "mcp.prompts.heic.title": "HEIC not supported",
+  "mcp.prompts.heic.text":
+    "I have a HEIC DuitNow QR photo from iPhone. Using TukarQR MCP, explain that HEIC is not supported and tell me to convert it to JPEG first, then decode and export after I attach the converted image.",
   "mcp.docs.github": "Technical notes on GitHub",
 
   // accordion

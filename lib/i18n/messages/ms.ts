@@ -229,6 +229,45 @@ export const ms: Messages = {
     "Claude Desktop: tampal URL endpoint di atas di Settings → Connectors → Add custom connector.",
   "mcp.install.copy": "Salin",
   "mcp.install.copied": "Disalin",
+  "mcp.prompts.heading": "Contoh prompt",
+  "mcp.prompts.body":
+    "Salin prompt ke Cursor atau Claude selepas sambung TukarQR MCP. Contoh payload guna QR halaman about (MASJID AN NUR KG PULAU PA / Bank Islam Malaysia Berhad). Lampirkan comparison-before.png dari /about untuk ujian decode.",
+  "mcp.prompts.validateValid.title": "Validate payload",
+  "mcp.prompts.validateValid.text":
+    "Guna TukarQR MCP, validate payload EMVCo DuitNow ini daripada contoh halaman about tukarqr.my dan beritahu sama ada ia valid:\n{payload}",
+  "mcp.prompts.validateInvalid.title": "Validate — negara salah",
+  "mcp.prompts.validateInvalid.text":
+    "Guna TukarQR MCP, validate payload ini dan terangkan mengapa ia bukan DuitNow Malaysia:\n000402025802SG5908Foreign Shop6304ABCD",
+  "mcp.prompts.validateCorrupt.title": "Validate — payload rosak",
+  "mcp.prompts.validateCorrupt.text":
+    "Guna TukarQR MCP, validate payload ini dan terangkan masalahnya. Jangan cipta medan palsu:\n000402025802MY5908Broken",
+  "mcp.prompts.parse.title": "Parse ringkasan",
+  "mcp.prompts.parse.text":
+    "Guna TukarQR MCP, parse payload DuitNow ini daripada contoh halaman about dan beri nama peniaga, bank, jumlah, dan negara:\n{payload}",
+  "mcp.prompts.details.title": "Butiran EMVCo mentah",
+  "mcp.prompts.details.text":
+    "Guna TukarQR MCP, tunjuk butiran EMVCo mentah penuh untuk DuitNow QR halaman about ini (MASJID AN NUR KG PULAU PA) — semua tag TLV, medan pembayaran, dan data akaun peniaga bersarang:\n{payload}",
+  "mcp.prompts.decodeImage.title": "Decode satu imej",
+  "mcp.prompts.decodeImage.text":
+    "Guna TukarQR MCP, decode DuitNow QR daripada PNG yang saya lampirkan (comparison-before.png dari tukarqr.my/about). Pulangkan rentetan payload EMVCo sahaja. Jangan simpan imej.",
+  "mcp.prompts.decodeBulk.title": "Decode bulk (maks 10)",
+  "mcp.prompts.decodeBulk.text":
+    "Guna TukarQR MCP, decode sehingga 10 imej DuitNow QR yang saya lampirkan (PNG/JPEG sahaja). Laporkan yang berjaya decode dan yang gagal, dengan ralat setiap item.",
+  "mcp.prompts.encodeDefault.title": "Eksport — lalai laman web",
+  "mcp.prompts.encodeDefault.text":
+    "Guna TukarQR MCP, eksport payload DuitNow halaman about ini sebagai QR bergaya mengikut lalai tukarqr.my (bingkai Malaysia National QR, modul classic, latar putih, nama bank dipapar, PNG segi empat 1:1):\n{payload}",
+  "mcp.prompts.encodeCustom.title": "Eksport — gaya tersuai",
+  "mcp.prompts.encodeCustom.text":
+    "Guna TukarQR MCP, eksport payload DuitNow halaman about ini dengan: layout plain (QR sahaja), qrStyle rounded, showBankName false, outerBg transparent, format svg:\n{payload}",
+  "mcp.prompts.encodeBulk.title": "Eksport bulk ZIP",
+  "mcp.prompts.encodeBulk.text":
+    "Guna TukarQR MCP, eksport payload DuitNow ini sebagai satu ZIP PNG bergaya (maks 10, gaya sama: bingkai duitnow, classic, papar bank, latar putih). Laporkan sebarang kegagalan:\n{payload}\n{payload}",
+  "mcp.prompts.fullWorkflow.title": "Gambar → QR bergaya",
+  "mcp.prompts.fullWorkflow.text":
+    "Guna TukarQR MCP, decode gambar DuitNow QR kabur yang saya lampirkan (comparison-before.png dari tukarqr.my/about), validate, parse peniaga dan bank, kemudian eksport QR bergaya bersih mengikut comparison-after.png. Tanya gaya eksport jika saya belum nyatakan.",
+  "mcp.prompts.heic.title": "HEIC tidak disokong",
+  "mcp.prompts.heic.text":
+    "Saya ada gambar DuitNow QR HEIC dari iPhone. Guna TukarQR MCP, terangkan HEIC tidak disokong dan minta saya tukar ke JPEG dahulu, kemudian decode dan eksport selepas saya lampirkan imej yang ditukar.",
   "mcp.docs.github": "Nota teknikal di GitHub",
 
   // accordion
