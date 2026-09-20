@@ -40,6 +40,9 @@ export function AboutContent({ githubStars }: AboutContentProps) {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {githubStars}
             <Button variant="secondary" asChild>
+              <a href="/mcp">{t("about.openSource.mcp")}</a>
+            </Button>
+            <Button variant="secondary" asChild>
               <a
                 href="https://shahrulestar.com/sponsor"
                 target="_blank"

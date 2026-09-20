@@ -4,6 +4,14 @@ import { useState } from "react";
 import { PageBackButton } from "@/components/page-back-button";
 import { Button } from "@/components/ui/button";
 import { Copy01Icon, Icon } from "@/components/ui/icon";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useT } from "@/lib/i18n";
 
 const MCP_ENDPOINT = "https://mcp.tukarqr.my/mcp";
@@ -58,6 +66,14 @@ export function McpContent() {
         <PageBackButton className="-ml-2" />
         <h1 className="text-xl font-semibold">{t("mcp.heading")}</h1>
 
+        <img
+          src="/mcp-image.png"
+          alt={t("mcp.image.alt")}
+          width={1200}
+          height={630}
+          className="w-full h-auto rounded-xl border border-border"
+        />
+
         <p>{t("mcp.intro")}</p>
 
         <div className="space-y-2">
@@ -98,20 +114,31 @@ export function McpContent() {
           <h2 id="mcp-tools-heading" className="text-base font-semibold">
             {t("mcp.tools.heading")}
           </h2>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {MCP_TOOLS.map((tool) => (
-              <article
-                key={tool.name}
-                className="rounded-xl border border-border bg-muted/30 px-4 py-3.5"
-              >
-                <h3 className="font-mono text-[13px] font-medium leading-snug text-primary">
-                  {tool.name}
-                </h3>
-                <p className="mt-1.5 text-[14px] leading-relaxed text-muted-foreground">
-                  {t(tool.descriptionKey)}
-                </p>
-              </article>
-            ))}
+          <div className="mt-3 overflow-x-auto rounded-xl border border-border [-webkit-overflow-scrolling:touch]">
+            <Table className="min-w-[720px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[260px] px-4">
+                    {t("mcp.tools.table.name")}
+                  </TableHead>
+                  <TableHead className="min-w-[420px] px-4">
+                    {t("mcp.tools.table.description")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {MCP_TOOLS.map((tool) => (
+                  <TableRow key={tool.name}>
+                    <TableCell className="min-w-[260px] px-4 align-top font-mono text-[13px] font-medium whitespace-nowrap text-primary">
+                      {tool.name}
+                    </TableCell>
+                    <TableCell className="min-w-[420px] px-4 align-top whitespace-normal text-muted-foreground">
+                      {t(tool.descriptionKey)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </section>
 

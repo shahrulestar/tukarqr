@@ -21,12 +21,13 @@
     "mcp:deploy": "npm run deploy -w @tukarqr/mcp"
   },
   "dependencies": {
-    "@tukarqr/qr-core": "*",
     "@hugeicons/core-free-icons": "^4.2.2",
     "@hugeicons/react": "^1.1.9",
+    "@tukarqr/qr-core": "*",
     "@zxing/browser": "^0.1.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cn": "^0.3.0",
     "framer-motion": "^12.34.0",
     "geist": "^1.7.2",
     "heic2any": "^0.0.4",

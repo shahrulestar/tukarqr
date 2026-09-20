@@ -11,6 +11,7 @@ import {
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 interface ComparisonSliderProps {
@@ -32,7 +33,22 @@ export function ComparisonSlider({
 }: ComparisonSliderProps) {
   const [position, setPosition] = useState(defaultPosition);
   const [isDragging, setIsDragging] = useState(false);
+  const [beforeLoaded, setBeforeLoaded] = useState(false);
+  const [afterLoaded, setAfterLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const afterImgRef = useRef<HTMLImageElement>(null);
+  const beforeImgRef = useRef<HTMLImageElement>(null);
+  const isReady = beforeLoaded && afterLoaded;
+
+  useEffect(() => {
+    setBeforeLoaded(false);
+    setAfterLoaded(false);
+  }, [beforeSrc, afterSrc]);
+
+  useEffect(() => {
+    if (afterImgRef.current?.complete) setAfterLoaded(true);
+    if (beforeImgRef.current?.complete) setBeforeLoaded(true);
+  }, [beforeSrc, afterSrc]);
 
   const updateFromClientX = useCallback((clientX: number) => {
     const el = containerRef.current;
@@ -63,7 +79,7 @@ export function ComparisonSlider({
   }, [isDragging, updateFromClientX]);
 
   function handleContainerPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
-    if (e.button !== 0) return;
+    if (!isReady || e.button !== 0) return;
     setIsDragging(true);
     updateFromClientX(e.clientX);
   }
@@ -75,59 +91,84 @@ export function ComparisonSlider({
           ref={containerRef}
           role="img"
           aria-label={`${beforeAlt}. ${afterAlt}. Seret untuk bandingkan.`}
+          aria-busy={!isReady}
           className={cn(
-            "relative w-full touch-none select-none overflow-hidden rounded-xl bg-muted",
-            isDragging && "cursor-ew-resize"
+            "relative w-full touch-none select-none overflow-hidden rounded-xl bg-muted aspect-square",
+            isReady && isDragging && "cursor-ew-resize"
           )}
           onPointerDown={handleContainerPointerDown}
           onContextMenu={(e) => e.preventDefault()}
         >
+          {!isReady && (
+            <Skeleton className="absolute inset-0 size-full rounded-xl bg-foreground/10" />
+          )}
+
           <img
+            ref={afterImgRef}
             src={afterSrc}
             alt=""
             draggable={false}
             onDragStart={(e) => e.preventDefault()}
-            className="block h-auto w-full object-contain object-center"
+            onLoad={() => setAfterLoaded(true)}
+            onError={() => setAfterLoaded(true)}
+            className={cn(
+              "block size-full object-contain object-center",
+              !isReady && "invisible"
+            )}
           />
 
           <div
-            className="absolute inset-0 overflow-hidden"
+            className={cn(
+              "absolute inset-0 overflow-hidden",
+              !isReady && "invisible"
+            )}
             style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
           >
             <img
+              ref={beforeImgRef}
               src={beforeSrc}
               alt=""
               draggable={false}
               onDragStart={(e) => e.preventDefault()}
+              onLoad={() => setBeforeLoaded(true)}
+              onError={() => setBeforeLoaded(true)}
               className="size-full object-contain object-center"
             />
           </div>
 
-          <div
-            className="pointer-events-none absolute inset-y-0 z-20 -translate-x-1/2"
-            style={{ left: `${position}%` }}
-            aria-hidden
-          >
-            <Separator
-              orientation="vertical"
-              decorative
-              className="h-full w-0.5 bg-[#E6007E] shadow-sm"
-            />
-          </div>
+          {isReady && (
+            <>
+              <div
+                className="pointer-events-none absolute inset-y-0 z-20 -translate-x-1/2"
+                style={{ left: `${position}%` }}
+                aria-hidden
+              >
+                <Separator
+                  orientation="vertical"
+                  decorative
+                  className="h-full w-0.5 bg-[#E6007E] shadow-sm"
+                />
+              </div>
 
-          <div
-            className="pointer-events-none absolute top-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
-            style={{ left: `${position}%` }}
-          >
-            <div
-              className={cn(
-                "flex size-10 items-center justify-center rounded-full border-2 border-[#E6007E] bg-[#E6007E] text-white shadow-md transition-transform",
-                isDragging && "scale-105"
-              )}
-            >
-              <Icon icon={DragDropVerticalIcon} size={20} className="text-white" />
-            </div>
-          </div>
+              <div
+                className="pointer-events-none absolute top-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${position}%` }}
+              >
+                <div
+                  className={cn(
+                    "flex size-10 items-center justify-center rounded-full border-2 border-[#E6007E] bg-[#E6007E] text-white shadow-md transition-transform",
+                    isDragging && "scale-105"
+                  )}
+                >
+                  <Icon
+                    icon={DragDropVerticalIcon}
+                    size={20}
+                    className="text-white"
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>

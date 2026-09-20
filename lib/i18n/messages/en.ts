@@ -178,6 +178,7 @@ export const en: Messages = {
   "about.openSource.body":
     "Tukar QR's source code is on GitHub. You can review the implementation, help improve the project, or report issues. The star badge reflects community support for this open repository — a sign the tool is built in the open and can be trusted.",
   "about.openSource.stars": "Star",
+  "about.openSource.mcp": "MCP Server",
   "about.openSource.sponsor": "Become Sponsor",
   "about.hero.beforeAlt": "Original physical QR — blurry and hard to scan",
   "about.hero.afterAlt": "Digital QR after conversion — clear and clean",
@@ -186,10 +187,13 @@ export const en: Messages = {
   "mcp.heading": "TukarQR MCP Server",
   "mcp.intro":
     "Remote MCP for DuitNow QR — validate, parse, decode images, and export styled QR codes that match tukarqr.my. Use from Cursor, Claude Desktop, or any MCP client.",
+  "mcp.image.alt": "TukarQR MCP Server — connect Cursor or Claude to DuitNow QR tools",
   "mcp.endpoint.label": "Endpoint",
   "mcp.privacy":
     "Payloads and images are processed in memory only. Nothing is stored or logged. Bulk and image decode are capped at 10 items, same as the website.",
   "mcp.tools.heading": "Tools",
+  "mcp.tools.table.name": "Tool",
+  "mcp.tools.table.description": "Description",
   "mcp.tools.validate":
     "Check a payload and return valid, plus an optional reason.",
   "mcp.tools.parse":

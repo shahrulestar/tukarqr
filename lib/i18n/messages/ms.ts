@@ -182,6 +182,7 @@ export const ms: Messages = {
   "about.openSource.body":
     "Kod sumber Tukar QR tersedia di GitHub. Anda boleh menyemak implementasi, membantu meningkatkan projek, atau melaporkan isu. Lencana bintang mencerminkan sokongan komuniti terhadap repositori terbuka ini — bukti bahawa alat ini dibangunkan secara terbuka dan boleh dipercayai.",
   "about.openSource.stars": "Bintang",
+  "about.openSource.mcp": "MCP Server",
   "about.openSource.sponsor": "Jadi Sponsor",
   "about.hero.beforeAlt": "QR fizikal asal — kabur dan tidak jelas",
   "about.hero.afterAlt": "QR digital selepas ditukar — jelas dan kemas",
@@ -190,10 +191,13 @@ export const ms: Messages = {
   "mcp.heading": "TukarQR MCP Server",
   "mcp.intro":
     "MCP jauh untuk DuitNow QR — validate, parse, decode imej, dan eksport QR bergaya yang sepadan dengan tukarqr.my. Gunakan dari Cursor, Claude Desktop, atau mana-mana klien MCP.",
+  "mcp.image.alt": "TukarQR MCP Server — sambungkan Cursor atau Claude ke alatan DuitNow QR",
   "mcp.endpoint.label": "Endpoint",
   "mcp.privacy":
     "Payload dan imej diproses dalam memori sahaja. Tiada disimpan atau dilog. Bulk dan decode imej dihadkan 10 item, sama seperti laman web.",
   "mcp.tools.heading": "Alatan",
+  "mcp.tools.table.name": "Nama",
+  "mcp.tools.table.description": "Penerangan",
   "mcp.tools.validate":
     "Semak payload dan pulangkan valid, serta sebab jika ada.",
   "mcp.tools.parse":

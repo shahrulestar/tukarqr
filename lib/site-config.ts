@@ -3,6 +3,7 @@ export const SITE_URL =
 
 export const DEFAULT_OG_IMAGE = "/og-image.png";
 export const ABOUT_OG_IMAGE = "/about.png";
+export const MCP_OG_IMAGE = "/mcp-image.png";
 
 export const SITE_ICONS = {
   favicon: "/favicon.ico",
