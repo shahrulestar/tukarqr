@@ -6,33 +6,36 @@ import {
   resolveExportOptions,
   type QrEncodeFormat,
   type QrExportLayout,
-  type QrExportRatio,
   type QrModuleStyle,
   type QrOuterBg,
 } from "@tukarqr/qr-core";
 
 export interface EncodeQrInput {
   payload: string;
+  /** Output file format (png | svg). Default png. */
   format?: QrEncodeFormat;
+  /** Export format: duitnow frame | plain QR only. */
   layout?: QrExportLayout;
-  ratio?: QrExportRatio;
+  /** QR module style: classic (square) | rounded. */
   qrStyle?: QrModuleStyle;
+  /** Canvas background. */
   outerBg?: QrOuterBg;
+  /** Show bank name on framed export. */
   showBankName?: boolean;
   merchantName?: string;
   bankName?: string;
 }
 
-async function loadFont(): Promise<ArrayBuffer> {
+/** Compact Latin subset for Workers PNG (SVG uses system-ui; no full font shipped). */
+async function loadRasterFont(): Promise<Uint8Array> {
   try {
     const path = fileURLToPath(
-      new URL("../../assets/fonts/NotoSans-SemiBold.ttf", import.meta.url)
+      new URL("../../assets/fonts/latin-semibold.ttf", import.meta.url)
     );
-    const buf = await readFile(path);
-    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+    return new Uint8Array(await readFile(path));
   } catch {
-    const mod = await import("../../assets/fonts/NotoSans-SemiBold.ttf");
-    return mod.default as ArrayBuffer;
+    const mod = await import("../../assets/fonts/latin-semibold.ttf");
+    return new Uint8Array(mod.default as ArrayBuffer);
   }
 }
 
@@ -43,10 +46,11 @@ async function svgToPng(svg: string): Promise<Uint8Array> {
   } catch {
     ({ Resvg } = await import("@cf-wasm/resvg/node"));
   }
-  const font = await loadFont();
+  const font = await loadRasterFont();
   const instance = await Resvg.async(svg, {
     font: {
-      fontBuffers: [new Uint8Array(font)],
+      fontBuffers: [font],
+      // SVG declares system-ui; Workers have no OS fonts — subset fills glyphs.
       defaultFontFamily: "Noto Sans",
     },
   });
@@ -69,7 +73,8 @@ export async function encodeQr(input: EncodeQrInput) {
   const built = buildExportSvg(payload, {
     format: input.format,
     layout: input.layout,
-    ratio: input.ratio,
+    // MCP image size is fixed square (same default as website 1:1).
+    ratio: "1:1",
     qrStyle: input.qrStyle,
     outerBg: input.outerBg,
     showBankName: input.showBankName,

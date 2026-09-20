@@ -1,7 +1,10 @@
 export const MAX_BATCH_SIZE = 10;
 export const NATIONAL_QR_LABEL = "MALAYSIA NATIONAL QR";
-/** TukarQR primary magenta — matches web preview / comparison-after.png */
+/** TukarQR primary pink — matches web preview / comparison-after.png */
 export const PRIMARY_MAGENTA = "#ec4899";
+/** Same stack as web canvas (`lib/qr-render.ts` HOLDER_NAME_FONT). */
+export const SYSTEM_FONT_STACK =
+  "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
 export type QrExportLayout = "duitnow" | "plain";
 export type QrModuleStyle = "classic" | "rounded";

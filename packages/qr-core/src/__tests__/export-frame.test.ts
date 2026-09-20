@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildExportSvg } from "../export-frame";
 import { getDuitNowQrDetails } from "../details";
-import { NATIONAL_QR_LABEL, PRIMARY_MAGENTA } from "../export-types";
+import { NATIONAL_QR_LABEL, PRIMARY_MAGENTA, SYSTEM_FONT_STACK } from "../export-types";
 
 const SAMPLE = "HELLO-TUKARQR";
 
@@ -14,6 +14,8 @@ describe("buildExportSvg", () => {
     });
     expect(svg).toContain(NATIONAL_QR_LABEL);
     expect(svg).toContain(PRIMARY_MAGENTA);
+    expect(PRIMARY_MAGENTA).toBe("#ec4899");
+    expect(svg).toContain(SYSTEM_FONT_STACK);
     expect(svg).toContain("MASJID AN NUR KG PULAU PA");
     expect(svg).toContain("Bank Islam Malaysia Berhad");
     expect(svg).not.toMatch(/<image/i);

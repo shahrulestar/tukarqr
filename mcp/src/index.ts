@@ -9,7 +9,7 @@ import { parseDuitNowQrTool } from "./tools/parse-duitnow-qr";
 import { validateDuitNowQr } from "./tools/validate-duitnow-qr";
 
 const STYLE_HINT =
-  "If the user has not specified layout/ratio/module style/background, ask which they want before generating; otherwise use Malaysia National QR frame, 1:1, classic modules, white background, show bank name — matching tukarqr.my and comparison-after.png. Do not invent decorative QR images. Do not add a DuitNow logo or any brand mark. Export anatomy: magenta rounded frame, magenta QR modules (no center logo), optional merchant then bank text in black, bottom bar text exactly MALAYSIA NATIONAL QR.";
+  "Same export settings as tukarqr.my: export format (layout duitnow frame vs plain QR only), QR style (classic square vs rounded), show bank name yes/no, background white vs transparent. Image size is always square 1:1 (fixed). Output file format png or svg. If the user has not chosen those settings, ask before generating; otherwise defaults match the website — duitnow frame, classic, show bank, white bg, PNG. Do not invent decorative QR images. Do not add a DuitNow logo. Frame + QR modules use #ec4899; bottom bar text exactly MALAYSIA NATIONAL QR.";
 
 function jsonResult(data: unknown) {
   return {
@@ -22,13 +22,30 @@ function jsonResult(data: unknown) {
   };
 }
 
-const styleFields = {
-  format: z.enum(["png", "svg"]).optional(),
-  layout: z.enum(["duitnow", "plain"]).optional(),
-  ratio: z.enum(["1:1", "3:4"]).optional(),
-  qrStyle: z.enum(["classic", "rounded"]).optional(),
-  outerBg: z.enum(["white", "transparent"]).optional(),
-  showBankName: z.boolean().optional(),
+/** Mirrors website ExportSettings (+ file format). Image size fixed square 1:1. */
+const exportSettingsFields = {
+  format: z
+    .enum(["png", "svg"])
+    .optional()
+    .describe("Output file format. Default png."),
+  layout: z
+    .enum(["duitnow", "plain"])
+    .optional()
+    .describe(
+      "Export format: duitnow = Malaysia National QR frame; plain = QR only (no merchant/bank on image)."
+    ),
+  qrStyle: z
+    .enum(["classic", "rounded"])
+    .optional()
+    .describe("QR style: classic = square modules; rounded = rounded modules."),
+  showBankName: z
+    .boolean()
+    .optional()
+    .describe("Show bank name under merchant on the framed export. Default true."),
+  outerBg: z
+    .enum(["white", "transparent"])
+    .optional()
+    .describe("Background: white or transparent. Default white."),
   merchantName: z.string().max(80).optional(),
   bankName: z.string().max(45).optional(),
 };
@@ -81,7 +98,7 @@ function createServer() {
       description: `Encode a DuitNow EMVCo payload as a TukarQR-styled PNG (base64) or SVG. ${STYLE_HINT}`,
       inputSchema: z.object({
         payload: z.string().min(1).max(5000),
-        ...styleFields,
+        ...exportSettingsFields,
       }),
     },
     async (args) => jsonResult(await encodeQr(args))
@@ -90,7 +107,7 @@ function createServer() {
   server.registerTool(
     "get_encode_qr_bulk",
     {
-      description: `Export up to 10 QR payloads as a ZIP of styled PNGs using one shared style. ${STYLE_HINT} Ask style once for the whole batch.`,
+      description: `Export up to 10 QR payloads as a ZIP of styled PNGs using one shared style. ${STYLE_HINT} Ask export settings once for the whole batch.`,
       inputSchema: z.object({
         items: z
           .array(
@@ -101,11 +118,10 @@ function createServer() {
           )
           .min(1)
           .max(10),
-        layout: styleFields.layout,
-        ratio: styleFields.ratio,
-        qrStyle: styleFields.qrStyle,
-        outerBg: styleFields.outerBg,
-        showBankName: styleFields.showBankName,
+        layout: exportSettingsFields.layout,
+        qrStyle: exportSettingsFields.qrStyle,
+        outerBg: exportSettingsFields.outerBg,
+        showBankName: exportSettingsFields.showBankName,
       }),
     },
     async (args) => jsonResult(await encodeQrBulk(args))

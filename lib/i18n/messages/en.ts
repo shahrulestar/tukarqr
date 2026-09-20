@@ -201,15 +201,17 @@ export const en: Messages = {
   "mcp.tools.decodeBulk":
     "Decode up to 10 images in one call. Per-item success or failure.",
   "mcp.tools.encode":
-    "Export one styled QR (Malaysia National QR frame or plain) as PNG or SVG. Same layout options as the website.",
+    "Export one styled QR with the same settings as the website (export format, QR style, bank name, background). Square 1:1 PNG or SVG.",
   "mcp.tools.encodeBulk":
-    "Export up to 10 payloads with shared style settings. Returns a ZIP of PNGs.",
-  "mcp.export.heading": "Default export style",
+    "Export up to 10 payloads with shared export settings. Returns a ZIP of square PNGs.",
+  "mcp.export.heading": "Export settings (same as website)",
   "mcp.export.layout":
-    "Malaysia National QR frame (not a DuitNow logo)",
-  "mcp.export.ratio": "1:1 aspect ratio",
-  "mcp.export.style": "Classic modules, white background, bank name shown",
-  "mcp.export.format": "PNG output with TukarQR primary magenta modules",
+    "Export format: Malaysia National QR frame or QR only (not a DuitNow logo)",
+  "mcp.export.style": "QR style: classic (square) or rounded modules",
+  "mcp.export.showBank": "Show bank name: on or off",
+  "mcp.export.bg": "Background: white or transparent",
+  "mcp.export.ratio": "Image size: fixed square 1:1",
+  "mcp.export.format": "File format: PNG (default) or SVG — modules use #ec4899",
   "mcp.export.note":
     "National bar text is MALAYSIA NATIONAL QR only. No DuitNow, PayNet, or bank logos are embedded.",
   "mcp.install.heading": "Quick install",

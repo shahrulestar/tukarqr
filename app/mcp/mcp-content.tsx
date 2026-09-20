@@ -22,8 +22,10 @@ const MCP_TOOLS = [
 
 const MCP_EXPORT_DEFAULTS = [
   "mcp.export.layout",
-  "mcp.export.ratio",
   "mcp.export.style",
+  "mcp.export.showBank",
+  "mcp.export.bg",
+  "mcp.export.ratio",
   "mcp.export.format",
 ] as const;
 

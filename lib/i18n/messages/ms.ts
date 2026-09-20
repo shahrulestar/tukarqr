@@ -205,15 +205,17 @@ export const ms: Messages = {
   "mcp.tools.decodeBulk":
     "Decode sehingga 10 imej dalam satu panggilan. Kejayaan atau kegagalan setiap item.",
   "mcp.tools.encode":
-    "Eksport satu QR bergaya (bingkai Malaysia National QR atau plain) sebagai PNG atau SVG. Pilihan susun atur sama seperti laman web.",
+    "Eksport satu QR bergaya dengan tetapan sama seperti laman web (format eksport, gaya QR, nama bank, latar). Segi empat 1:1 PNG atau SVG.",
   "mcp.tools.encodeBulk":
-    "Eksport sehingga 10 payload dengan tetapan gaya yang sama. Pulangkan ZIP PNG.",
-  "mcp.export.heading": "Gaya eksport lalai",
+    "Eksport sehingga 10 payload dengan tetapan eksport yang sama. Pulangkan ZIP PNG segi empat.",
+  "mcp.export.heading": "Tetapan eksport (sama seperti laman web)",
   "mcp.export.layout":
-    "Bingkai Malaysia National QR (bukan logo DuitNow)",
-  "mcp.export.ratio": "Nisbah 1:1",
-  "mcp.export.style": "Modul classic, latar putih, nama bank dipaparkan",
-  "mcp.export.format": "Output PNG dengan modul magenta utama TukarQR",
+    "Format eksport: bingkai Malaysia National QR atau QR sahaja (bukan logo DuitNow)",
+  "mcp.export.style": "Gaya QR: modul classic (petak) atau rounded (bulat)",
+  "mcp.export.showBank": "Papar nama bank: ya atau tidak",
+  "mcp.export.bg": "Latar belakang: putih atau lutsinar",
+  "mcp.export.ratio": "Saiz imej: segi empat 1:1 tetap",
+  "mcp.export.format": "Format fail: PNG (lalai) atau SVG — modul #ec4899",
   "mcp.export.note":
     "Teks bar kebangsaan MALAYSIA NATIONAL QR sahaja. Tiada logo DuitNow, PayNet, atau bank disertakan.",
   "mcp.install.heading": "Pemasangan pantas",

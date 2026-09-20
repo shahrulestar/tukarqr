@@ -1,6 +1,7 @@
 import {
   NATIONAL_QR_LABEL,
   PRIMARY_MAGENTA,
+  SYSTEM_FONT_STACK,
   resolveExportOptions,
   type QrExportOptions,
 } from "./export-types";
@@ -124,20 +125,20 @@ export function buildExportSvg(
   if (includeText) {
     if (merchantName && bankName) {
       texts.push(
-        `<text x="${holderCenterX}" y="${holderTop + 22}" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, -apple-system, sans-serif" font-size="44" font-weight="600" fill="#000000">${escapeXml(merchantName)}</text>`,
-        `<text x="${holderCenterX}" y="${holderTop + 78}" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, -apple-system, sans-serif" font-size="44" font-weight="600" fill="#000000">${escapeXml(bankName)}</text>`
+        `<text x="${holderCenterX}" y="${holderTop + 22}" text-anchor="middle" dominant-baseline="middle" font-family="${SYSTEM_FONT_STACK}" font-size="44" font-weight="600" fill="#000000">${escapeXml(merchantName)}</text>`,
+        `<text x="${holderCenterX}" y="${holderTop + 78}" text-anchor="middle" dominant-baseline="middle" font-family="${SYSTEM_FONT_STACK}" font-size="44" font-weight="600" fill="#000000">${escapeXml(bankName)}</text>`
       );
     } else {
       const label = merchantName || bankName || "";
       texts.push(
-        `<text x="${holderCenterX}" y="${holderTop + holderNameArea / 2}" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, -apple-system, sans-serif" font-size="44" font-weight="600" fill="#000000">${escapeXml(label)}</text>`
+        `<text x="${holderCenterX}" y="${holderTop + holderNameArea / 2}" text-anchor="middle" dominant-baseline="middle" font-family="${SYSTEM_FONT_STACK}" font-size="44" font-weight="600" fill="#000000">${escapeXml(label)}</text>`
       );
     }
   }
 
   const nationalY = frameY + frameSize - barHeight / 2;
   texts.push(
-    `<text x="${holderCenterX}" y="${nationalY}" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, -apple-system, sans-serif" font-size="44" font-weight="600" fill="#ffffff">${NATIONAL_QR_LABEL}</text>`
+    `<text x="${holderCenterX}" y="${nationalY}" text-anchor="middle" dominant-baseline="middle" font-family="${SYSTEM_FONT_STACK}" font-size="44" font-weight="600" fill="#ffffff">${NATIONAL_QR_LABEL}</text>`
   );
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalWidth} ${totalHeight}" width="${totalWidth}" height="${totalHeight}">

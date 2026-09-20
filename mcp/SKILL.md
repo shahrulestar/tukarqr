@@ -16,13 +16,28 @@ Visual ground truth: `mcp/assets/examples/comparison-after.png` (same as `public
 
 ## What a correct `layout: duitnow` export looks like
 
-1. Outer canvas — white (or transparent if `outerBg: transparent`); square for `1:1`, taller for `3:4`.
-2. Frame — thick rounded rectangle in TukarQR primary magenta/pink; no logos on the border.
-3. Inner white area — padded region inside the frame.
-4. QR modules — centered near the top; **same primary magenta/pink** as the frame (not black); `classic` or `rounded`; **no center logo**.
-5. Merchant line — centered black sans-serif under the QR (example: `MASJID AN NUR KG PULAU PA`).
-6. Bank line — centered black sans-serif under merchant if `showBankName` (example: `Bank Islam Malaysia Berhad`).
-7. Bottom bar — solid primary-magenta strip; white uppercase text exactly **`MALAYSIA NATIONAL QR`**.
+1. Outer canvas — white `#ffffff` (or transparent if `outerBg: transparent`); **always square 1:1** on MCP.
+2. Frame — thick rounded rectangle filled `#ec4899`; no logos on the border.
+3. Inner white area — padded region inside the frame (`#ffffff`).
+4. QR modules — centered near the top; fill `#ec4899` (same as frame, not black); `classic` or `rounded`; **no center logo**.
+5. Merchant line — centered `#000000` system-ui under the QR (example: `MASJID AN NUR KG PULAU PA`).
+6. Bank line — centered `#000000` system-ui under merchant if `showBankName` (example: `Bank Islam Malaysia Berhad`).
+7. Bottom bar — solid `#ec4899` strip; white `#ffffff` uppercase text exactly **`MALAYSIA NATIONAL QR`**.
+
+Primary pink color code: **`#ec4899`**. Do not substitute other pinks/magentas. Text uses the system UI font stack (`system-ui, -apple-system, …`), not a custom webfont.
+
+## Export settings (same as website)
+
+Ask for these if unspecified (image size is fixed square — do not offer 3:4):
+
+| Setting | Tool field | Values | Default |
+|---------|------------|--------|---------|
+| Export format | `layout` | `duitnow` (National QR frame) / `plain` (QR only) | `duitnow` |
+| QR style | `qrStyle` | `classic` (square) / `rounded` | `classic` |
+| Show bank name | `showBankName` | `true` / `false` | `true` |
+| Background | `outerBg` | `white` / `transparent` | `white` |
+| Image size | _(fixed)_ | square `1:1` only | `1:1` |
+| File format | `format` | `png` / `svg` (single encode) | `png` |
 
 Do not copy phone chrome or buttons from `public/about.png`. Only the QR **card** matching `comparison-after.png`.
 
@@ -39,8 +54,8 @@ Do not copy phone chrome or buttons from `public/about.png`. Only the QR **card*
 
 - Use only these MCP tools with a real EMVCo payload (paste or decode). Never invent a payload.
 - Prefer validate → parse/details → encode.
-- If style is unspecified, **ask** for: layout (`duitnow` frame vs `plain`), ratio `1:1`/`3:4`, module `classic`/`rounded`, background `white`/`transparent`, show bank yes/no.
-- If they skip choosing, use defaults: frame, 1:1, classic, white, show bank.
+- If style is unspecified, **ask** for the same export settings as the website: export format (`layout`), QR style, show bank name, background. Image size is always square — do not ask for 3:4.
+- If they skip choosing, use defaults: `duitnow`, classic, show bank, white, PNG, 1:1.
 - For bulk images: decode first, report failures, ask style **once**, then `get_encode_qr_bulk`.
 - For “what’s in this QR / raw details”: call `get_duitnow_qr_details`. Do not invent tags.
 - Return the tool PNG/SVG/ZIP only.

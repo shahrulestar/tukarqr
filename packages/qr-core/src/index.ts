@@ -24,6 +24,7 @@ export {
   MAX_BATCH_SIZE,
   NATIONAL_QR_LABEL,
   PRIMARY_MAGENTA,
+  SYSTEM_FONT_STACK,
   formatExportFilename,
   resolveExportOptions,
   type QrEncodeFormat,

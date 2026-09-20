@@ -53,6 +53,13 @@ describe("encodeQr", () => {
     const result = await encodeQr({ payload: "HELLO", format: "png" });
     expect(result).toMatchObject({ format: "png", mimeType: "image/png" });
     expect("data" in result && (result.data?.length ?? 0)).toBeGreaterThan(20);
+    expect("optionsUsed" in result && result.optionsUsed).toMatchObject({
+      ratio: "1:1",
+      layout: "duitnow",
+      qrStyle: "classic",
+      outerBg: "white",
+      showBankName: true,
+    });
   });
 });
 

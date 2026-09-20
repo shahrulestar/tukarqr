@@ -5,7 +5,6 @@ import { encodeQr, type EncodeQrInput } from "./encode-qr";
 export async function encodeQrBulk(input: {
   items: Array<{ payload: string; name?: string }>;
   layout?: EncodeQrInput["layout"];
-  ratio?: EncodeQrInput["ratio"];
   qrStyle?: EncodeQrInput["qrStyle"];
   outerBg?: EncodeQrInput["outerBg"];
   showBankName?: EncodeQrInput["showBankName"];
@@ -20,7 +19,6 @@ export async function encodeQrBulk(input: {
       payload: item.payload,
       format: "png",
       layout: input.layout,
-      ratio: input.ratio,
       qrStyle: input.qrStyle,
       outerBg: input.outerBg,
       showBankName: input.showBankName,
