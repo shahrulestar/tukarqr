@@ -34,6 +34,34 @@ Next.js (App Router), React, TypeScript, Tailwind CSS 4, shadcn/ui, Framer Motio
 
 Nothing is uploaded to a server—QR work runs in your tab only.
 
+## MCP
+
+Remote MCP for DuitNow QR **validate**, **parse**, and **encode**. Hosted as a Cloudflare Worker at [https://mcp.tukarqr.my/mcp](https://mcp.tukarqr.my/mcp). The website stays on Pages; this Worker is a separate project (`tukarqr-mcp`).
+
+Text-only: send EMVCo payload strings. Do not send images. Payloads are not stored.
+
+| Tool | Input | Output |
+|------|-------|--------|
+| `get_validate_duitnow_qr` | `payload` | `{ valid, reasonCode?, reason? }` |
+| `get_parse_duitnow_qr` | `payload` | merchant, bank, amount, country |
+| `get_encode_qr` | `payload`, optional `format` (`png` \| `svg`), `size` | PNG base64 or SVG |
+
+Cursor (`~/.cursor/mcp.json` or `.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "tukarqr": {
+      "url": "https://mcp.tukarqr.my/mcp"
+    }
+  }
+}
+```
+
+Claude Desktop: add the endpoint URL under Settings → Connectors → Add custom connector.
+
+Local development and deploy notes: [mcp/README.md](mcp/README.md).
+
 ## License
 
 [MIT](LICENSE)

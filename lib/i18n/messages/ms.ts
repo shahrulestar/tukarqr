@@ -4,6 +4,7 @@ export const ms: Messages = {
   // nav
   "nav.footer.ariaLabel": "Footer",
   "nav.footer.about": "Tentang",
+  "nav.footer.mcp": "MCP Server",
   "nav.language.ariaLabel": "Pilih bahasa",
   "nav.language.ms": "B. Melayu",
   "nav.language.en": "English",
@@ -184,6 +185,29 @@ export const ms: Messages = {
   "about.openSource.sponsor": "Jadi Sponsor",
   "about.hero.beforeAlt": "QR fizikal asal — kabur dan tidak jelas",
   "about.hero.afterAlt": "QR digital selepas ditukar — jelas dan kemas",
+
+  // mcp
+  "mcp.heading": "TukarQR MCP Server",
+  "mcp.intro":
+    "MCP jauh untuk validate, parse, dan encode DuitNow QR. Gunakan dari Cursor, Claude Desktop, atau mana-mana klien MCP.",
+  "mcp.endpoint.label": "Endpoint",
+  "mcp.privacy":
+    "Teks sahaja: hantar rentetan payload EMVCo. Jangan hantar imej. Payload tidak disimpan.",
+  "mcp.tools.heading": "Alatan",
+  "mcp.tools.validate":
+    "Semak payload dan pulangkan valid, serta sebab jika ada.",
+  "mcp.tools.parse":
+    "Ekstrak peniaga, bank, jumlah, dan negara.",
+  "mcp.tools.encode":
+    "Jana payload sebagai PNG (base64) atau SVG. Format dan saiz pilihan.",
+  "mcp.install.heading": "Pemasangan pantas",
+  "mcp.install.body":
+    "Tambah ini ke ~/.cursor/mcp.json (global) atau .cursor/mcp.json (projek), kemudian mulakan semula Cursor.",
+  "mcp.install.claude":
+    "Claude Desktop: tampal URL endpoint di atas di Settings → Connectors → Add custom connector.",
+  "mcp.install.copy": "Salin",
+  "mcp.install.copied": "Disalin",
+  "mcp.docs.github": "Nota teknikal di GitHub",
 
   // accordion
   "accordion.howItWorks.title": "Bagaimana ia berfungsi",

@@ -4,6 +4,7 @@ export const en: Messages = {
   // nav
   "nav.footer.ariaLabel": "Footer",
   "nav.footer.about": "About",
+  "nav.footer.mcp": "MCP Server",
   "nav.language.ariaLabel": "Choose language",
   "nav.language.ms": "B. Melayu",
   "nav.language.en": "English",
@@ -180,6 +181,29 @@ export const en: Messages = {
   "about.openSource.sponsor": "Become Sponsor",
   "about.hero.beforeAlt": "Original physical QR — blurry and hard to scan",
   "about.hero.afterAlt": "Digital QR after conversion — clear and clean",
+
+  // mcp
+  "mcp.heading": "TukarQR MCP Server",
+  "mcp.intro":
+    "Remote MCP for DuitNow QR validate, parse, and encode. Use it from Cursor, Claude Desktop, or any MCP client.",
+  "mcp.endpoint.label": "Endpoint",
+  "mcp.privacy":
+    "Text-only: send EMVCo payload strings. Do not send images. Payloads are not stored.",
+  "mcp.tools.heading": "Tools",
+  "mcp.tools.validate":
+    "Check a payload and return valid, plus an optional reason.",
+  "mcp.tools.parse":
+    "Extract merchant, bank, amount, and country.",
+  "mcp.tools.encode":
+    "Render the payload as PNG (base64) or SVG. Optional format and size.",
+  "mcp.install.heading": "Quick install",
+  "mcp.install.body":
+    "Add this to ~/.cursor/mcp.json (global) or .cursor/mcp.json (project), then restart Cursor.",
+  "mcp.install.claude":
+    "Claude Desktop: paste the endpoint URL above under Settings → Connectors → Add custom connector.",
+  "mcp.install.copy": "Copy",
+  "mcp.install.copied": "Copied",
+  "mcp.docs.github": "Technical notes on GitHub",
 
   // accordion
   "accordion.howItWorks.title": "How it works",

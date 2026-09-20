@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./"),
+      "@tukarqr/qr-core": path.resolve(__dirname, "./packages/qr-core/src/index.ts"),
     },
   },
 });
