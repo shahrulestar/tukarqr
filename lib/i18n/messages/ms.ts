@@ -189,17 +189,33 @@ export const ms: Messages = {
   // mcp
   "mcp.heading": "TukarQR MCP Server",
   "mcp.intro":
-    "MCP jauh untuk validate, parse, dan encode DuitNow QR. Gunakan dari Cursor, Claude Desktop, atau mana-mana klien MCP.",
+    "MCP jauh untuk DuitNow QR — validate, parse, decode imej, dan eksport QR bergaya yang sepadan dengan tukarqr.my. Gunakan dari Cursor, Claude Desktop, atau mana-mana klien MCP.",
   "mcp.endpoint.label": "Endpoint",
   "mcp.privacy":
-    "Teks sahaja: hantar rentetan payload EMVCo. Jangan hantar imej. Payload tidak disimpan.",
+    "Payload dan imej diproses dalam memori sahaja. Tiada disimpan atau dilog. Bulk dan decode imej dihadkan 10 item, sama seperti laman web.",
   "mcp.tools.heading": "Alatan",
   "mcp.tools.validate":
     "Semak payload dan pulangkan valid, serta sebab jika ada.",
   "mcp.tools.parse":
-    "Ekstrak peniaga, bank, jumlah, dan negara.",
+    "Ringkasan pendek: peniaga, bank, jumlah, dan negara.",
+  "mcp.tools.details":
+    "Butiran EMVCo penuh — tag TLV, medan pembayaran, data akaun peniaga bersarang.",
+  "mcp.tools.decodeImage":
+    "Decode PNG atau JPEG (base64) kepada rentetan payload EMVCo.",
+  "mcp.tools.decodeBulk":
+    "Decode sehingga 10 imej dalam satu panggilan. Kejayaan atau kegagalan setiap item.",
   "mcp.tools.encode":
-    "Jana payload sebagai PNG (base64) atau SVG. Format dan saiz pilihan.",
+    "Eksport satu QR bergaya (bingkai Malaysia National QR atau plain) sebagai PNG atau SVG. Pilihan susun atur sama seperti laman web.",
+  "mcp.tools.encodeBulk":
+    "Eksport sehingga 10 payload dengan tetapan gaya yang sama. Pulangkan ZIP PNG.",
+  "mcp.export.heading": "Gaya eksport lalai",
+  "mcp.export.layout":
+    "Bingkai Malaysia National QR (bukan logo DuitNow)",
+  "mcp.export.ratio": "Nisbah 1:1",
+  "mcp.export.style": "Modul classic, latar putih, nama bank dipaparkan",
+  "mcp.export.format": "Output PNG dengan modul magenta utama TukarQR",
+  "mcp.export.note":
+    "Teks bar kebangsaan MALAYSIA NATIONAL QR sahaja. Tiada logo DuitNow, PayNet, atau bank disertakan.",
   "mcp.install.heading": "Pemasangan pantas",
   "mcp.install.body":
     "Tambah ini ke ~/.cursor/mcp.json (global) atau .cursor/mcp.json (projek), kemudian mulakan semula Cursor.",

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     absolute: "MCP Server - Tukar QR",
   },
   description:
-    "Pasang TukarQR MCP untuk validate, parse, dan encode DuitNow QR dari Cursor atau Claude Desktop.",
+    "Pasang TukarQR MCP untuk validate, parse, decode imej, dan eksport QR DuitNow bergaya dari Cursor atau Claude Desktop.",
   alternates: {
     canonical: `${SITE_URL}/mcp`,
   },

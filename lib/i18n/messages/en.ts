@@ -185,17 +185,33 @@ export const en: Messages = {
   // mcp
   "mcp.heading": "TukarQR MCP Server",
   "mcp.intro":
-    "Remote MCP for DuitNow QR validate, parse, and encode. Use it from Cursor, Claude Desktop, or any MCP client.",
+    "Remote MCP for DuitNow QR — validate, parse, decode images, and export styled QR codes that match tukarqr.my. Use from Cursor, Claude Desktop, or any MCP client.",
   "mcp.endpoint.label": "Endpoint",
   "mcp.privacy":
-    "Text-only: send EMVCo payload strings. Do not send images. Payloads are not stored.",
+    "Payloads and images are processed in memory only. Nothing is stored or logged. Bulk and image decode are capped at 10 items, same as the website.",
   "mcp.tools.heading": "Tools",
   "mcp.tools.validate":
     "Check a payload and return valid, plus an optional reason.",
   "mcp.tools.parse":
-    "Extract merchant, bank, amount, and country.",
+    "Short summary: merchant, bank, amount, and country.",
+  "mcp.tools.details":
+    "Full raw EMVCo details — TLV tags, payment fields, nested merchant account data.",
+  "mcp.tools.decodeImage":
+    "Decode a PNG or JPEG (base64) into an EMVCo payload string.",
+  "mcp.tools.decodeBulk":
+    "Decode up to 10 images in one call. Per-item success or failure.",
   "mcp.tools.encode":
-    "Render the payload as PNG (base64) or SVG. Optional format and size.",
+    "Export one styled QR (Malaysia National QR frame or plain) as PNG or SVG. Same layout options as the website.",
+  "mcp.tools.encodeBulk":
+    "Export up to 10 payloads with shared style settings. Returns a ZIP of PNGs.",
+  "mcp.export.heading": "Default export style",
+  "mcp.export.layout":
+    "Malaysia National QR frame (not a DuitNow logo)",
+  "mcp.export.ratio": "1:1 aspect ratio",
+  "mcp.export.style": "Classic modules, white background, bank name shown",
+  "mcp.export.format": "PNG output with TukarQR primary magenta modules",
+  "mcp.export.note":
+    "National bar text is MALAYSIA NATIONAL QR only. No DuitNow, PayNet, or bank logos are embedded.",
   "mcp.install.heading": "Quick install",
   "mcp.install.body":
     "Add this to ~/.cursor/mcp.json (global) or .cursor/mcp.json (project), then restart Cursor.",

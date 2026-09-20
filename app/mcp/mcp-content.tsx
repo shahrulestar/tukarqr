@@ -13,7 +13,18 @@ const MCP_GITHUB_README =
 const MCP_TOOLS = [
   { name: "get_validate_duitnow_qr", descriptionKey: "mcp.tools.validate" },
   { name: "get_parse_duitnow_qr", descriptionKey: "mcp.tools.parse" },
+  { name: "get_duitnow_qr_details", descriptionKey: "mcp.tools.details" },
+  { name: "get_decode_qr_image", descriptionKey: "mcp.tools.decodeImage" },
+  { name: "get_decode_qr_images_bulk", descriptionKey: "mcp.tools.decodeBulk" },
   { name: "get_encode_qr", descriptionKey: "mcp.tools.encode" },
+  { name: "get_encode_qr_bulk", descriptionKey: "mcp.tools.encodeBulk" },
+] as const;
+
+const MCP_EXPORT_DEFAULTS = [
+  "mcp.export.layout",
+  "mcp.export.ratio",
+  "mcp.export.style",
+  "mcp.export.format",
 ] as const;
 
 const INSTALL_JSON = `{
@@ -54,13 +65,14 @@ export function McpContent() {
           >
             {t("mcp.endpoint.label")}
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <input
               id="mcp-endpoint"
               type="text"
               readOnly
               value={MCP_ENDPOINT}
-              className="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 font-mono text-[13px] text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              size={MCP_ENDPOINT.length}
+              className="h-9 w-fit max-w-full rounded-md border border-input bg-background px-3 font-mono text-[13px] text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onFocus={(e) => e.currentTarget.select()}
             />
             <Button
@@ -84,15 +96,41 @@ export function McpContent() {
           <h2 id="mcp-tools-heading" className="text-base font-semibold">
             {t("mcp.tools.heading")}
           </h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {MCP_TOOLS.map((tool) => (
-              <li key={tool.name}>
-                <span className="font-medium text-primary">{tool.name}</span>
-                {" — "}
-                {t(tool.descriptionKey)}
-              </li>
+              <article
+                key={tool.name}
+                className="rounded-xl border border-border bg-muted/30 px-4 py-3.5"
+              >
+                <h3 className="font-mono text-[13px] font-medium leading-snug text-primary">
+                  {tool.name}
+                </h3>
+                <p className="mt-1.5 text-[14px] leading-relaxed text-muted-foreground">
+                  {t(tool.descriptionKey)}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section
+          className="rounded-xl border border-border bg-muted/30 px-4 py-4 sm:px-5"
+          aria-labelledby="mcp-export-heading"
+        >
+          <h2
+            id="mcp-export-heading"
+            className="text-base font-semibold text-foreground"
+          >
+            {t("mcp.export.heading")}
+          </h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-[14px] leading-relaxed text-muted-foreground">
+            {MCP_EXPORT_DEFAULTS.map((key) => (
+              <li key={key}>{t(key)}</li>
             ))}
           </ul>
+          <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
+            {t("mcp.export.note")}
+          </p>
         </section>
 
         <section

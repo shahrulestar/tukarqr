@@ -36,15 +36,19 @@ Nothing is uploaded to a server—QR work runs in your tab only.
 
 ## MCP
 
-Remote MCP for DuitNow QR **validate**, **parse**, and **encode**. Hosted as a Cloudflare Worker at [https://mcp.tukarqr.my/mcp](https://mcp.tukarqr.my/mcp). The website stays on Pages; this Worker is a separate project (`tukarqr-mcp`).
+Remote MCP for DuitNow QR validate, parse, details, decode, and styled export. Hosted as a Cloudflare Worker at [https://mcp.tukarqr.my/mcp](https://mcp.tukarqr.my/mcp). The website stays on Pages; this Worker is a separate project (`tukarqr-mcp`).
 
-Text-only: send EMVCo payload strings. Do not send images. Payloads are not stored.
+PNG/JPEG decode and styled PNG/SVG/ZIP encode run in memory only. Payloads are not stored. Agent skill: [mcp/SKILL.md](mcp/SKILL.md).
 
 | Tool | Input | Output |
 |------|-------|--------|
 | `get_validate_duitnow_qr` | `payload` | `{ valid, reasonCode?, reason? }` |
 | `get_parse_duitnow_qr` | `payload` | merchant, bank, amount, country |
-| `get_encode_qr` | `payload`, optional `format` (`png` \| `svg`), `size` | PNG base64 or SVG |
+| `get_duitnow_qr_details` | `payload` | summary + raw TLV / payment fields |
+| `get_decode_qr_image` | PNG/JPEG base64 | `{ ok, payload? }` |
+| `get_decode_qr_images_bulk` | up to 10 images | per-item decode results |
+| `get_encode_qr` | payload + style options | styled PNG or SVG |
+| `get_encode_qr_bulk` | up to 10 payloads + shared style | ZIP of styled PNGs |
 
 Cursor (`~/.cursor/mcp.json` or `.cursor/mcp.json`):
 
