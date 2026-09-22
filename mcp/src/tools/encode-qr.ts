@@ -6,9 +6,11 @@ import {
   resolveExportOptions,
   type QrEncodeFormat,
   type QrExportLayout,
+  type QrExportRatio,
   type QrModuleStyle,
   type QrOuterBg,
 } from "@tukarqr/qr-core";
+import { validateDuitNowQr } from "./validate-duitnow-qr";
 
 export interface EncodeQrInput {
   payload: string;
@@ -20,6 +22,8 @@ export interface EncodeQrInput {
   qrStyle?: QrModuleStyle;
   /** Canvas background. */
   outerBg?: QrOuterBg;
+  /** Image size. Default 1:1. */
+  ratio?: QrExportRatio;
   /** Show bank name on framed export. */
   showBankName?: boolean;
   merchantName?: string;
@@ -70,11 +74,19 @@ export async function encodeQr(input: EncodeQrInput) {
   const payload = input.payload;
   if (!payload) return { error: "payload is required" };
 
+  const validation = validateDuitNowQr(payload);
+  if (!validation.valid) {
+    return {
+      error: validation.reason ?? "Invalid DuitNow QR",
+      reasonCode: validation.reasonCode,
+      reason: validation.reason,
+    };
+  }
+
   const built = buildExportSvg(payload, {
     format: input.format,
     layout: input.layout,
-    // MCP image size is fixed square (same default as website 1:1).
-    ratio: "1:1",
+    ratio: input.ratio,
     qrStyle: input.qrStyle,
     outerBg: input.outerBg,
     showBankName: input.showBankName,

@@ -43,6 +43,8 @@ const MCP_TOOLS = [
   { name: "get_decode_qr_images_bulk", descriptionKey: "mcp.tools.decodeBulk" },
   { name: "get_encode_qr", descriptionKey: "mcp.tools.encode" },
   { name: "get_encode_qr_bulk", descriptionKey: "mcp.tools.encodeBulk" },
+  { name: "get_convert_qr_image", descriptionKey: "mcp.tools.convert" },
+  { name: "get_convert_qr_images_bulk", descriptionKey: "mcp.tools.convertBulk" },
 ] as const;
 
 const MCP_EXPORT_DEFAULTS = [
@@ -55,6 +57,31 @@ const MCP_EXPORT_DEFAULTS = [
 ] as const;
 
 const MCP_EXAMPLE_PROMPTS = [
+  {
+    id: "blurry",
+    titleKey: "mcp.prompts.fullWorkflow.title",
+    promptKey: "mcp.prompts.fullWorkflow.text",
+  },
+  {
+    id: "old-photo",
+    titleKey: "mcp.prompts.decodeImage.title",
+    promptKey: "mcp.prompts.decodeImage.text",
+  },
+  {
+    id: "snapshot",
+    titleKey: "mcp.prompts.snapshot.title",
+    promptKey: "mcp.prompts.snapshot.text",
+  },
+  {
+    id: "decode-bulk",
+    titleKey: "mcp.prompts.decodeBulk.title",
+    promptKey: "mcp.prompts.decodeBulk.text",
+  },
+  {
+    id: "heic",
+    titleKey: "mcp.prompts.heic.title",
+    promptKey: "mcp.prompts.heic.text",
+  },
   {
     id: "validate-valid",
     titleKey: "mcp.prompts.validateValid.title",
@@ -84,16 +111,6 @@ const MCP_EXAMPLE_PROMPTS = [
     params: SAMPLE_PROMPT_PARAMS,
   },
   {
-    id: "decode-image",
-    titleKey: "mcp.prompts.decodeImage.title",
-    promptKey: "mcp.prompts.decodeImage.text",
-  },
-  {
-    id: "decode-bulk",
-    titleKey: "mcp.prompts.decodeBulk.title",
-    promptKey: "mcp.prompts.decodeBulk.text",
-  },
-  {
     id: "encode-default",
     titleKey: "mcp.prompts.encodeDefault.title",
     promptKey: "mcp.prompts.encodeDefault.text",
@@ -110,16 +127,6 @@ const MCP_EXAMPLE_PROMPTS = [
     titleKey: "mcp.prompts.encodeBulk.title",
     promptKey: "mcp.prompts.encodeBulk.text",
     params: SAMPLE_PROMPT_PARAMS,
-  },
-  {
-    id: "full-workflow",
-    titleKey: "mcp.prompts.fullWorkflow.title",
-    promptKey: "mcp.prompts.fullWorkflow.text",
-  },
-  {
-    id: "heic",
-    titleKey: "mcp.prompts.heic.title",
-    promptKey: "mcp.prompts.heic.text",
   },
 ] as const;
 

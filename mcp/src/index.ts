@@ -1,6 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { createMcpHandler } from "agents/mcp/server";
 import { z } from "zod";
+import { presentEncodeResult, buildToolResult } from "./tool-result";
+import { convertQrImage, convertQrImagesBulk } from "./tools/convert-qr";
 import { decodeQrImage, decodeQrImagesBulk } from "./tools/decode-qr";
 import { getDuitNowQrDetailsTool } from "./tools/details";
 import { encodeQr } from "./tools/encode-qr";
@@ -9,20 +11,13 @@ import { parseDuitNowQrTool } from "./tools/parse-duitnow-qr";
 import { validateDuitNowQr } from "./tools/validate-duitnow-qr";
 
 const STYLE_HINT =
-  "Same export settings as tukarqr.my: export format (layout duitnow frame vs plain QR only), QR style (classic square vs rounded), show bank name yes/no, background white vs transparent. Image size is always square 1:1 (fixed). Output file format png or svg. If the user has not chosen those settings, ask before generating; otherwise defaults match the website — duitnow frame, classic, show bank, white bg, PNG. Do not invent decorative QR images. Do not add a DuitNow logo. Frame + QR modules use #ec4899; bottom bar text exactly MALAYSIA NATIONAL QR.";
+  "Same export settings as tukarqr.my: layout duitnow frame vs plain QR only, qrStyle classic vs rounded, showBankName, outerBg white vs transparent, ratio 1:1 (default) or 3:4. File format png or svg. If the user does not specify a style, use website defaults immediately — duitnow, classic, show bank, white, 1:1, PNG. Do not ask a style questionnaire first. Do not invent decorative QR images. Do not add a DuitNow logo. Frame + QR modules use #ec4899; bottom bar text exactly MALAYSIA NATIONAL QR. Reject payloads that are not valid Malaysia DuitNow QR.";
 
 function jsonResult(data: unknown) {
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: JSON.stringify(data, null, 2),
-      },
-    ],
-  };
+  return buildToolResult(data);
 }
 
-/** Mirrors website ExportSettings (+ file format). Image size fixed square 1:1. */
+/** Mirrors website ExportSettings (+ file format). Default ratio is square 1:1. */
 const exportSettingsFields = {
   format: z
     .enum(["png", "svg"])
@@ -46,6 +41,10 @@ const exportSettingsFields = {
     .enum(["white", "transparent"])
     .optional()
     .describe("Background: white or transparent. Default white."),
+  ratio: z
+    .enum(["1:1", "3:4"])
+    .optional()
+    .describe("Image size: square 1:1 (default) or portrait 3:4."),
   merchantName: z.string().max(80).optional(),
   bankName: z.string().max(45).optional(),
 };
@@ -95,13 +94,13 @@ function createServer() {
   server.registerTool(
     "get_encode_qr",
     {
-      description: `Encode a DuitNow EMVCo payload as a TukarQR-styled PNG (base64) or SVG. ${STYLE_HINT}`,
+      description: `Encode a valid Malaysia DuitNow EMVCo payload as a TukarQR-styled PNG or SVG. PNG is returned as an image. ${STYLE_HINT}`,
       inputSchema: z.object({
         payload: z.string().min(1).max(5000),
         ...exportSettingsFields,
       }),
     },
-    async (args) => jsonResult(await encodeQr(args))
+    async (args) => presentEncodeResult(await encodeQr(args))
   );
 
   server.registerTool(
@@ -121,6 +120,7 @@ function createServer() {
         layout: exportSettingsFields.layout,
         qrStyle: exportSettingsFields.qrStyle,
         outerBg: exportSettingsFields.outerBg,
+        ratio: exportSettingsFields.ratio,
         showBankName: exportSettingsFields.showBankName,
       }),
     },
@@ -161,6 +161,47 @@ function createServer() {
       }),
     },
     async ({ images }) => jsonResult(decodeQrImagesBulk(images))
+  );
+
+  server.registerTool(
+    "get_convert_qr_image",
+    {
+      description: `Decode one PNG/JPEG, validate it as Malaysia DuitNow, and export a styled QR in one call. PNG is returned as an image. HEIC is not supported. ${STYLE_HINT}`,
+      inputSchema: z.object({
+        imageBase64: z.string().min(1),
+        mimeType: z.enum(["image/png", "image/jpeg", "image/jpg"]).optional(),
+        name: z.string().max(80).optional(),
+        ...exportSettingsFields,
+      }),
+    },
+    async (args) => presentEncodeResult(await convertQrImage(args))
+  );
+
+  server.registerTool(
+    "get_convert_qr_images_bulk",
+    {
+      description: `Decode up to 10 PNG/JPEG images, validate each as Malaysia DuitNow, and return a ZIP of styled PNGs. Per-item failures do not abort the batch. HEIC is not supported. ${STYLE_HINT}`,
+      inputSchema: z.object({
+        images: z
+          .array(
+            z.object({
+              imageBase64: z.string().min(1),
+              mimeType: z
+                .enum(["image/png", "image/jpeg", "image/jpg"])
+                .optional(),
+              name: z.string().max(80).optional(),
+            })
+          )
+          .min(1)
+          .max(10),
+        layout: exportSettingsFields.layout,
+        qrStyle: exportSettingsFields.qrStyle,
+        outerBg: exportSettingsFields.outerBg,
+        ratio: exportSettingsFields.ratio,
+        showBankName: exportSettingsFields.showBankName,
+      }),
+    },
+    async (args) => jsonResult(await convertQrImagesBulk(args))
   );
 
   return server;

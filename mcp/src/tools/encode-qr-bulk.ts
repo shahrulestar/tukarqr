@@ -7,6 +7,7 @@ export async function encodeQrBulk(input: {
   layout?: EncodeQrInput["layout"];
   qrStyle?: EncodeQrInput["qrStyle"];
   outerBg?: EncodeQrInput["outerBg"];
+  ratio?: EncodeQrInput["ratio"];
   showBankName?: EncodeQrInput["showBankName"];
   format?: "png";
 }) {
@@ -21,6 +22,7 @@ export async function encodeQrBulk(input: {
       layout: input.layout,
       qrStyle: input.qrStyle,
       outerBg: input.outerBg,
+      ratio: input.ratio,
       showBankName: input.showBankName,
     });
     if ("error" in encoded && encoded.error) {

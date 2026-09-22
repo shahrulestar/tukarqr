@@ -190,7 +190,7 @@ export const ms: Messages = {
   // mcp
   "mcp.heading": "TukarQR MCP Server",
   "mcp.intro":
-    "MCP jauh untuk DuitNow QR — validate, parse, decode imej, dan eksport QR bergaya yang sepadan dengan tukarqr.my. Gunakan dari Cursor, Claude Desktop, atau mana-mana klien MCP.",
+    "MCP jauh untuk DuitNow QR. Lampirkan gambar kabur, lama, atau yang baru dirakam dan dapatkan kad Malaysia National QR baharu dalam format TukarQR. Gunakan dari Cursor, Claude Desktop, atau mana-mana klien MCP.",
   "mcp.image.alt": "TukarQR MCP Server — sambungkan Cursor atau Claude ke alatan DuitNow QR",
   "mcp.endpoint.label": "Endpoint",
   "mcp.privacy":
@@ -199,26 +199,30 @@ export const ms: Messages = {
   "mcp.tools.table.name": "Nama",
   "mcp.tools.table.description": "Penerangan",
   "mcp.tools.validate":
-    "Semak payload dan pulangkan valid, serta sebab jika ada.",
+    "Semak payload yang ditampal ialah DuitNow QR Malaysia yang sah, dan nyatakan sebab jika tidak.",
   "mcp.tools.parse":
-    "Ringkasan pendek: peniaga, bank, jumlah, dan negara.",
+    "Baca peniaga, bank, jumlah, dan negara daripada payload.",
   "mcp.tools.details":
-    "Butiran EMVCo penuh — tag TLV, medan pembayaran, data akaun peniaga bersarang.",
+    "Tunjuk medan mentah penuh dalam QR: tag TLV, data pembayaran, dan akaun peniaga bersarang.",
   "mcp.tools.decodeImage":
-    "Decode PNG atau JPEG (base64) kepada rentetan payload EMVCo.",
+    "Baca payload daripada satu PNG atau JPEG — cetakan kabur, gambar lama, atau rakaman. Tidak melukis kad baharu. HEIC tidak disokong.",
   "mcp.tools.decodeBulk":
-    "Decode sehingga 10 imej dalam satu panggilan. Kejayaan atau kegagalan setiap item.",
+    "Baca sehingga 10 gambar PNG atau JPEG. Gambar yang gagal tidak menghentikan yang lain.",
   "mcp.tools.encode":
-    "Eksport satu QR bergaya dengan tetapan sama seperti laman web (format eksport, gaya QR, nama bank, latar). Segi empat 1:1 PNG atau SVG.",
+    "Lukis kad TukarQR baharu daripada payload yang sah. PNG dipulangkan sebagai imej. Segi empat 1:1 atau potret 3:4. Payload bukan DuitNow ditolak.",
   "mcp.tools.encodeBulk":
-    "Eksport sehingga 10 payload dengan tetapan eksport yang sama. Pulangkan ZIP PNG segi empat.",
+    "Lukis sehingga 10 kad daripada payload yang sudah sah, dengan satu gaya. Pulangkan ZIP PNG.",
+  "mcp.tools.convert":
+    "Tukar satu PNG atau JPEG yang dilampirkan kepada kad TukarQR baharu dalam satu panggilan: baca gambar, sahkan ia DuitNow Malaysia, kemudian eksport. Guna ini untuk QR kabur, lama, atau yang baru dirakam.",
+  "mcp.tools.convertBulk":
+    "Tukar sehingga 10 gambar kepada kad TukarQR baharu dan pulangkan satu ZIP. Gambar yang gagal tidak menghentikan yang lain.",
   "mcp.export.heading": "Tetapan eksport (sama seperti laman web)",
   "mcp.export.layout":
     "Format eksport: bingkai Malaysia National QR atau QR sahaja (bukan logo DuitNow)",
   "mcp.export.style": "Gaya QR: modul classic (petak) atau rounded (bulat)",
   "mcp.export.showBank": "Papar nama bank: ya atau tidak",
   "mcp.export.bg": "Latar belakang: putih atau lutsinar",
-  "mcp.export.ratio": "Saiz imej: segi empat 1:1 tetap",
+  "mcp.export.ratio": "Saiz imej: segi empat 1:1 (lalai) atau potret 3:4",
   "mcp.export.format": "Format fail: PNG (lalai) atau SVG — modul #ec4899",
   "mcp.export.note":
     "Teks bar kebangsaan MALAYSIA NATIONAL QR sahaja. Tiada logo DuitNow, PayNet, atau bank disertakan.",
@@ -231,7 +235,7 @@ export const ms: Messages = {
   "mcp.install.copied": "Disalin",
   "mcp.prompts.heading": "Contoh prompt",
   "mcp.prompts.body":
-    "Salin prompt ke Cursor atau Claude selepas sambung TukarQR MCP. Contoh payload guna QR halaman about (MASJID AN NUR KG PULAU PA / Bank Islam Malaysia Berhad). Lampirkan comparison-before.png dari /about untuk ujian decode.",
+    "Salin prompt ke Cursor atau Claude selepas sambung TukarQR MCP, kemudian lampirkan gambar. Contoh ini untuk cetakan kabur, QR lama, atau gambar yang baru dirakam. Hasilnya kad Malaysia National QR baharu dalam format TukarQR.",
   "mcp.prompts.validateValid.title": "Validate payload",
   "mcp.prompts.validateValid.text":
     "Guna TukarQR MCP, validate payload EMVCo DuitNow ini daripada contoh halaman about tukarqr.my dan beritahu sama ada ia valid:\n{payload}",
@@ -247,12 +251,12 @@ export const ms: Messages = {
   "mcp.prompts.details.title": "Butiran EMVCo mentah",
   "mcp.prompts.details.text":
     "Guna TukarQR MCP, tunjuk butiran EMVCo mentah penuh untuk DuitNow QR halaman about ini (MASJID AN NUR KG PULAU PA) — semua tag TLV, medan pembayaran, dan data akaun peniaga bersarang:\n{payload}",
-  "mcp.prompts.decodeImage.title": "Decode satu imej",
+  "mcp.prompts.decodeImage.title": "QR lama → kad baharu",
   "mcp.prompts.decodeImage.text":
-    "Guna TukarQR MCP, decode DuitNow QR daripada PNG yang saya lampirkan (comparison-before.png dari tukarqr.my/about). Pulangkan rentetan payload EMVCo sahaja. Jangan simpan imej.",
-  "mcp.prompts.decodeBulk.title": "Decode bulk (maks 10)",
+    "Saya lampirkan gambar DuitNow QR lama dari galeri. Ia pudar dan sukar diimbas. Guna TukarQR MCP, jana semula kad bersih dalam format TukarQR dengan butiran pembayaran yang sama. PNG segi empat, lalai laman web. Jangan cipta payload palsu.",
+  "mcp.prompts.decodeBulk.title": "Beberapa gambar → ZIP",
   "mcp.prompts.decodeBulk.text":
-    "Guna TukarQR MCP, decode sehingga 10 imej DuitNow QR yang saya lampirkan (PNG/JPEG sahaja). Laporkan yang berjaya decode dan yang gagal, dengan ralat setiap item.",
+    "Saya lampirkan sehingga 10 gambar DuitNow QR. Ada yang kabur, ada yang lama, dan ada yang baru dirakam. Guna TukarQR MCP, jana semula setiap satu sebagai kad baharu dalam format TukarQR dan beri satu ZIP. Beritahu gambar yang gagal. PNG atau JPEG sahaja.",
   "mcp.prompts.encodeDefault.title": "Eksport — lalai laman web",
   "mcp.prompts.encodeDefault.text":
     "Guna TukarQR MCP, eksport payload DuitNow halaman about ini sebagai QR bergaya mengikut lalai tukarqr.my (bingkai Malaysia National QR, modul classic, latar putih, nama bank dipapar, PNG segi empat 1:1):\n{payload}",
@@ -262,12 +266,15 @@ export const ms: Messages = {
   "mcp.prompts.encodeBulk.title": "Eksport bulk ZIP",
   "mcp.prompts.encodeBulk.text":
     "Guna TukarQR MCP, eksport payload DuitNow ini sebagai satu ZIP PNG bergaya (maks 10, gaya sama: bingkai duitnow, classic, papar bank, latar putih). Laporkan sebarang kegagalan:\n{payload}\n{payload}",
-  "mcp.prompts.fullWorkflow.title": "Gambar → QR bergaya",
+  "mcp.prompts.snapshot.title": "Gambar telefon → kad baharu",
+  "mcp.prompts.snapshot.text":
+    "Saya baru rakam DuitNow QR dengan telefon dan lampirkan gambar itu. Guna TukarQR MCP, tukar ia kepada PNG segi empat baharu dalam format Malaysia National QR TukarQR. Kekalkan peniaga dan bank daripada gambar. Jangan lukis semula QR.",
+  "mcp.prompts.fullWorkflow.title": "Gambar kabur → kad baharu",
   "mcp.prompts.fullWorkflow.text":
-    "Guna TukarQR MCP, decode gambar DuitNow QR kabur yang saya lampirkan (comparison-before.png dari tukarqr.my/about), validate, parse peniaga dan bank, kemudian eksport QR bergaya bersih mengikut comparison-after.png. Tanya gaya eksport jika saya belum nyatakan.",
-  "mcp.prompts.heic.title": "HEIC tidak disokong",
+    "Saya lampirkan gambar DuitNow QR yang kabur. Guna TukarQR MCP, jana semula sebagai kad Malaysia National QR baharu dalam format TukarQR: bingkai merah jambu, modul classic, nama bank dipapar, latar putih, PNG segi empat. Guna data pembayaran daripada gambar. Jangan cipta QR palsu.",
+  "mcp.prompts.heic.title": "Rakaman iPhone (HEIC)",
   "mcp.prompts.heic.text":
-    "Saya ada gambar DuitNow QR HEIC dari iPhone. Guna TukarQR MCP, terangkan HEIC tidak disokong dan minta saya tukar ke JPEG dahulu, kemudian decode dan eksport selepas saya lampirkan imej yang ditukar.",
+    "Saya rakam DuitNow QR dengan iPhone dan failnya HEIC. Guna TukarQR MCP, beritahu HEIC tidak disokong dan minta saya hantar JPEG atau PNG. Selepas saya lampirkan fail itu, jana semula kad TukarQR baharu.",
   "mcp.docs.github": "Nota teknikal di GitHub",
 
   // accordion

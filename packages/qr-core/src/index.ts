@@ -17,6 +17,14 @@ export {
   getDuitNowQrDetails,
   parseNestedTlv,
 } from "./details";
+export {
+  binarize,
+  centerSquareCrop,
+  contrastStretch,
+  decodeQrFromRgba,
+  scaleRaster,
+  type QrRaster,
+} from "./decode-raster";
 export { buildQrModuleSvg } from "./qr-modules";
 export { buildExportSvg } from "./export-frame";
 export {

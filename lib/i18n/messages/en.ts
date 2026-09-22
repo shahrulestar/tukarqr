@@ -186,7 +186,7 @@ export const en: Messages = {
   // mcp
   "mcp.heading": "TukarQR MCP Server",
   "mcp.intro":
-    "Remote MCP for DuitNow QR — validate, parse, decode images, and export styled QR codes that match tukarqr.my. Use from Cursor, Claude Desktop, or any MCP client.",
+    "Remote MCP for DuitNow QR. Attach a blurry, old, or snapped photo and get a new Malaysia National QR card in the TukarQR format. Use from Cursor, Claude Desktop, or any MCP client.",
   "mcp.image.alt": "TukarQR MCP Server — connect Cursor or Claude to DuitNow QR tools",
   "mcp.endpoint.label": "Endpoint",
   "mcp.privacy":
@@ -195,26 +195,30 @@ export const en: Messages = {
   "mcp.tools.table.name": "Tool",
   "mcp.tools.table.description": "Description",
   "mcp.tools.validate":
-    "Check a payload and return valid, plus an optional reason.",
+    "Check a pasted payload is a valid Malaysia DuitNow QR, and say why if it is not.",
   "mcp.tools.parse":
-    "Short summary: merchant, bank, amount, and country.",
+    "Read merchant, bank, amount, and country from a payload.",
   "mcp.tools.details":
-    "Full raw EMVCo details — TLV tags, payment fields, nested merchant account data.",
+    "Show the full raw fields in a QR: TLV tags, payment data, and the nested merchant account.",
   "mcp.tools.decodeImage":
-    "Decode a PNG or JPEG (base64) into an EMVCo payload string.",
+    "Read the payload from one PNG or JPEG — a blurry print, an old photo, or a snapshot. Does not draw a new card. HEIC is not supported.",
   "mcp.tools.decodeBulk":
-    "Decode up to 10 images in one call. Per-item success or failure.",
+    "Read up to 10 PNG or JPEG photos. A photo that fails does not stop the rest.",
   "mcp.tools.encode":
-    "Export one styled QR with the same settings as the website (export format, QR style, bank name, background). Square 1:1 PNG or SVG.",
+    "Draw a new TukarQR card from a valid payload. PNG is returned as an image. Square 1:1 or portrait 3:4. Non-DuitNow payloads are rejected.",
   "mcp.tools.encodeBulk":
-    "Export up to 10 payloads with shared export settings. Returns a ZIP of square PNGs.",
+    "Draw up to 10 cards from payloads that are already valid, with one shared style. Returns a ZIP of PNGs.",
+  "mcp.tools.convert":
+    "Turn one attached PNG or JPEG into a new TukarQR card in one call: read the photo, check it is Malaysia DuitNow, then export. Use this for a blurry, old, or snapped QR.",
+  "mcp.tools.convertBulk":
+    "Turn up to 10 photos into new TukarQR cards and return one ZIP. A failed photo does not stop the rest.",
   "mcp.export.heading": "Export settings (same as website)",
   "mcp.export.layout":
     "Export format: Malaysia National QR frame or QR only (not a DuitNow logo)",
   "mcp.export.style": "QR style: classic (square) or rounded modules",
   "mcp.export.showBank": "Show bank name: on or off",
   "mcp.export.bg": "Background: white or transparent",
-  "mcp.export.ratio": "Image size: fixed square 1:1",
+  "mcp.export.ratio": "Image size: square 1:1 (default) or portrait 3:4",
   "mcp.export.format": "File format: PNG (default) or SVG — modules use #ec4899",
   "mcp.export.note":
     "National bar text is MALAYSIA NATIONAL QR only. No DuitNow, PayNet, or bank logos are embedded.",
@@ -227,7 +231,7 @@ export const en: Messages = {
   "mcp.install.copied": "Copied",
   "mcp.prompts.heading": "Example prompts",
   "mcp.prompts.body":
-    "Copy a prompt into Cursor or Claude after connecting TukarQR MCP. Payload examples use the about page QR (MASJID AN NUR KG PULAU PA / Bank Islam Malaysia Berhad). Attach comparison-before.png from /about for decode tests.",
+    "Copy a prompt into Cursor or Claude after connecting TukarQR MCP, then attach the photo. These cover a blurry print, an old QR, or a picture you just snapped. The result is a new Malaysia National QR card in the TukarQR format.",
   "mcp.prompts.validateValid.title": "Validate a payload",
   "mcp.prompts.validateValid.text":
     "Using TukarQR MCP, validate this DuitNow EMVCo payload from the tukarqr.my about page example and tell me if it is valid:\n{payload}",
@@ -243,12 +247,12 @@ export const en: Messages = {
   "mcp.prompts.details.title": "Raw EMVCo details",
   "mcp.prompts.details.text":
     "Using TukarQR MCP, show the full raw EMVCo details for this about page DuitNow QR (MASJID AN NUR KG PULAU PA) — all TLV tags, payment fields, and nested merchant account data:\n{payload}",
-  "mcp.prompts.decodeImage.title": "Decode one image",
+  "mcp.prompts.decodeImage.title": "Old QR photo → new card",
   "mcp.prompts.decodeImage.text":
-    "Using TukarQR MCP, decode the DuitNow QR from the PNG I attached (comparison-before.png from tukarqr.my/about). Return the EMVCo payload string only. Do not store the image.",
-  "mcp.prompts.decodeBulk.title": "Decode bulk (max 10)",
+    "I attached an old DuitNow QR photo from my gallery. It is faded and hard to scan. Using TukarQR MCP, regenerate a clean card in the TukarQR format with the same payment details. Square PNG, website defaults. Do not invent a payload.",
+  "mcp.prompts.decodeBulk.title": "Several photos → ZIP",
   "mcp.prompts.decodeBulk.text":
-    "Using TukarQR MCP, decode up to 10 DuitNow QR images I attached (PNG/JPEG only). Report which decoded successfully and which failed, with per-item errors.",
+    "I attached up to 10 DuitNow QR photos. Some are blurry, some are old, and some are snapshots. Using TukarQR MCP, regenerate each as a new card in the TukarQR format and give me one ZIP. Tell me which photos failed. PNG or JPEG only.",
   "mcp.prompts.encodeDefault.title": "Export — website defaults",
   "mcp.prompts.encodeDefault.text":
     "Using TukarQR MCP, export this about page DuitNow payload as a styled QR matching tukarqr.my defaults (Malaysia National QR frame, classic modules, white background, bank name shown, square 1:1 PNG):\n{payload}",
@@ -258,12 +262,15 @@ export const en: Messages = {
   "mcp.prompts.encodeBulk.title": "Bulk export ZIP",
   "mcp.prompts.encodeBulk.text":
     "Using TukarQR MCP, export these DuitNow payloads as one ZIP of styled PNGs (max 10, shared style: duitnow frame, classic, show bank name, white background). Report any failures:\n{payload}\n{payload}",
-  "mcp.prompts.fullWorkflow.title": "Photo → styled QR",
+  "mcp.prompts.snapshot.title": "Phone snapshot → new card",
+  "mcp.prompts.snapshot.text":
+    "I just snapped a DuitNow QR with my phone and attached the photo. Using TukarQR MCP, turn it into a new square PNG in the TukarQR Malaysia National QR format. Keep the merchant and bank from the photo. Do not redraw the QR.",
+  "mcp.prompts.fullWorkflow.title": "Blurry photo → new card",
   "mcp.prompts.fullWorkflow.text":
-    "Using TukarQR MCP, decode my attached blurry DuitNow QR photo (comparison-before.png from tukarqr.my/about), validate it, parse merchant and bank, then export a clean styled QR matching comparison-after.png. Ask for export style if I did not specify.",
-  "mcp.prompts.heic.title": "HEIC not supported",
+    "I attached a blurry DuitNow QR photo. Using TukarQR MCP, regenerate it as a new Malaysia National QR card in the TukarQR format: pink frame, classic modules, bank name shown, white background, square PNG. Use the payment data from the photo. Do not invent a QR.",
+  "mcp.prompts.heic.title": "iPhone snapshot (HEIC)",
   "mcp.prompts.heic.text":
-    "I have a HEIC DuitNow QR photo from iPhone. Using TukarQR MCP, explain that HEIC is not supported and tell me to convert it to JPEG first, then decode and export after I attach the converted image.",
+    "I snapped a DuitNow QR on my iPhone and the file is HEIC. Using TukarQR MCP, tell me HEIC is not supported and ask me to send a JPEG or PNG. After I attach that file, regenerate a new TukarQR card.",
   "mcp.docs.github": "Technical notes on GitHub",
 
   // accordion
